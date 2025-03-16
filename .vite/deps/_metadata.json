@@ -1,0 +1,58 @@
+{
+  "hash": "cdcda25e",
+  "configHash": "cec0c8c9",
+  "lockfileHash": "d9029615",
+  "browserHash": "b29a2c01",
+  "optimized": {
+    "prop-types": {
+      "src": "../../node_modules/prop-types/index.js",
+      "file": "prop-types.js",
+      "fileHash": "0cce63ce",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "0c399668",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "3541a884",
+      "needsInterop": true
+    },
+    "react-icons/fi": {
+      "src": "../../node_modules/react-icons/fi/index.mjs",
+      "file": "react-icons_fi.js",
+      "fileHash": "7c61eb76",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "73725f29",
+      "needsInterop": false
+    },
+    "react-scroll": {
+      "src": "../../node_modules/react-scroll/modules/index.js",
+      "file": "react-scroll.js",
+      "fileHash": "ff9e971f",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-PG7MA6DX": {
+      "file": "chunk-PG7MA6DX.js"
+    },
+    "chunk-DBUGNT2R": {
+      "file": "chunk-DBUGNT2R.js"
+    },
+    "chunk-VUPZMC2T": {
+      "file": "chunk-VUPZMC2T.js"
+    },
+    "chunk-EQCVQC35": {
+      "file": "chunk-EQCVQC35.js"
+    }
+  }
+}
