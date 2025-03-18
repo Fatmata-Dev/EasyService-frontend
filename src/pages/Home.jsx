@@ -205,7 +205,7 @@ export default function Home() {
                     name="email"
                     type="email"
                     autoComplete="given-email"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>
@@ -222,13 +222,13 @@ export default function Home() {
                     id="password"
                     name="password"
                     type="password"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>
               <button
                 type="submit"
-                className="w-full bg-orange-500 text-white font-bold py-2 my-4 rounded hover:bg-orange-600"
+                className="w-full bg-orange-500 text-white cursor-pointer font-bold py-2 my-4 rounded hover:bg-orange-600"
               >
                 Se connecter
               </button>
@@ -281,7 +281,7 @@ export default function Home() {
                     name="nom"
                     type="text"
                     autoComplete="given-name"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>
@@ -299,7 +299,7 @@ export default function Home() {
                     name="email"
                     type="email"
                     autoComplete="given-email"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>
@@ -316,7 +316,7 @@ export default function Home() {
                     id="password"
                     name="password"
                     type="password"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>
@@ -356,7 +356,7 @@ export default function Home() {
                     setShowSignup(false);
                     setShowLogin(true);
                   }}
-                  className="text-orange-500 font-bold hover:text-orange-700"
+                  className="text-orange-500 cursor-pointer font-bold hover:text-orange-700"
                 >
                   {" "}
                   Se connecter
@@ -403,7 +403,7 @@ export default function Home() {
                     name="email"
                     type="email"
                     autoComplete="given-email"
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded-md px-3 py-1.5 text-base text-gray-900 border-2 border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>
               </div>

@@ -122,21 +122,25 @@ export default function FooterSection() {
             to="home" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Home</Link>
             <Link  
             to="services" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Services</Link>
             <Link  
             to="testimonials" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Testimonials</Link>
             <Link  
             to="contact" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Contact</Link>
         </div>
       </div>

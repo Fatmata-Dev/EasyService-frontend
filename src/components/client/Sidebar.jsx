@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import ProfileSignature from "../../assets/ProfileSignature.png";
- // Remplace par le bon chemin de ton image
+// Remplace par le bon chemin de ton image
 
 const Sidebar = () => {
   return (
-    <div className="bg-white w-56 fixed h-full p-4 shadow-lg flex flex-col justify-between">
+    <div className="bg-white w-67 fixed h-full p-4 shadow-lg flex flex-col justify-between">
       {/* Logo centré */}
       <Link
         to="home"
@@ -29,7 +29,7 @@ const Sidebar = () => {
 
       {/* Profil utilisateur en bas */}
       <div className="flex items-center space-x-3 p-3 border-t mt-4">
-        <img src={ProfileSignature} alt="User" className="w-10 h-10 rounded-full" />
+        <img src={ProfileSignature} alt="Signature professionnelle" className="w-16 h-16 rounded-full" />
         <div>
           <p className="font-semibold text-sm">Mouhamed Ndiaye</p>
           <p className="text-gray-500 text-xs flex items-center">
