@@ -8,7 +8,7 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 3000, // Utiliser le port défini par Render
     strictPort: true,
-    allowedHosts: ["https://easyservice-29e5.onrender.com"],
+    allowedHosts: ["easyservice-29e5.onrender.com"],
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify('production')
