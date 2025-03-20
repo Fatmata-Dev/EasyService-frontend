@@ -86,7 +86,8 @@ export default function TestimonialSection() {
         className="bg-gray-50 relative overflow-hidden"
       >
         <div className="container mx-auto pb-12">
-          <h4 className="text-center mb-4 mt-0">
+ 
+          <h4 className="text-lg text-center mb-4 mt-0">
             Nous sommes fiers de vous témoigner de la fiabilité de nos service
             et de l'efficacité de nos techniciens
           </h4>
