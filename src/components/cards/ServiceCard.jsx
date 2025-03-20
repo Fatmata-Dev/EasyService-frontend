@@ -22,18 +22,18 @@ const ServiceCard = ({ service }) => {
       {/* Catégorie, sous-catégorie et lieu */}
       <div className="flex flex-col p-3">
         <p className=" text-orange-800">Ajouté le {service.date}</p>
-        <h1 className="text-gray-600 text-xl font-bold mb-2">
+        <h1 className="text-gray-600 text-xl font-bold mb-2 line-clamp-1">
           {service.title}
         </h1>
+        <p className="line-clamp-2">{service.description}</p>
 
-        <p>{service.description}</p>
         <div className="flex justify-between flex-wrap items-center mt-4">
           <span className="text-orange-500 font-bold text-lg">
             {service.price}
           </span>
 
           <Link
-            to="contact"
+            to=""
             smooth={true}
             className="bg-orange-500 text-white px-4 py-2 rounded-lg 
                     hover:bg-orange-600 transition-colors cursor-pointer"

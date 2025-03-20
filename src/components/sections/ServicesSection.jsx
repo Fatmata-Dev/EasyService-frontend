@@ -22,7 +22,8 @@ const ServicesSection = () => {
       image: "13430.jpg",
       date: new Date().toLocaleDateString(),
       title: "Plomberie",
-      description: "Installation et réparation de systèmes sanitaires rapidement",
+      description:
+        "Installation et réparation de systèmes sanitaires rapidement",
       price: "15 000 XOF",
     },
     {
@@ -71,9 +72,13 @@ const ServicesSection = () => {
         Nos Services
       </h2>
 
-      <section className="lg:p-12 bg-white">
-        <div className="mx-auto mx-16 sm:mx-8 md:mx-12 lg:px-4">
-          <h4 className="text-center pb-8 pt-2">Découvrez nos services les plus demandés et connectez vous pour en découvrir d’avantage</h4>
+      <section className="lg:px-8 bg-white">
+        <div className="mx-8">
+          <h4 className="text-center pb-8 pt-4 text-lg">
+            Découvrez nos services les plus demandés et connectez vous pour en
+            découvrir d’avantage
+          </h4>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service} />

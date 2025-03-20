@@ -3,7 +3,7 @@ import logo from "../../assets/logo.png";
 
 export default function FooterSection() {
   return (
-    <footer className="bg-[#2C3E50] w-full text-white">
+    <footer className="bg-[#2C3E50] w-full text-white pb-1">
       <div className="mx-12 py-4 flex flex-col sm:flex-row sm:justify-between">
         <div className="flex flex-col items-center sm:items-start w-full sm:w-1/2">
           <Link
@@ -49,7 +49,8 @@ export default function FooterSection() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <g clip-path="url(#clip0_165_3439)">
+              <g clipPath="url(#clip0_165_3439)">
+              <g clipPath="url(#clip0_165_3439)">
                 <path
                   d="M9.63598 37.8655C8.16617 37.8491 6.71018 37.5795 5.33192 37.0686C4.32546 36.6966 3.41486 36.1043 2.66671 35.3352C1.89544 34.5885 1.30231 33.6777 0.931373 32.6703C0.420888 31.2921 0.151695 29.8362 0.135608 28.3666C0.0227255 25.9234 0 25.1906 0 19C0 12.8094 0.0249608 12.0792 0.13449 9.63412C0.15253 8.16507 0.422054 6.70997 0.931373 5.33192C1.30412 4.32529 1.89641 3.41433 2.66522 2.66522C3.41245 1.89465 4.32347 1.30207 5.3308 0.931373C6.70906 0.420465 8.16505 0.150893 9.63486 0.13449C12.0788 0.0227255 12.8127 0 19 0C25.1873 0 25.9208 0.0249608 28.3659 0.13449C29.8353 0.152403 31.2908 0.421929 32.6692 0.931373C33.6761 1.30256 34.5869 1.89493 35.3344 2.66484C36.1046 3.41264 36.6972 4.32365 37.0686 5.3308C37.5797 6.70904 37.8494 8.16503 37.8659 9.63486C37.9776 12.0799 38.0004 12.812 38.0004 19.0007C38.0004 25.1895 37.9776 25.9216 37.8659 28.3666C37.8481 29.8362 37.5785 31.2919 37.0686 32.6703C36.683 33.6699 36.0923 34.5777 35.3345 35.3352C34.5768 36.0927 33.6689 36.6832 32.6692 37.0686C31.291 37.5797 29.835 37.8493 28.3651 37.8659C25.9223 37.9776 25.188 38.0004 18.9993 38.0004C12.8105 38.0004 12.0784 37.9788 9.63561 37.8659"
                   fill="url(#paint0_radial_165_3439)"
@@ -63,6 +64,7 @@ export default function FooterSection() {
                   fill="white"
                 />
               </g>
+              </g>
               <defs>
                 <radialGradient
                   id="paint0_radial_165_3439"
@@ -72,8 +74,10 @@ export default function FooterSection() {
                   gradientUnits="userSpaceOnUse"
                   gradientTransform="translate(2.45919 37.1677) scale(48.2458)"
                 >
-                  <stop offset="0.09" stop-color="#FA8F21" />
-                  <stop offset="0.78" stop-color="#D82D7E" />
+                  <stop offset="0.09" stopColor="#FA8F21" />
+                  <stop offset="0.78" stopColor="#D82D7E" />
+                  <stop offset="0.09" stopColor="#FA8F21" />
+                  <stop offset="0.78" stopColor="#D82D7E" />
                 </radialGradient>
                 <radialGradient
                   id="paint1_radial_165_3439"
@@ -83,8 +87,10 @@ export default function FooterSection() {
                   gradientUnits="userSpaceOnUse"
                   gradientTransform="translate(26.3213 35.9473) scale(42.4568)"
                 >
-                  <stop offset="0.64" stop-color="#8C3AAA" stop-opacity="0" />
-                  <stop offset="1" stop-color="#8C3AAA" />
+                  <stop offset="0.64" stopColor="#8C3AAA" stopOpacity="0" />
+                  <stop offset="1" stopColor="#8C3AAA" />
+                  <stop offset="0.64" stopColor="#8C3AAA" stopOpacity="0" />
+                  <stop offset="1" stopColor="#8C3AAA" />
                 </radialGradient>
                 <clipPath id="clip0_165_3439">
                   <rect width="38" height="38" fill="white" />
@@ -98,7 +104,8 @@ export default function FooterSection() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <g clip-path="url(#clip0_165_3443)">
+              <g clipPath="url(#clip0_165_3443)">
+              <g clipPath="url(#clip0_165_3443)">
                 <path
                   d="M31.0218 0H8.97818C4.01967 0 0 4.01967 0 8.97818V31.0218C0 35.9803 4.01967 40 8.97818 40H31.0218C35.9803 40 40 35.9803 40 31.0218V8.97818C40 4.01967 35.9803 0 31.0218 0Z"
                   fill="#0B86CA"
@@ -107,6 +114,7 @@ export default function FooterSection() {
                   d="M11.0842 16.6263H15.2408V30.0381H11.0842V16.6263ZM13.2041 9.96191C13.6803 9.96192 14.1458 10.103 14.542 10.3673C14.9381 10.6316 15.2471 11.0073 15.43 11.447C15.6129 11.8867 15.6614 12.3707 15.5695 12.838C15.4776 13.3052 15.2494 13.7348 14.9136 14.0725C14.5778 14.4102 14.1496 14.6409 13.6828 14.7355C13.2161 14.8301 12.7318 14.7843 12.291 14.604C11.8503 14.4236 11.4728 14.1168 11.2063 13.7222C10.9397 13.3275 10.796 12.8628 10.7933 12.3866C10.7914 12.0688 10.8524 11.7538 10.9728 11.4597C11.0931 11.1657 11.2704 10.8982 11.4944 10.6729C11.7185 10.4476 11.9849 10.2688 12.2783 10.1467C12.5717 10.0247 12.8863 9.96191 13.2041 9.96191ZM17.901 16.6263H21.9051V18.4552C22.306 17.7711 22.885 17.2088 23.5804 16.8281C24.2759 16.4474 25.0617 16.2627 25.8539 16.2937C30.0104 16.2937 30.8556 19.0648 30.8556 22.681V30.0381H26.699V23.5539C26.699 22.0021 26.699 19.9931 24.5376 19.9931C22.3762 19.9931 22.0437 21.6834 22.0437 23.4292V30.0658H17.8871L17.901 16.6263Z"
                   fill="white"
                 />
+              </g>
               </g>
               <defs>
                 <clipPath id="clip0_165_3443">
@@ -122,21 +130,25 @@ export default function FooterSection() {
             to="home" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Home</Link>
             <Link  
             to="services" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Services</Link>
             <Link  
             to="testimonials" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Testimonials</Link>
             <Link  
             to="contact" 
             spy={true} 
             smooth={true}
+            className="cursor-pointer hover:text-orange-500 transition-colors"
             >Contact</Link>
         </div>
       </div>

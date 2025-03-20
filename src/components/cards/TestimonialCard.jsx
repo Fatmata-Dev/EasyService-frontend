@@ -1,6 +1,4 @@
-// src/components/cards/TestimonialCard.jsx
-import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const TestimonialCard = ({ testimonial }) => {
   return (
@@ -37,9 +35,11 @@ const TestimonialCard = ({ testimonial }) => {
       <p className="text-gray-600 italic">
         "{testimonial.text}"
       </p>
+
     </div>
   );
 };
+
 
 TestimonialCard.propTypes = {
   testimonial: PropTypes.shape({
