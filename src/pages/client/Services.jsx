@@ -1,71 +1,90 @@
-import { useState, useEffect } from 'react';
-// import axios from 'axios';
+import { useState } from "react";
+import { IoIosAdd } from "react-icons/io";
+import ServiceCard from "../../components/cards/ServiceCard";
+import ServicesModal from "../../components/Modals/ServicesModal";
 
-const Services = () => {
-  const [services, setServices] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+const services = [
+  {
+    id: 1,
+    image: "/maintenance.jpg",
+    date: new Date().toLocaleDateString(),
+    title: "Maintenance Informatique",
+    description: "Service complet de maintenance et dépannage informatique",
+    price: "20 000 XOF",
+  },
+  {
+    id: 2,
+    image: "/13430.jpg",
+    date: new Date().toLocaleDateString(),
+    title: "Plomberie",
+    description: "Installation et réparation de systèmes sanitaires rapidement",
+    price: "15 000 XOF",
+  },
+  {
+    id: 3,
+    image: "/Analyste de données.png",
+    date: new Date().toLocaleDateString(),
+    title: "Analyste de données",
+    description:
+      "Installation, rénovation, et maintenance d'appareils électriques",
+    price: "10 000 XOF",
+  },
+  {
+    id: 4,
+    image: "/Développement-web.png",
+    date: new Date().toLocaleDateString(),
+    title: "Developpement web",
+    description:
+      "Assistance et réparation de véhicules, camions, et autres matériels",
+    price: "5 000 XOF",
+  },
+  // Ajoutez d'autres services...
+];
 
-  // Données fictives
-  const mockServices = [
-    {
-      id: 1,
-      title: "Maintenance Réseau",
-      price: "10.000 FCFA/jour",
-      duration: "2 heures",
-      category: "Informatique"
-    },
-    {
-      id: 2,
-      title: "Réparation Plomberie",
-      price: "15.000 FCFA/jour",
-      duration: "3 heures",
-      category: "Bâtiment"
-    }
-  ];
-
-  useEffect(() => {
-    const loadServices = async () => {
-      try {
-        // À décommenter pour le backend
-        // const res = await axios.get(`/api/services?search=${searchTerm}`);
-        // setServices(res.data);
-        
-        setServices(mockServices);
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error("Erreur de chargement:", error);
-      }
-    };
-    loadServices();
-  }, [searchTerm]);
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Services Disponibles</h1>
-      <input
-        type="text"
-        placeholder="Rechercher un service..."
-        className="border p-2 rounded w-full mb-4"
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {services.map((service) => (
-          <div key={service.id} className="border rounded-lg p-4 hover:shadow-md">
-            <h3 className="font-bold text-lg">{service.title}</h3>
-            <div className="mt-2">
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                {service.category}
-              </span>
+export default function Services() {
+    const [showModal, setShowModal] = useState(false);
+  
+    return (
+      <div className="flex flex-col">
+          <div className="">
+            <div className="flex justify-between items-center mb-5">
+              <h1 className="text-2xl font-bold uppercase w-fit">Demandes</h1>
+              
+              {/* Affichage du modal */}
+              {showModal && (
+                <ServicesModal setShowModal={setShowModal} />
+              )}
+  
+              {/* Bouton pour afficher le modal */}
+              <button
+                className="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg flex items-center text-lg hover:bg-orange-500 hover:text-white"
+                onClick={() => setShowModal(true)}
+              >
+                <IoIosAdd className="text-3xl" />
+                Ajouter un Service
+              </button>
             </div>
-            <div className="mt-4 flex justify-between items-center">
-              <span className="text-blue-600 font-semibold">{service.price}</span>
-              <span className="text-sm text-gray-500">{service.duration}</span>
+  
+            <div>
+              <h3 className="text-lg font-bold text-orange-500 underline my-3">
+                Ajout récent
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-5">
+                {services.map((service) => (
+                  <ServiceCard key={service.id} service={service} />
+                ))}
+              </div>
+              <h3 className="text-lg font-bold text-orange-500 underline my-3">
+                Les plus demandés
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 lg:gap-5">
+                {services.map((service) => (
+                  <ServiceCard key={service.id} service={service} />
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export default Services;
+        </div>
+    );
+  }
+  
