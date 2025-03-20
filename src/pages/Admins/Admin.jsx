@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../../components/client/Sidebar';
+import Sidebar from '../../components/Admin/Sidebar';
 import Header from '../../components/client/Header';
 import { useState, useEffect } from 'react';
 // import axios from 'axios';

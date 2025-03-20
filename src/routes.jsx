@@ -39,6 +39,19 @@ export default function AppRoutes() {
       <Route path="/admin/Dashboard" element={<DashboardAdmin />} />
       <Route path="/admin/Demandes" element={<ServicesAdmin />} />
       <Route path="/Modal" element={<ServicesModal />} />
+
+      {/* Espace Admin */}
+      <Route path="/admin" element={<ClientHome />}>
+        <Route index element={<Dashboard />} /> 
+        <Route path="dashboard" element={<DashboardAdmin />} /> 
+        <Route path="services" element={<ServicesAdmin />} /> 
+        {/* <Route path="demandes" element={<DemandsAdmin />} /> 
+        <Route path="interventions" element={<MessagesAdmin />} />
+        <Route path="messages" element={<MessagesAdmin />} />
+        <Route path="permissions" element={<PermissionsAdmin />} /> 
+        <Route path="avis" element={<Avis />} />
+        <Route path="services/:id" element={<ServiceDetail />} /> */}
+      </Route>
     </Routes>
   );
 }
