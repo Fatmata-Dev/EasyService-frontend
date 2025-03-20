@@ -26,6 +26,7 @@ const ServiceCard = ({ service }) => {
           {service.title}
         </h1>
         <p className="line-clamp-2">{service.description}</p>
+
         <div className="flex justify-between flex-wrap items-center mt-4">
           <span className="text-orange-500 font-bold text-lg">
             {service.price}

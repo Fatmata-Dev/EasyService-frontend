@@ -71,6 +71,7 @@ const ServicesSection = () => {
       <h2 className="bg-[#2C3E50] text-3xl md:text-4xl font-bold text-center p-2 text-gray-100 uppercase">
         Nos Services
       </h2>
+
       <section className="lg:px-8 bg-white">
         <div className="mx-8">
           <h4 className="text-center pb-8 pt-4 text-lg">

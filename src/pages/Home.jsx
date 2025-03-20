@@ -57,6 +57,7 @@ const servicesData = [
   },
 ];
 
+
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
@@ -182,7 +183,6 @@ export default function Home() {
 
       {/* Modals */}
       {showLogin && (
-
         <LoginModal
           onClose={() => setShowLogin(false)}
           onSwitchToSignup={() => {
