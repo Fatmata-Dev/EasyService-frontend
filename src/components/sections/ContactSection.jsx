@@ -34,7 +34,7 @@ export default function ContactSection() {
 
               <div className="mb-4">
                 <label
-                  htmlFor="email"
+                  htmlFor="mail"
                   className="block font-medium text-gray-900"
                 >
                   Email
@@ -43,10 +43,10 @@ export default function ContactSection() {
                   <input
                   
                   placeholder="Votre email"
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="family-name"
+                    id="mail"
+                    name="mail"
+                    type="mail"
+                    autoComplete="given-email"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-400 focus:outline-orange-500 sm:text-sm/6"
                   />
                 </div>

@@ -27,13 +27,13 @@ export default function LoginModal({
       // Stockage du token JWT
       localStorage.setItem("authToken", response.data.token);
 
-      // Redirection conditionnelle pour l'admin
-      if (email === "fadiaba@gmail.com") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/dashboard");
+      // Redirection conditionnelle pour l'admin else {
+        if((response.data.user.role) == "client") {
+          navigate("/client/dashboard");
+        } else if((response.data.user.role) == "admin") {
+          navigate("/admin/dashboard");
+        }
         console.log(response.data)
-      }
 
       onClose(); // Fermer la modale après connexion
 

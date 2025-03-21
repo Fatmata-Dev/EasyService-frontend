@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // import axios from 'axios';
 
-const Messages = () => {
+const MessagesAdmin = () => {
   const [messages, setMessages] = useState([]);
 
   // Données fictives
@@ -76,4 +76,4 @@ const Messages = () => {
   );
 };
 
-export default Messages;
+export default MessagesAdmin;

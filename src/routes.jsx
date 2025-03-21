@@ -13,6 +13,8 @@ import ServicesAdmin from './pages/Admin/ServicesAdmin';
 import DashboardAdmin from './pages/Admin/Dashboard';
 import ClientHome from './pages/client/Client';
 import AdminHome from './pages/Admin/Admin';
+import DemandesAdmin from './pages/Admin/DemandesAdmin';
+import MessagesAdmin from './pages/client/Messages';
 
 export default function AppRoutes() {
   return (
@@ -40,10 +42,11 @@ export default function AppRoutes() {
         <Route index element={<DashboardAdmin />} /> 
         <Route path="dashboard" element={<DashboardAdmin />} /> 
         <Route path="services" element={<ServicesAdmin />} /> 
-        {/* <Route path="demandes" element={<DemandsAdmin />} /> 
-        <Route path="interventions" element={<MessagesAdmin />} />
+        <Route path="service/detail" element={<ServiceDetail />} /> 
+         <Route path="demandes" element={<DemandesAdmin />} /> 
+        {/* <Route path="interventions" element={<InterventionsAdmin />} /> */}
         <Route path="messages" element={<MessagesAdmin />} />
-        <Route path="permissions" element={<PermissionsAdmin />} /> 
+        {/*<Route path="permissions" element={<PermissionsAdmin />} /> 
         <Route path="avis" element={<Avis />} />
         <Route path="services/:id" element={<ServiceDetail />} /> */}
       </Route>
