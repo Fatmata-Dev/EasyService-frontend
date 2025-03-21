@@ -25,10 +25,10 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
     await axios
       .post(
-        `https://easyservice-backend-iv29.onrender.com/api/auth/register`,
+        "https://easyservice-backend-iv29.onrender.com/api/auth/register",
         {
-          prenom,
           nom,
+          prenom,
           email,
           password,
           role,
@@ -47,7 +47,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
           if (res.data.errors.password)
             passwordError.innerHTML = res.data.errors.password;
         } else {
-          window.location("/client/dashboard", { replace: true });
+          onSwitchToLogin(true);
         }
       })
       .catch((err) => {

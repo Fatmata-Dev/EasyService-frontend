@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import ProfileSignature from "../../assets/ProfileSignature.png";
 
-const Sidebar = () => {
+const SidebarAdmin = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   return (
@@ -42,4 +42,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default SidebarAdmin;
