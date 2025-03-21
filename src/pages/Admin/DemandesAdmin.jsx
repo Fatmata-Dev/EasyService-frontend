@@ -1,68 +1,208 @@
-import { useState, useEffect } from 'react';
-// import axios from 'axios';
+import { useState } from "react";
 
-const DemandesAdmin = () => {
-  const [demands, setDemands] = useState([]);
-  
-  // Données fictives
-  const mockDemands = [
+export default function DemandesAdmin() {
+  const demandes = [
     {
       id: 1,
-      service: "Maintenance Informatique",
-      date: "25/02/2025",
-      status: "Terminé",
-      price: "20.000 XOF"
+      service: "Maintenance Réseaux",
+      date: "10-03-2025",
+      client: "Mouhamed Ndiaye",
+      status: "En attente",
     },
     {
       id: 2,
-      service: "Plomberie",
-      date: "28/02/2025",
+      service: "Installation Serveur",
+      date: "15-04-2025",
+      client: "Awa Diop",
       status: "En cours",
-      price: "15.000 XOF"
-    }
+    },
+    {
+      id: 3,
+      service: "Installation Serveur",
+      date: "15-04-2025",
+      client: "Awa Diop",
+      status: "Terminé",
+    },
+    {
+      id: 4,
+      service: "Installation Serveur",
+      date: "15-04-2025",
+      client: "Awa Diop",
+      status: "Annulé",
+    },
+    {
+      id: 5,
+      service: "Installation Serveur",
+      date: "15-04-2025",
+      client: "Awa Diop",
+      status: "En attente",
+    },
+    {
+      id: 6,
+      service: "Installation Serveur",
+      date: "15-04-2025",
+      client: "Awa Diop",
+      status: "Refusé",
+    },
   ];
 
-  useEffect(() => {
-    const loadDemands = async () => {
-      try {
-        // À décommenter pour le backend
-        // const res = await axios.get('/api/demands');
-        // setDemands(res.data);
-        
-        setDemands(mockDemands);
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error("Erreur de chargement:", error);
-      }
-    };
-    loadDemands();
-  }, []);
+  const [activeTab, setActiveTab] = useState("En attente");
+
+  const filteredDemandes = demandes.filter(
+    (demande) => demande.status === activeTab
+  );
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "En attente":
+        return "bg-yellow-500";
+      case "En cours":
+        return "bg-blue-500";
+      case "Terminé":
+        return "bg-green-500";
+      case "Annulé":
+        return "bg-red-500";
+      case "Refusé":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const handleAccept = (id) => {
+    console.log(`Demande ${id} acceptée`);
+    // Ajoutez votre logique ici
+  };
+
+  const handleReject = (id) => {
+    console.log(`Demande ${id} refusée`);
+    // Ajoutez votre logique ici
+  };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Mes Demandes</h1>
-      <div className="space-y-4">
-        {demands.map((demand) => (
-          <div key={demand.id} className="border rounded-lg p-4 hover:bg-gray-50">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-semibold">{demand.service}</h3>
-                <p className="text-sm text-gray-500">{demand.date}</p>
-              </div>
-              <div>
-                <span className={`px-2 py-1 rounded ${
-                  demand.status === 'Terminé' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {demand.status}
-                </span>
-                <p className="mt-2 text-right">{demand.price}</p>
-              </div>
+    <div className="">
+      <h1 className="text-2xl font-bold uppercase w-full text-center pb-3">
+        Demandes
+      </h1>
+
+      {/* Onglets */}
+      <div className="flex justify-center mb-6 w-full">
+        <button
+          className={`py-2 w-full ${
+            activeTab === "En attente"
+              ? "bg-orange-500 text-white"
+              : "border border-gray-400"
+          }`}
+          onClick={() => setActiveTab("En attente")}
+        >
+          En attente
+        </button>
+        <button
+          className={`py-2 w-full ${
+            activeTab === "En cours"
+              ? "bg-orange-500 text-white"
+              : "border border-gray-400"
+          }`}
+          onClick={() => setActiveTab("En cours")}
+        >
+          En cours
+        </button>
+        <button
+          className={`py-2 w-full ${
+            activeTab === "Annulé"
+              ? "bg-orange-500 text-white"
+              : "border border-gray-400"
+          }`}
+          onClick={() => setActiveTab("Annulé")}
+        >
+          Annulés
+        </button>
+        <button
+          className={`py-2 w-full ${
+            activeTab === "Refusé"
+              ? "bg-orange-500 text-white"
+              : "border border-gray-400"
+          }`}
+          onClick={() => setActiveTab("Refusé")}
+        >
+          Refusés
+        </button>
+        <button
+          className={`py-2 w-full ${
+            activeTab === "Terminé"
+              ? "bg-orange-500 text-white"
+              : "border border-gray-400"
+          }`}
+          onClick={() => setActiveTab("Terminé")}
+        >
+          Terminés
+        </button>
+      </div>
+
+      {/* Liste des demandes */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+        {filteredDemandes.map((demande) => (
+          <div
+            key={demande.id}
+            className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50"
+          >
+            <h2 className="text-orange-500 font-bold text-lg mb-2">
+              INFORMATION DE LA DEMANDE
+            </h2>
+            <p>
+              <strong>ID DEMANDE :</strong> {demande.id}
+            </p>
+            <p>
+              <strong>NOM SERVICE :</strong>{" "}
+              <span className="text-orange-600">{demande.service}</span>
+            </p>
+            <p>
+              <strong>DATE DEMANDE :</strong> {demande.date}
+            </p>
+            <p>
+              <strong>CLIENT :</strong>{" "}
+              <span className="text-orange-600">{demande.client}</span>
+            </p>
+            <p>
+              <strong>TECHNICIEN :</strong>
+            </p>
+            <p>
+              <strong>DATE INTERVENTION :</strong>
+            </p>
+            <p>
+              <strong>STATUS :</strong>{" "}
+              <span
+                className={`${getStatusColor(
+                  demande.status
+                )} text-white px-2 py-1 rounded-full text-sm`}
+              >
+                {demande.status}
+              </span>
+            </p>
+
+            {/* Boutons */}
+            <div className="flex justify-between mt-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                onClick={() => handleReject(demande.id)}
+              >
+                Refuser
+              </button>
+              <button
+                className="bg-orange-500 text-white px-4 py-2 rounded-md"
+                onClick={() => handleAccept(demande.id)}
+              >
+                Accepter
+              </button>
             </div>
+
+            {/* Lien détails */}
+            <p className="text-center mt-2 text-blue-500 cursor-pointer">
+              Plus de détails
+            </p>
           </div>
         ))}
       </div>
     </div>
   );
-};
-
-export default DemandesAdmin;
+}

@@ -69,7 +69,7 @@ export default function ServicesAdmin() {
   
     return (
       <div className="flex flex-col">
-          <div className="p-4 lg:p-6 rounded-tl-xl w-full -ms-2 -mt-2">
+          <div className="rounded-tl-xl w-full">
             <div className="flex justify-between items-center mb-5">
               <h1 className="text-2xl font-bold uppercase w-fit">Services</h1>
               
@@ -83,13 +83,17 @@ export default function ServicesAdmin() {
   
               {/* Bouton pour afficher le modal */}
               <button
-            className="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg flex items-center text-lg hover:bg-orange-500 hover:text-white"
-            onClick={() => setShowModal(true)}
-          >
-            <IoIosAdd className="text-3xl" />
-            Ajouter un Service
-          </button>
+
+                className="px-4 py-1 text-orange-500 border-2 border-orange-500 rounded-lg flex justify-center items-center text-md hover:bg-orange-500 hover:text-white"
+                onClick={() => setShowModal(true)}
+              >
+                <IoIosAdd className="text-3xl" />
+                Ajouter un Service
+              </button>
             </div>
+  
+            <div>
+
   
             <div>
           <h3 className="text-lg font-bold text-orange-500 underline my-3">
@@ -100,6 +104,7 @@ export default function ServicesAdmin() {
                   <ServiceCard key={service.id} service={service} />
                 ))}
               </div>
+
               <h3 className="text-lg font-bold text-orange-500 underline my-3">
                 Les plus demandés
               </h3>

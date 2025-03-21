@@ -53,6 +53,17 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
         }
       );
 
+
+      // Redirection conditionnelle pour l'admin else {
+        if((response.data.user.role) == "client") {
+          navigate("/client/dashboard");
+        } else if((response.data.user.role) == "admin") {
+          navigate("/admin/dashboard");
+        }
+        console.log(response.data)
+
+      onClose(); // Fermer la modale après connexion
+
       if (response.status === 201) {
         setShowModal(false);
         onServiceAdded(); // Rafraîchir la liste des services

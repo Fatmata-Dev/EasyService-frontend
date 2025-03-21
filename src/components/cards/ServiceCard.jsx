@@ -33,7 +33,7 @@ const ServiceCard = ({ service }) => {
           </span>
 
           <Link
-            to=""
+            to="/ServiceDetail"
             smooth={true}
             className="bg-orange-500 text-white px-4 py-2 rounded-lg 
                     hover:bg-orange-600 transition-colors cursor-pointer"

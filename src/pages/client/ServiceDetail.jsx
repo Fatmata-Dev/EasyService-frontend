@@ -1,91 +1,75 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-// import axios from 'axios';
+import React from "react";
 
 const ServiceDetail = () => {
-  const { id } = useParams();
-  const [service, setService] = useState(null);
-  const [requestData, setRequestData] = useState({
-    date: '',
-    details: ''
-  });
-
-  // Données fictives
-  const mockService = {
-    id: 1,
-    title: "Maintenance Réseau Informatique",
-    price: "10.000 FCFA/jour",
-    duration: "2 heures",
-    requirements: ["2 ans d'expérience", "Certification réseau"]
-  };
-
-  useEffect(() => {
-    const loadService = async () => {
-      try {
-        // À décommenter pour le backend
-        // const res = await axios.get(`/api/services/${id}`);
-        // setService(res.data);
-        
-        setService(mockService);
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error("Erreur de chargement:", error);
-      }
-    };
-    loadService();
-  }, [id]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // À décommenter pour le backend
-      // await axios.post('/api/requests', { serviceId: id, ...requestData });
-      alert('Demande envoyée avec succès!');
-    } catch (error) {
-      alert("Erreur lors de l'envoi de la demande");
-    }
-  };
-
-  if (!service) return <div>Chargement...</div>;
-
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">{service.title}</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Détails du Service</h2>
-          <div className="space-y-2">
-            <p><span className="font-semibold">Tarif:</span> {service.price}</p>
-            <p><span className="font-semibold">Durée:</span> {service.duration}</p>
-          </div>
-        </div>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-4 text-center">DETAIL DU SERVICE</h1>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Faire une Demande</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block mb-2">Date souhaitée</label>
-              <input
-                type="date"
-                className="border p-2 rounded w-full"
-                onChange={(e) => setRequestData({...requestData, date: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Détails supplémentaires</label>
-              <textarea
-                className="border p-2 rounded w-full h-32"
-                onChange={(e) => setRequestData({...requestData, details: e.target.value})}
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Soumettre la Demande
-            </button>
-          </form>
-        </div>
+      <div className="flex gap-3">
+        <img src="/plomberie.jpg" alt="" className="w-1/2" />
+        <div className="flex flex-col w-1/2">
+
+      <h2 className="text-xl font-semibold mb-2 text-orange-500">MAINTENANCE RÉSEAU</h2>
+      <p className="text-gray-700 mb-4">INFORMATIQUE</p>
+
+      <p className="mb-4">
+        Le technicien sera chargé de faire les installations pour le réseau. Une
+        fois les installations faites, il y aura un suivi et évaluation par le
+        technicien afin de valider la fiabilité de son travail.
+      </p>
+
+      <div className="mb-4">
+        <p>
+          <strong>TARIF :</strong> 10.000 FCFA / Jours
+        </p>
+        <p>
+          <strong>DUREE :</strong> 2 Heures
+        </p>
+        <p>
+          <strong>DATE INTERVENTION :</strong> Vendredi 14 Mars 2025
+        </p>
+      </div>
+
+      <p className="text-sm text-gray-500 mb-6">
+        Ajouté le 11/03/2025 par Admin FADIABA
+      </p></div>
+      </div>
+
+      <hr className="mb-6" />
+
+      <h3 className="text-xl font-semibold mb-4">PROFIL</h3>
+      <p className="mb-4">
+        Ce travail est fait pour les profils et ceux qui remplissent ces
+        pré-requis :
+      </p>
+
+      <div className="mb-4">
+        <p>
+          <strong>Profil :</strong>
+        </p>
+        <ul className="list-disc list-inside">
+          <li>Métier informatique</li>
+          <li>Métier administrateur réseaux</li>
+        </ul>
+      </div>
+
+      <div className="mb-6">
+        <p>
+          <strong>Pré-requis :</strong>
+        </p>
+        <ul className="list-disc list-inside">
+          <li>Avoir au moins 2 ans d'expériences</li>
+          <li>Savoir travailler en groupe</li>
+        </ul>
+      </div>
+
+      <div className="flex space-x-4">
+        <button className="bg-red-500 text-white px-4 py-2 rounded-md">
+          Supprimer
+        </button>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
+          Modifier
+        </button>
       </div>
     </div>
   );
