@@ -10,7 +10,7 @@ const services = [
     date: new Date().toLocaleDateString(),
     title: "Maintenance Informatique",
     description: "Service complet de maintenance et dépannage informatique",
-    price: "20 000 XOF",
+    tarif: "20 000 XOF",
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const services = [
     date: new Date().toLocaleDateString(),
     title: "Plomberie",
     description: "Installation et réparation de systèmes sanitaires rapidement",
-    price: "15 000 XOF",
+    tarif: "15 000 XOF",
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const services = [
     title: "Analyste de données",
     description:
       "Installation, rénovation, et maintenance d'appareils électriques",
-    price: "10 000 XOF",
+    tarif: "10 000 XOF",
   },
   {
     id: 4,
@@ -36,7 +36,7 @@ const services = [
     title: "Developpement web",
     description:
       "Assistance et réparation de véhicules, camions, et autres matériels",
-    price: "5 000 XOF",
+    tarif: "5 000 XOF",
   },
   // Ajoutez d'autres services...
 ];
