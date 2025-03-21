@@ -58,7 +58,7 @@ export default function Demands() {
       {/* Liste des demandes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
         {demandes.map((demande) => (
-          <div key={demande.id} className="border border-orange-300 bg-white p-4 rounded-lg shadow-md w-full">
+          <div key={demande.id} className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50">
             <h2 className="text-orange-500 font-bold text-lg mb-2">INFORMATION DE LA DEMANDE</h2>
             <p><strong>ID DEMANDE :</strong> {demande.id}</p>
             <p><strong>NOM SERVICE :</strong> <span className="text-orange-600">{demande.service}</span></p>

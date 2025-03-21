@@ -35,11 +35,8 @@ export default function DashboardAdmin() {
   ];
 
   return (
-    <div className="flex flex-col bg-[#F8F9FA]">
-      <div className="w-full h-[80px]"></div>
-      <div className="flex w-full">
-        <div className=" w-[250px]"></div>
-        <div className="p-4 lg:p-6 border-2 border-orange-500 rounded-tl-xl w-full -ms-2 -mt-2">
+    <div className="flex flex-col">
+        <div className="p-4 lg:p-6 -ms-2 -mt-2">
           <h1 className="text-2xl font-bold mb-4">
             Tableau de Bord Administrateur
           </h1>
@@ -107,6 +104,5 @@ export default function DashboardAdmin() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
