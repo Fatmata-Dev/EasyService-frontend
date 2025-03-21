@@ -1,12 +1,18 @@
 import { useState } from "react";
 import ProfileSignature from "../../assets/ProfileSignature.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import React from "react";
 import { FiMenu } from "react-icons/fi";
 
 const Header = ({ user }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Supprime le token d'authentification
+    navigate("/"); // Redirige vers la racine
+  };
 
   // Icône personnalisée fournie
   const CustomIcon = () => (
@@ -16,6 +22,7 @@ const Header = ({ user }) => {
       viewBox="0 0 24 24"
       fill="none"
       className="cursor-pointer hover:text-orange-500"
+      onClick={handleLogout}
     >
       <g id="log-out">
         <path
@@ -104,7 +111,7 @@ const Header = ({ user }) => {
             className="w-10 h-10 rounded-full object-cover"
           />
 
-          {/* Icône personnalisée */}
+          {/* Icône personnalisée pour la déconnexion */}
           <CustomIcon />
         </div>
       </div>
