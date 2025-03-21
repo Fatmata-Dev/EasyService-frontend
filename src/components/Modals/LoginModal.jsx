@@ -26,6 +26,12 @@ export default function LoginModal({
 
       // Stockage du token JWT
       localStorage.setItem("authToken", response.data.token);
+      if (response.data.user.prenom && response.data.user.nom) {
+        localStorage.setItem("authPrenom", response.data.user.prenom);
+        localStorage.setItem("authNom", response.data.user.nom);
+      } else {
+        setError("Données utilisateur manquantes");
+      }
 
       // Redirection conditionnelle pour l'admin else {
         if((response.data.user.role) == "client") {
