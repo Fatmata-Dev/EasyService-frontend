@@ -1,12 +1,16 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, replace } from 'react-router-dom';
 import Sidebar from '../../components/client/Sidebar';
 import Header from '../../components/client/Header';
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 // import axios from 'axios';
 
 const ClientHome = () => {
   const [user, setUser] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const token = localStorage.getItem('authToken');
+  
+  const navigate = useNavigate();
 
   // Mock user data
   useEffect(() => {
@@ -35,6 +39,7 @@ const ClientHome = () => {
   }, []);
 
   if (!user) return <div className="text-center p-8">Chargement...</div>;
+  if(!token) return navigate("/", { replace: true });
 
   return (
     <div className="min-h-screen bg-gray-50">
