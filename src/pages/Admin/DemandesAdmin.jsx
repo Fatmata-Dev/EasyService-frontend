@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // import axios from 'axios';
 
-const Demands = () => {
+const DemandesAdmin = () => {
   const [demands, setDemands] = useState([]);
   
   // Données fictives
@@ -65,4 +65,4 @@ const Demands = () => {
   );
 };
 
-export default Demands;
+export default DemandesAdmin;

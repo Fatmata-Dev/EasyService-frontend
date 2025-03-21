@@ -6,12 +6,12 @@ const SidebarAdmin = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   return (
-<div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between  hidden md:flex">      {/* Navigation avec liens centrés */}
+<div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between  hidden md:flex">
       <nav className="space-y-2 flex-1 mt-16 text-md">
         {["dashboard", "services", "demandes", "interventions", "messages", "permissions", "avis"].map((tab) => (
           <NavLink
             key={tab}
-            to={`/client/${tab}`}
+            to={`/admin/${tab}`}
             className={({ isActive }) =>
               `block p-1 w-full text-center font-semibold text-gray-800 cursor-pointer px-4 py-2 transition-colors ${
                 isActive ? "bg-orange-500 text-white" : "hover:bg-orange-500 hover:text-white"

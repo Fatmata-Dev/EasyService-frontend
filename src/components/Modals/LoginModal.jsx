@@ -32,6 +32,7 @@ export default function LoginModal({
         navigate("/admin/dashboard");
       } else {
         navigate("/dashboard");
+        console.log(response.data)
       }
 
       onClose(); // Fermer la modale après connexion

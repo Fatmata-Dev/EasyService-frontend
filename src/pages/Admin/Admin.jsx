@@ -4,18 +4,18 @@ import Header from '../../components/client/Header';
 import { useState, useEffect } from 'react';
 // import axios from 'axios';
 
-const ClientHome = () => {
-  const [user, setUser] = useState(null);
+const AdminHome = () => {
+  const [admin, setAdmin] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Mock user data
+  // Mock admin data
   useEffect(() => {
-    setUser({
+    setAdmin({
       name: "Mouhamed Ndiaye",
       email: "mouhamed@gmail.com"
     });
     // À remplacer par :
-    // axios.get('/api/users/me').then(res => setUser(res.data));
+    // axios.get('/api/admins/me').then(res => setadmin(res.data));
   }, []);
 
   useEffect(() => {
@@ -34,16 +34,16 @@ const ClientHome = () => {
     };
   }, []);
 
-  if (!user) return <div className="text-center p-8">Chargement...</div>;
+  if (!admin) return <div className="text-center p-8">Chargement...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header user={admin} />
       <div className="md:ml-[220px] bg-transparent relative">
         <SidebarAdmin />
         <div className={`${isScrolled ? 'h-full' : 'h-screen'} -mt-[65px] pt-[65px]`}>
           <main className="p-4 md:rounded-tl-xl md:border-t border-l bg-white h-full">
-            <Outlet context={{ user }} />
+            <Outlet context={{ admin }} />
           </main>
         </div>
       </div>
@@ -51,4 +51,4 @@ const ClientHome = () => {
   );
 };
 
-export default ClientHome;
+export default AdminHome;

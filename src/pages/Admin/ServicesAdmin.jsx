@@ -45,13 +45,10 @@ export default function ServicesAdmin() {
     const [showModal, setShowModal] = useState(false);
   
     return (
-      <div className="flex flex-col bg-[#F8F9FA]">
-        <div className="w-full h-[80px]"></div>
-        <div className="flex w-full">
-          <div className="w-[250px]"></div>
-          <div className="p-4 lg:p-6 border-2 border-orange-500 rounded-tl-xl w-full -ms-2 -mt-2">
+      <div className="flex flex-col">
+          <div className="p-4 lg:p-6 rounded-tl-xl w-full -ms-2 -mt-2">
             <div className="flex justify-between items-center mb-5">
-              <h1 className="text-2xl font-bold uppercase w-fit">Demandes</h1>
+              <h1 className="text-2xl font-bold uppercase w-fit">Services</h1>
               
               {/* Affichage du modal */}
               {showModal && (
@@ -88,7 +85,6 @@ export default function ServicesAdmin() {
             </div>
           </div>
         </div>
-      </div>
     );
   }
   

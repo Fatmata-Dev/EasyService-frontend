@@ -47,23 +47,9 @@ export default function Services() {
     return (
       <div className="flex flex-col">
           <div className="">
-            <div className="flex justify-between items-center mb-5">
-              <h1 className="text-2xl font-bold uppercase w-fit">Demandes</h1>
+              <h1 className="text-2xl text-center py-2 font-bold uppercase w-full">Services</h1>
               
-              {/* Affichage du modal */}
-              {showModal && (
-                <ServicesModal setShowModal={setShowModal} />
-              )}
-  
-              {/* Bouton pour afficher le modal */}
-              <button
-                className="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg flex items-center text-lg hover:bg-orange-500 hover:text-white"
-                onClick={() => setShowModal(true)}
-              >
-                <IoIosAdd className="text-3xl" />
-                Ajouter un Service
-              </button>
-            </div>
+              
   
             <div>
               <h3 className="text-lg font-bold text-orange-500 underline my-3">

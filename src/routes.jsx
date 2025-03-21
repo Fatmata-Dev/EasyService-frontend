@@ -9,10 +9,10 @@ import Services from './pages/client/Services';
 import Avis from './pages/client/Avis';
 import Contact from './pages/client/Contact';
 import ServiceDetail from './pages/client/ServiceDetail';
-import ServicesAdmin from './pages/Admin/Services';
+import ServicesAdmin from './pages/Admin/ServicesAdmin';
 import DashboardAdmin from './pages/Admin/Dashboard';
-import ServicesModal from './components/Modals/ServicesModal';
 import ClientHome from './pages/client/Client';
+import AdminHome from './pages/Admin/Admin';
 
 export default function AppRoutes() {
   return (
@@ -36,13 +36,8 @@ export default function AppRoutes() {
       <Route path="*" element={<NotFound />} />
 
       {/* Espace Admin */}
-      <Route path="/admin/Dashboard" element={<DashboardAdmin />} />
-      <Route path="/admin/Demandes" element={<ServicesAdmin />} />
-      <Route path="/Modal" element={<ServicesModal />} />
-
-      {/* Espace Admin */}
-      <Route path="/admin" element={<ClientHome />}>
-        <Route index element={<Dashboard />} /> 
+      <Route path="/admin" element={<AdminHome />}>
+        <Route index element={<DashboardAdmin />} /> 
         <Route path="dashboard" element={<DashboardAdmin />} /> 
         <Route path="services" element={<ServicesAdmin />} /> 
         {/* <Route path="demandes" element={<DemandsAdmin />} /> 
