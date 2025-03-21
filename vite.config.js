@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()], // Ajoutez des options si nécessaire, par exemple : react({ fastRefresh: false })
@@ -7,7 +7,8 @@ export default defineConfig({
     allowedHosts: [
       "easyservice-29e5.onrender.com",
       "www.easyservice-29e5.onrender.com",
-      "localhost", // Autoriser localhost pour le développement local
+      "localhost",
+      "0.0.0.0",
     ],
   },
 });
