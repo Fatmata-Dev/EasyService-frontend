@@ -1,16 +1,13 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react()], // Ajoutez des options si nécessaire, par exemple : react({ fastRefresh: false })
   server: {
-    host: "0.0.0.0",
-    port: 3000, // Utiliser le port défini par Render
-    strictPort: true,
-    allowedHosts: ["easyservice-29e5.onrender.com"],
+    host: "0.0.0.0", // Écoute sur toutes les interfaces réseau
+    port: 3000, // Port utilisé pour le développement
+    strictPort: true, // Force l'utilisation du port 3000
   },
-  define: {
-    'process.env.NODE_ENV': JSON.stringify('production')
-  }
-})
+  // Utilisez un fichier .env pour les variables d'environnement
+  // Vite expose automatiquement les variables préfixées par VITE_ via import.meta.env
+});

@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../../components/Admin/Sidebar';
+import SidebarAdmin from '../../components/Admin/SidebarAdmin';
 import Header from '../../components/client/Header';
 import { useState, useEffect } from 'react';
 // import axios from 'axios';
@@ -40,7 +40,7 @@ const ClientHome = () => {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} />
       <div className="md:ml-[220px] bg-transparent relative">
-        <Sidebar />
+        <SidebarAdmin />
         <div className={`${isScrolled ? 'h-full' : 'h-screen'} -mt-[65px] pt-[65px]`}>
           <main className="p-4 md:rounded-tl-xl md:border-t border-l bg-white h-full">
             <Outlet context={{ user }} />
