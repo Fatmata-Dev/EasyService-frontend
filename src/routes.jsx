@@ -15,6 +15,7 @@ import ClientHome from './pages/client/Client';
 import AdminHome from './pages/Admin/Admin';
 import DemandesAdmin from './pages/Admin/DemandesAdmin';
 import MessagesAdmin from './pages/client/Messages';
+import PermissionsAdmin from './pages/Admin/Permsissions';
 
 export default function AppRoutes() {
   return (
@@ -46,8 +47,8 @@ export default function AppRoutes() {
          <Route path="demandes" element={<DemandesAdmin />} /> 
         {/* <Route path="interventions" element={<InterventionsAdmin />} /> */}
         <Route path="messages" element={<MessagesAdmin />} />
-        {/*<Route path="permissions" element={<PermissionsAdmin />} /> 
-        <Route path="avis" element={<Avis />} />
+        <Route path="permissions" element={<PermissionsAdmin />} /> 
+        {/*<Route path="avis" element={<Avis />} />
         <Route path="services/:id" element={<ServiceDetail />} /> */}
       </Route>
     </Routes>

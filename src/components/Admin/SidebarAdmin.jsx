@@ -4,11 +4,13 @@ import ProfileSignature from "../../assets/ProfileSignature.png";
 
 const SidebarAdmin = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const prenom = localStorage.getItem("authPrenom");
+  const nom = localStorage.getItem("authNom");
 
   return (
-<div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between  hidden md:flex">
+    <div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between hidden md:flex">
       <nav className="space-y-2 flex-1 mt-16 text-md">
-        {["dashboard", "services", "demandes", "interventions", "messages", "permissions", "avis"].map((tab) => (
+        {["dashboard", "services", "demandes", "messages", "permissions", "avis"].map((tab) => (
           <NavLink
             key={tab}
             to={`/admin/${tab}`}
@@ -32,7 +34,7 @@ const SidebarAdmin = () => {
           className="w-12 h-12 rounded-full"
         />
         <div>
-          <p className="font-semibold text-sm">Mouhamed Ndiaye</p>
+          <p className="font-semibold text-sm">{prenom && nom ? `${prenom} ${nom}` : "Utilisateur non connecté"}</p>
           <p className="text-gray-500 text-xs flex items-center">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span> en ligne
           </p>
