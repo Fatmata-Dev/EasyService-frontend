@@ -8,7 +8,7 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
     description: "",
     tarif: "",
     duree: "",
-    unitDuree: "jours",
+    uniteDuree: "jours",
     categorie: "67d0c96c7d44b02789ce0734",
     image: null
   });
@@ -41,7 +41,7 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
       data.append("description", formData.description);
       data.append("tarif", formData.tarif);
       data.append("duree", formData.duree);
-      data.append("unitDuree", "jours");
+      data.append("uniteDuree", "jours");
       data.append("categorie", "67d0c96c7d44b02789ce0734");
       data.append("image", formData.image);
 
@@ -161,10 +161,10 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
               </label>
               <input
                 placeholder="Ex: 2 heures"
-                id="unitDuree"
-                name="unitDuree"
+                id="uniteDuree"
+                name="uniteDuree"
                 type="text"
-                value={formData.unitDuree}
+                value={formData.uniteDuree}
                 onChange={handleInputChange}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
