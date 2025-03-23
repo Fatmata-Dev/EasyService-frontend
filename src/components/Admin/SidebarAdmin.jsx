@@ -10,7 +10,7 @@ const SidebarAdmin = () => {
   return (
     <div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between hidden md:flex">
       <nav className="space-y-2 flex-1 mt-16 text-md">
-        {["dashboard", "services", "demandes", "messages", "permissions", "avis"].map((tab) => (
+        {["dashboard", "services", "demandes", "messages", "permissions", "avisAdmin"].map((tab) => (
           <NavLink
             key={tab}
             to={`/admin/${tab}`}

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 // import axios from 'axios';
 
-const Avis = () => {
+const AvisAdmin = () => {
   const { user } = useOutletContext();
   const [reviews, setReviews] = useState([]);
 
@@ -76,4 +76,4 @@ const Avis = () => {
   );
 };
 
-export default Avis;
+export default AvisAdmin;
