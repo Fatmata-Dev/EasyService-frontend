@@ -39,11 +39,11 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
       const data = new FormData();
       data.append("nom", formData.nom);
       data.append("description", formData.description);
-      data.append("tarif", 20000);
-      data.append("duree", 4);
+      data.append("tarif", formData.tarif);
+      data.append("duree", formData.duree);
       data.append("uniteDuree", "jours");
       data.append("categorie", "67d0c96c7d44b02789ce0734");
-      data.append("image", formData.image);
+      data.append("image", "");
 
       const response = await axios.post(
         "https://easyservice-backend-iv29.onrender.com/api/services/ajouter/service",
