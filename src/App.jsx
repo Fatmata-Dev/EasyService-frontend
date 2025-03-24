@@ -1,10 +1,12 @@
 // src/App.jsx
 import { Link } from 'react-router-dom';
 import AppRoutes from './routes';
+import { Toaster } from "react-hot-toast";
 
 export default function App() {
   return (
     <div>
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Barre de navigation */}
       {/* <nav className="bg-blue-500 p-4">
         <ul className="flex space-x-4">

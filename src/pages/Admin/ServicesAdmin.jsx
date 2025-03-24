@@ -54,6 +54,8 @@ export default function ServicesAdmin() {
               {showModal && (
                 <ServicesModal setShowModal={setShowModal} />
               )}
+
+              
   
               {/* Bouton pour afficher le modal */}
               <button
