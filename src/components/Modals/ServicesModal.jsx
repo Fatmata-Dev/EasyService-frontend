@@ -148,7 +148,7 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
                 placeholder="Ex: 2 heures"
                 id="duree"
                 name="duree"
-                type="text"
+                type="number"
                 value={formData.duree}
                 onChange={handleInputChange}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
@@ -163,7 +163,7 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
                 placeholder="Ex: 2 heures"
                 id="uniteDuree"
                 name="uniteDuree"
-                type="text"
+                type="number"
                 value={formData.uniteDuree}
                 onChange={handleInputChange}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
@@ -194,6 +194,7 @@ export default function ServicesModal({ setShowModal, onServiceAdded }) {
               <div>
                 <textarea
                   placeholder="Mettez la description"
+                  type="text"
                   id="description"
                   name="description"
                   value={formData.description}
