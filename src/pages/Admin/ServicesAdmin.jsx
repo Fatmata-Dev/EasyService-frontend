@@ -14,7 +14,7 @@ export default function ServicesAdmin() {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get("https://easyservice-backend-iv29.onrender.com/api/services/afficher/service", {
+      const response = await axios.get("http://localhost:4000/api/services/afficher/service", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
@@ -43,7 +43,7 @@ export default function ServicesAdmin() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Gestion des Services</h1>
         <button

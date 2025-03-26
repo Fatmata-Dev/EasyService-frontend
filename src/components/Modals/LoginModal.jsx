@@ -19,7 +19,7 @@ export default function LoginModal({
     setError("");
 
     try {
-      const response = await axios.post("https://easyservice-backend-iv29.onrender.com/api/auth/login", {
+      const response = await axios.post("http://localhost:4000/api/auth/login", {
         email,
         password
       });

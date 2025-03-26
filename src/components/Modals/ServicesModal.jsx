@@ -2,26 +2,60 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-export default function ServicesModal({ setShowModal, selectedService }) {
+export default function ServicesModal({
+  setShowModal,
+  selectedService,
+  isEditing,
+}) {
   const userData = JSON.parse(localStorage.getItem("user"));
   const user = userData?.id;
   const [categories, setCategories] = useState([]);
-  const fullImageUrl = selectedService?.image ? `${selectedService.image}` : null;
+  const fullImageUrl = selectedService?.image
+    ? `${selectedService.image}`
+    : null;
   const [imagePreview, setImagePreview] = useState(fullImageUrl);
+  const [serviceId, setServiceId] = useState(selectedService?._id || null);
+
   const [formData, setFormData] = useState({
     nom: selectedService?.nom || "",
     description: selectedService?.description || "",
     tarif: selectedService?.tarif || "",
     duree: selectedService?.duree || "",
     uniteDuree: selectedService?.uniteDuree || "",
-    categorie: selectedService?.categories || "",
-    image: fullImageUrl,
+    categorie: selectedService?.categorie?._id || "", // Prendre l'ID de l'objet catégorie
+    image: selectedService?.image || null,
     admin: user,
   });
+
+  useEffect(() => {
+    if (selectedService) {
+      setFormData({
+        nom: selectedService.nom || "",
+        description: selectedService.description || "",
+        tarif: selectedService.tarif || "",
+        duree: selectedService.duree || "",
+        uniteDuree: selectedService.uniteDuree || "",
+        categorie:
+          selectedService.categorie?._id || selectedService.categorie || "",
+        image: selectedService.image || null,
+        admin: user,
+      });
+      setServiceId(selectedService._id);
+    }
+  }, [selectedService, user]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCategoryInput, setShowCategoryInput] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,19 +75,13 @@ export default function ServicesModal({ setShowModal, selectedService }) {
     setIsLoading(true);
     setError("");
 
-    // Vérification de l'ID admin
-  if (!user || typeof user !== 'string' || user === 'undefined') {
-    setError("Identifiant administrateur invalide");
-    toast.error("Identifiant administrateur invalide");
-    return;
-  }
-
     try {
       let categoryId = formData.categorie;
 
+      // Vérification si une nouvelle catégorie doit être créée
       if (showCategoryInput && newCategory) {
         const categoryResponse = await axios.post(
-          "https://easyservice-backend-iv29.onrender.com/api/categories/ajouter/categorie",
+          "http://localhost:4000/api/categories/ajouter/categorie",
           { nom: newCategory },
           {
             headers: {
@@ -64,46 +92,56 @@ export default function ServicesModal({ setShowModal, selectedService }) {
         categoryId = categoryResponse.data._id;
       }
 
-      // Création de FormData avec la bonne casse
+      // Création d'un objet FormData
       const formDataToSend = new FormData();
       formDataToSend.append("nom", formData.nom);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("tarif", formData.tarif);
       formDataToSend.append("duree", formData.duree);
       formDataToSend.append("uniteDuree", formData.uniteDuree);
-      formDataToSend.append("categorie", categoryId); // Utiliser la variable categoryId
+      formDataToSend.append("categorie", categoryId);
       formDataToSend.append("admin", user);
 
-      // Ajout conditionnel de l'image
       if (formData.image instanceof File) {
         formDataToSend.append("image", formData.image);
       }
 
-      const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/services/ajouter/service",
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            "Content-Type": "multipart/form-data", // En-tête importante
-          },
-        }
-      );
+      let response;
+      if (isEditing && serviceId) {
+        // 🔄 Mode Édition : Requête PUT
+        response = await axios.put(
+          `http://localhost:4000/api/services/${serviceId}`,
+          formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("Service mis à jour avec succès !");
+      } else {
+        // ➕ Mode Ajout : Requête POST
+        response = await axios.post(
+          "http://localhost:4000/api/services/ajouter/service",
+          formDataToSend,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        toast.success("Service ajouté avec succès !");
+      }
 
-      console.log("Réponse serveur:", response.data);
-      toast.success(response.data.message);
-
-      if (response.status === 201) {
+      if (response.status === 200 || response.status === 201) {
         setShowModal(false);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Erreur lors de l'enregistrement"
-      );
-      console.log(err);
-      toast.error(
-        err.response?.data?.message || "Erreur lors de l'enregistrement"
-      );
+      console.error("Erreur:", err.response?.data);
+      setError(err.response?.data?.message || "Une erreur s'est produite.");
+      toast.error("Une erreur s'est produite.");
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +151,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
     const getAllCategories = async () => {
       try {
         const response = await axios.get(
-          "https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
+          "http://localhost:4000/api/categories/all/categories",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -139,7 +177,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
-          Ajouter un service
+          {isEditing ? "Modifier le service" : "Ajouter un service"}
         </h3>
 
         {error && (
@@ -173,6 +211,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                 onChange={handleInputChange}
                 className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
+                <option value="">Sélectionnez une catégorie</option>
                 {categories.map((item) => (
                   <option key={item._id} value={item._id}>
                     {item.nom}

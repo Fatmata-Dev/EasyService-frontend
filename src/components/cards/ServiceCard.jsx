@@ -23,17 +23,17 @@ const ServiceCard = ({ service }) => {
       </div>
 
       <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-bold text-gray-800">{service.nom}</h3>
-          <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">
-          {service.createDate ? new Date(service.createDate).toLocaleDateString('fr-FR') : "date inconnue"}
+        <div className="flex justify-between items-start mb-2 sm:h-[50px]">
+          <h3 className="text-lg font-bold text-gray-800 line-clamp-2">{service.nom}</h3>
+          <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded w-fit">
+          Ajouté le {service.createDate ? new Date(service.createDate).toLocaleDateString('fr-FR') : "date inconnue"}
           </span>
         </div>
 
-        <p className="text-gray-600 mb-4 line-clamp-2 h-">{service.description || "Service professionnel de qualité"}</p>
+        <p className="text-gray-600 mb-4 line-clamp-2 sm:h-[50px]">{service.description || "Service professionnel de qualité"}</p>
 
         <div className="flex justify-between items-center">
-          <span className="text-xl font-bold text-gray-900">{service.tarif}</span>
+          <span className="text-xl font-bold text-gray-900">{service.tarif} F CFA</span>
           <a
             href={`services/${service._id}`}
             className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded transition-colors"
