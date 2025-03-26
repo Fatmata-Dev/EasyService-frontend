@@ -2,6 +2,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import ClientHome from './pages/client/Client';
 import Dashboard from './pages/client/Dashboard';
 import Demands from './pages/client/Demands';
 import Messages from './pages/client/Messages';
@@ -49,7 +50,7 @@ export default function AppRoutes() {
         {/* <Route path="interventions" element={<InterventionsAdmin />} /> */}
         <Route path="messages" element={<MessagesAdmin />} />
         <Route path="permissions" element={<PermissionsAdmin />} /> 
-        <Route path="avisAdmin" element={<AvisAdmin />} />
+        <Route path="avis" element={<AvisAdmin />} />
         {/*<Route path="services/:id" element={<ServiceDetail />} /> */}
       </Route>
     </Routes>
