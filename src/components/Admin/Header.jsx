@@ -4,9 +4,19 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import React from "react";
 import { FiMenu } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Header = ({ admin }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken"); // Supprime le token d'authentification
+    localStorage.removeItem("user"); // Supprime le token d'authentification
+    navigate("/"); // Redirige vers la racine
+    toast.success("Déconnexion réussis")
+  };
 
   // Icône personnalisée fournie
   const CustomIcon = () => (
@@ -16,6 +26,7 @@ const Header = ({ admin }) => {
       viewBox="0 0 24 24"
       fill="none"
       className="cursor-pointer hover:text-orange-500"
+      onClick={handleLogout}
     >
       <g id="log-out">
         <path
