@@ -4,8 +4,9 @@ import ProfileSignature from "../../assets/ProfileSignature.png";
 
 const SidebarAdmin = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
-  const prenom = localStorage.getItem("authPrenom");
-  const nom = localStorage.getItem("authNom");
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const prenom = userData.prenom;
+  const nom = userData.nom;
 
   return (
     <div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between hidden md:flex">

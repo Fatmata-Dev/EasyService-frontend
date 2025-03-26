@@ -1,21 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-export default function ServicesModal({ setShowModal }) {
-  const [imagePreview, setImagePreview] = useState("");
+export default function ServicesModal({ setShowModal, selectedService }) {
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const user = userData?.id;
+  const [categories, setCategories] = useState([]);
+  const fullImageUrl = selectedService?.image ? `${selectedService.image}` : null;
+  const [imagePreview, setImagePreview] = useState(fullImageUrl);
   const [formData, setFormData] = useState({
-    nom: "",
-    description: "",
-    tarif: "",
-    duree: "",
-    uniteDuree: "",
-    categorie: "67d0c96c7d44b02789ce0734",
-    image: "",
+    nom: selectedService?.nom || "",
+    description: selectedService?.description || "",
+    tarif: selectedService?.tarif || "",
+    duree: selectedService?.duree || "",
+    uniteDuree: selectedService?.uniteDuree || "",
+    categorie: selectedService?.categories || "",
+    image: fullImageUrl,
+    admin: user,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCategoryInput, setShowCategoryInput] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,28 +41,56 @@ export default function ServicesModal({ setShowModal }) {
     setIsLoading(true);
     setError("");
 
+    // Vérification de l'ID admin
+  if (!user || typeof user !== 'string' || user === 'undefined') {
+    setError("Identifiant administrateur invalide");
+    toast.error("Identifiant administrateur invalide");
+    return;
+  }
+
     try {
-      const data = {
-        nom: formData.nom,
-        description: formData.description,
-        tarif: formData.tarif,
-        duree: formData.duree,
-        uniteDuree: formData.uniteDuree,
-        categorie: formData.categorie,
-        image: formData.image ? formData.image : "", // Assurez-vous que le champ image est correctement défini
-      };
+      let categoryId = formData.categorie;
+
+      if (showCategoryInput && newCategory) {
+        const categoryResponse = await axios.post(
+          "https://easyservice-backend-iv29.onrender.com/api/categories/ajouter/categorie",
+          { nom: newCategory },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        categoryId = categoryResponse.data._id;
+      }
+
+      // Création de FormData avec la bonne casse
+      const formDataToSend = new FormData();
+      formDataToSend.append("nom", formData.nom);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("tarif", formData.tarif);
+      formDataToSend.append("duree", formData.duree);
+      formDataToSend.append("uniteDuree", formData.uniteDuree);
+      formDataToSend.append("categorie", categoryId); // Utiliser la variable categoryId
+      formDataToSend.append("admin", user);
+
+      // Ajout conditionnel de l'image
+      if (formData.image instanceof File) {
+        formDataToSend.append("image", formData.image);
+      }
 
       const response = await axios.post(
         "https://easyservice-backend-iv29.onrender.com/api/services/ajouter/service",
-        data,
+        formDataToSend,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "multipart/form-data", // En-tête importante
           },
         }
       );
+
       console.log("Réponse serveur:", response.data);
-      console.log(response.data.message);
       toast.success(response.data.message);
 
       if (response.status === 201) {
@@ -67,11 +101,33 @@ export default function ServicesModal({ setShowModal }) {
         err.response?.data?.message || "Erreur lors de l'enregistrement"
       );
       console.log(err);
-      toast.error(err.response?.data?.message || "Erreur lors de l'enregistrement")
+      toast.error(
+        err.response?.data?.message || "Erreur lors de l'enregistrement"
+      );
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const getAllCategories = async () => {
+      try {
+        const response = await axios.get(
+          "https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        setCategories(response.data);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des catégories", err);
+      }
+    };
+
+    getAllCategories();
+  }, []);
 
   return (
     <div
@@ -82,8 +138,7 @@ export default function ServicesModal({ setShowModal }) {
         className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center"
-        >
+        <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
           Ajouter un service
         </h3>
 
@@ -112,32 +167,26 @@ export default function ServicesModal({ setShowModal }) {
 
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">Categorie</label>
-
-              {/* <input
-                placeholder="Categorie de service"
-                id="type"
-                name="type"
-                type="text"
-                value={formData.type}
-                onChange={handleInputChange}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              /> */}
               <select
-                name=""
-                id=""
+                name="categorie"
+                value={formData.categorie}
+                onChange={handleInputChange}
                 className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
-                <option value="">Plomberie</option>
-                <option value="">Maintenance</option>
+                {categories.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.nom}
+                  </option>
+                ))}
               </select>
               {showCategoryInput ? (
                 <input
                   placeholder="Nouvelle categorie"
-                  id="type"
-                  name="type"
+                  id="newCategory"
+                  name="newCategory"
                   type="text"
-                  value={formData.type}
-                  onChange={handleInputChange}
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
                   className="mt-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               ) : (

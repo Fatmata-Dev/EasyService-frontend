@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import SidebarAdmin from '../../components/Admin/SidebarAdmin';
-import Header from '../../components/client/Header';
+import Header from '../../components/Admin/Header';
 import { useState, useEffect } from 'react';
 // import axios from 'axios';
 
