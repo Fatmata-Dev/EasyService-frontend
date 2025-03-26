@@ -6,8 +6,7 @@ import Dashboard from './pages/client/Dashboard';
 import Demands from './pages/client/Demands';
 import Messages from './pages/client/Messages';
 import Services from './pages/client/Services';
-import Avis from './pages/client/Avis';
-import ClientHome from './pages/client/Client';
+import AvisClient from './pages/client/AvisClient';
 import Contact from './pages/client/Contact';
 import ServiceDetail from './pages/client/ServiceDetail';
 import AdminHome from './pages/Admin/Admin';
@@ -17,6 +16,7 @@ import ServiceDetailAdmin from './pages/Admin/ServiceDetailAdmin';
 import DemandesAdmin from './pages/Admin/DemandesAdmin';
 import MessagesAdmin from './pages/client/Messages';
 import PermissionsAdmin from './pages/Admin/Permsissions';
+import AvisAdmin from './pages/Admin/AvisAdmin';
 
 export default function AppRoutes() {
   return (
@@ -31,7 +31,7 @@ export default function AppRoutes() {
         <Route path="demandes" element={<Demands />} /> 
         <Route path="messages" element={<Messages />} />
         <Route path="services" element={<Services />} /> 
-        <Route path="avis" element={<Avis />} />
+        <Route path="avisClient" element={<AvisClient />} />
         <Route path="services/:id" element={<ServiceDetail />} /> 
         <Route path="contact" element={<Contact />} /> 
       </Route>
@@ -49,8 +49,8 @@ export default function AppRoutes() {
         {/* <Route path="interventions" element={<InterventionsAdmin />} /> */}
         <Route path="messages" element={<MessagesAdmin />} />
         <Route path="permissions" element={<PermissionsAdmin />} /> 
-        {/*<Route path="avis" element={<Avis />} />
-        <Route path="services/:id" element={<ServiceDetail />} /> */}
+        <Route path="avisAdmin" element={<AvisAdmin />} />
+        {/*<Route path="services/:id" element={<ServiceDetail />} /> */}
       </Route>
     </Routes>
   );
