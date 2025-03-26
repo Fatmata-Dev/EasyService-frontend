@@ -18,7 +18,7 @@ const ServiceDetailAdmin = () => {
     const getService = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/services/${id}`,
+          `https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -66,11 +66,14 @@ const ServiceDetailAdmin = () => {
   const handleDelete = async () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")) {
       try {
-        await axios.delete(`http://localhost:4000/api/services/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
+        await axios.delete(
+          `      https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         toast.success("Service supprimé avec succès");
         navigate("/admin/services");
       } catch (err) {

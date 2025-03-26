@@ -81,7 +81,7 @@ export default function ServicesModal({
       // Vérification si une nouvelle catégorie doit être créée
       if (showCategoryInput && newCategory) {
         const categoryResponse = await axios.post(
-          "http://localhost:4000/api/categories/ajouter/categorie",
+          "https://easyservice-backend-iv29.onrender.com/api/categories/ajouter/categorie",
           { nom: newCategory },
           {
             headers: {
@@ -110,7 +110,7 @@ export default function ServicesModal({
       if (isEditing && serviceId) {
         // 🔄 Mode Édition : Requête PUT
         response = await axios.put(
-          `http://localhost:4000/api/services/${serviceId}`,
+          `      https://easyservice-backend-iv29.onrender.com/api/services/${serviceId}`,
           formDataToSend,
           {
             headers: {
@@ -123,7 +123,7 @@ export default function ServicesModal({
       } else {
         // ➕ Mode Ajout : Requête POST
         response = await axios.post(
-          "http://localhost:4000/api/services/ajouter/service",
+          "      https://easyservice-backend-iv29.onrender.com/api/services/ajouter/service",
           formDataToSend,
           {
             headers: {
@@ -151,7 +151,7 @@ export default function ServicesModal({
     const getAllCategories = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/categories/all/categories",
+          "      https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
