@@ -6,7 +6,7 @@ export default function ContactSection() {
   const [formData, setFormData] = useState({
     nom: '',
     mail: '',
-    phone: '',
+    subject: '',
     message: ''
   });
 
@@ -32,7 +32,7 @@ export default function ContactSection() {
       );
 
       toast.success('Message envoyé avec succès !');
-      setFormData({ nom: '', mail: '', phone: '', message: '' });
+      setFormData({ nom: '', mail: '', subject: '', message: '' });
     } catch (error) {
       console.error('Erreur:', error);
       toast.error("Erreur lors de l'envoi du message");
@@ -92,7 +92,7 @@ export default function ContactSection() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="phone" className="block font-medium text-gray-900">
+                <label htmlFor="subjct" className="block font-medium text-gray-900">
                   subject
                 </label>
                 <div className="mt-2">
@@ -101,7 +101,7 @@ export default function ContactSection() {
                     id="subject"
                     name="subject"
                     type="text"
-                    // value={formData.phone}
+                    // value={formData.subject}
                     onChange={handleChange}
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border-2 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-400 focus:outline-orange-500 sm:text-sm/6"
                   />
@@ -206,7 +206,7 @@ export default function ContactSection() {
 
 //               <div className="mb-4">
 //                 <label
-//                   htmlFor="phone"
+//                   htmlFor="subject"
 //                   className="block font-medium text-gray-900"
 //                 >
 //                   Téléphone
