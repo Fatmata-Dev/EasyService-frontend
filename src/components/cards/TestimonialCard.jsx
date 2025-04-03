@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 const TestimonialCard = ({ testimonial }) => {
   return (
-    <div className="bg-white p-6 my-2 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
       <div className="flex items-start mb-4">
         {/* Avatar et nom */}
         <div className="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center mr-4">
@@ -32,7 +32,7 @@ const TestimonialCard = ({ testimonial }) => {
         </div>
       </div>
       
-      <p className="text-gray-600 italic line-clamp-3 xl:line-clamp-2">
+      <p className="text-gray-600 italic">
         "{testimonial.text}"
       </p>
 

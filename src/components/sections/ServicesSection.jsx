@@ -12,37 +12,37 @@ const ServicesSection = () => {
     {
       id: 1,
       image: "maintenance.jpg",
-      createDate: "15/03/2025",
-      nom: "Maintenance Informatique",
+      date: new Date().toLocaleDateString(),
+      title: "Maintenance Informatique",
       description: "Service complet de maintenance et dépannage informatique",
-      tarif: "20 000",
+      price: "20 000 XOF",
     },
     {
       id: 2,
       image: "13430.jpg",
-      createDate: "12/03/2025",
-      nom: "Plomberie",
+      date: new Date().toLocaleDateString(),
+      title: "Plomberie",
       description:
         "Installation et réparation de systèmes sanitaires rapidement",
-      tarif: "15 000",
+      price: "15 000 XOF",
     },
     {
       id: 3,
       image: "Analyste de données.png",
-      createDate: "22/03/2025",
-      nom: "Analyste de données",
+      date: new Date().toLocaleDateString(),
+      title: "Analyste de données",
       description:
         "Installation, rénovation, et maintenance d'appareils électriques",
-      tarif: "10 000",
+      price: "10 000 XOF",
     },
     {
       id: 4,
       image: "Développement-web.png",
-      createDate: "20/03/2025",
-      nom: "Developpement web",
+      date: new Date().toLocaleDateString(),
+      title: "Developpement web",
       description:
         "Assistance et réparation de véhicules, camions, et autres matériels",
-      tarif: "5 000",
+      price: "5 000 XOF",
     },
     // Ajoutez d'autres services...
   ];

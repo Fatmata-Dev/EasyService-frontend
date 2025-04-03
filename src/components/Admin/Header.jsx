@@ -1,21 +1,21 @@
 import { useState } from "react";
 import ProfileSignature from "../../assets/ProfileSignature.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import React from "react";
 import { FiMenu } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const Header = ({ user }) => {
+const Header = ({ admin }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    
     localStorage.removeItem("authToken"); // Supprime le token d'authentification
     localStorage.removeItem("user"); // Supprime le token d'authentification
     navigate("/"); // Redirige vers la racine
-    toast.success("Déconnexion réussis");
+    toast.success("Déconnexion réussis")
   };
 
   // Icône personnalisée fournie
@@ -115,7 +115,7 @@ const Header = ({ user }) => {
             className="w-10 h-10 rounded-full object-cover"
           />
 
-          {/* Icône personnalisée pour la déconnexion */}
+          {/* Icône personnalisée */}
           <CustomIcon />
         </div>
       </div>
