@@ -1,19 +1,57 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import ServicesModal from '../../components/Modals/ServicesModal';
-import { 
-  useGetServiceByIdQuery,
-  useDeleteServiceMutation 
-} from '../../services/servicesApi';
+import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import ServicesModal from "../../components/Modals/ServicesModal";
 
-const ServiceDetailAdmin = () => {
-  const { id } = useParams();
-  const { data: service, isLoading, error } = useGetServiceByIdQuery(id);
-  const [deleteService] = useDeleteServiceMutation();
-  const [showModal, setShowModal] = useState(false);
+const ServiceDetail = () => {
+  const { id } = useParams(); // Récupère l'ID du Service depuis l'URL
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
+  useEffect(() => {
+    const getService = async () => {
+      try {
+        const response = await axios.get(
+          `https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // console.log("Structure complète des données:", {
+        //   data: response.data,
+        //   admin: response.data.admin,
+        //   isObject: typeof response.data.admin === "object",
+        //   keys: response.data.admin ? Object.keys(response.data.admin) : null,
+        // });
+        //console.log("Données du service:", response.data);
+        setService(response.data);
+      } catch (err) {
+        // console.error("Erreur complète:", err.response?.data);
+        setError(err.response?.data?.message || "Erreur serveur");
+      } finally {
+        setLoading(false);
+      }
+    };
+    getService();
+  }, [id]);
+
+  if (loading)
+    return <div className="text-center py-8">Chargement en cours...</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">{error}</div>;
+  if (!service)
+    return <div className="text-center py-8">Service non trouvé</div>;
+
+  // Formatage de la date
   const formatDate = (dateString) => {
     if (!dateString) return "Date non spécifiée";
     const options = {
@@ -28,23 +66,28 @@ const ServiceDetailAdmin = () => {
   const handleDelete = async () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")) {
       try {
-        await deleteService(id).unwrap();
+        await axios.delete(
+          `      https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         toast.success("Service supprimé avec succès");
-        navigate("/client/services");
+        navigate("/admin/services");
       } catch (err) {
-        toast.error(err.data?.message || "Erreur lors de la suppression");
+        toast.error(
+          err.response?.data?.message || "Erreur lors de la suppression"
+        );
       }
     }
   };
 
-  if (isLoading) return <div className="text-center py-8">Chargement en cours...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Erreur de chargement</div>;
-  if (!service) return <div className="text-center py-8">Service non trouvé</div>;
-
   return (
     <div className="container mx-auto px-4">
       <a
-        href="/client/services"
+        href="/admin/services"
         className="text-gray-700 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
       >
         Retour
@@ -56,7 +99,7 @@ const ServiceDetailAdmin = () => {
           <img
             src={service.image || "Image indisponible"}
             alt={service.nom || "Image indisponible"}
-            className="max-w-full sm:max-w-lg rounded-lg shadow-md"
+            className="max-w-full sm:max-w-lg rounded-lg shadow-md h-[300px]"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "Image indisponible";
@@ -99,7 +142,7 @@ const ServiceDetailAdmin = () => {
                 {service.createDate
                   ? new Date(service.createDate).toLocaleDateString("fr-FR")
                   : "date inconnue"}{" "}
-                par l'admin{" "}
+                par l&apos;admin{" "}
                 <strong className="text-orange-500 uppercase">
                   {service.admin?.prenom} {service.admin?.nom}
                 </strong>
@@ -111,7 +154,10 @@ const ServiceDetailAdmin = () => {
         {showModal && (
           <ServicesModal
             setShowModal={setShowModal}
-            selectedService={service}
+            selectedService={{
+              ...service,
+              categorie: service.categorie?._id || service.categorie, // S'assurer de passer l'ID
+            }}
             isEditing={true}
           />
         )}
@@ -135,4 +181,4 @@ const ServiceDetailAdmin = () => {
   );
 };
 
-export default ServiceDetailAdmin;
+export default ServiceDetail;
