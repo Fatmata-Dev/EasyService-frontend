@@ -99,7 +99,7 @@ const ServiceDetailAdmin = () => {
           <img
             src={service.image || "Image indisponible"}
             alt={service.nom || "Image indisponible"}
-            className="max-w-full sm:max-w-lg rounded-lg shadow-md"
+            className="max-w-full sm:max-w-lg rounded-lg shadow-md h-[300px]"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "Image indisponible";

@@ -94,7 +94,7 @@ export default function TestimonialSection() {
           </h4>
 
           {/* Carrousel avec 3 témoignages visibles */}
-          <div className="relative group mx-4 md:mx-16">
+          <div className="relative group mx-4 mb-4 md:mx-16">
             <button
               onClick={handlePrev}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-3 rounded-full shadow-lg hover:bg-orange-500 hover:text-white transition-all transform -translate-x-4 group-hover:translate-x-0 opacity-0 group-hover:opacity-100"

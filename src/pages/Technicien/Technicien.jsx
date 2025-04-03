@@ -3,18 +3,19 @@ import Sidebar from "../../components/client/Sidebar";
 import Header from "../../components/Header/Header";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import SidebarTechnicien from "../../components/Tehcnicien/SidebarTechnicien";
 // import axios from 'axios';
 
-const ClientHome = () => {
-  const [user, setUser] = useState(null);
+const TechnicienHome = () => {
+  const [technicien, setTechnicien] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const token = localStorage.getItem("authToken");
 
   const navigate = useNavigate();
 
-  // Mock user data
+  // Mock technicien data
   useEffect(() => {
-    setUser({
+    setTechnicien({
       name: "Mouhamed Ndiaye",
       email: "mouhamed@gmail.com",
     });
@@ -38,21 +39,21 @@ const ClientHome = () => {
     };
   }, []);
 
-  if (!user) return <div className="text-center p-8">Chargement...</div>;
+  if (!technicien) return <div className="text-center p-8">Chargement...</div>;
   if (!token) return navigate("/", { replace: true });
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header user={user} />
+      <Header technicien={technicien} />
       <div className="md:ml-[220px] bg-transparent relative">
-        <Sidebar />
+        <SidebarTechnicien />
         <div
           className={`${
             isScrolled ? "h-full" : "h-screen"
           } -mt-[65px] pt-[65px]`}
         >
           <main className="p-4 md:rounded-tl-xl md:border-t border-l bg-white h-full">
-            <Outlet context={{ user }} />
+            <Outlet context={{ technicien }} />
           </main>
         </div>
       </div>
@@ -60,4 +61,4 @@ const ClientHome = () => {
   );
 };
 
-export default ClientHome;
+export default TechnicienHome;
