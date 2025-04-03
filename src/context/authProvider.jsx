@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("user");
       setUser(null);
       setLastAuthorizedPath("/");
-      navigate("/auth/login");
+      navigate("/");
     } catch (err) {
       console.error("Erreur lors de la déconnexion :", err);
       setError(err);
