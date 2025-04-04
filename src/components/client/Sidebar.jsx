@@ -11,7 +11,7 @@ const Sidebar = () => {
   return (
 <div className="bg-gray-50 w-[220px] fixed z-9999 top-0 left-0 h-full py-4 flex flex-col justify-between  hidden md:flex">      {/* Navigation avec liens centrés */}
       <nav className="space-y-2 flex-1 mt-16 text-md">
-        {["dashboard", "services", "demandes", "messages", "avisClient", "contact"].map((tab) => (
+        {["dashboard", "services", "demandes", "messages", "avis", "contact"].map((tab) => (
           <NavLink
             key={tab}
             to={`/client/${tab}`}
