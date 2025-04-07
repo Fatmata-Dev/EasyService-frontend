@@ -7,7 +7,7 @@ export default function PermissionsAdmin() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Récupérer les utilisateurs depuis l'API
+  // 🔹 Récupérer les utilisateurs depuis l'API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -18,17 +18,16 @@ export default function PermissionsAdmin() {
           throw new Error("Erreur lors de la récupération des utilisateurs.");
         }
         const data = await response.json();
-        
-        console.log("Données reçues de l'API:", data);
-  
+
+        console.log("Données reçues de l'API:", data); // Debug
+
         // Vérifie si data est bien un tableau avant de le stocker
         if (Array.isArray(data.users)) {
-            setUsers(data.users); // Utilise uniquement le tableau des utilisateurs
-          } else {
-            console.error("L'API ne renvoie pas un tableau:", data);
-            setUsers([]); // Évite l'erreur en mettant un tableau vide
-          }
-          
+          setUsers(data.users); // Utilise uniquement le tableau des utilisateurs
+        } else {
+          console.error("L'API ne renvoie pas un tableau:", data);
+          setUsers([]); // Évite l'erreur en mettant un tableau vide
+        }
       } catch (error) {
         console.error(error);
         setUsers([]); // Gestion de l'erreur : stocke un tableau vide pour éviter l'erreur .map()
@@ -36,17 +35,14 @@ export default function PermissionsAdmin() {
         setIsLoading(false);
       }
     };
-  
+
     fetchUsers();
   }, []);
-  
 
   // 🔹 Met à jour le rôle d'un utilisateur (localement)
   const handleRoleChange = (id, newRole) => {
     setUsers(
-      users.map((user) =>
-        user._id === id ? { ...user, role: newRole } : user
-      )
+      users.map((user) => (user._id === id ? { ...user, role: newRole } : user))
     );
   };
 
@@ -72,7 +68,9 @@ export default function PermissionsAdmin() {
 
       <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
         {isLoading ? (
-          <p className="text-center text-gray-500">Chargement des utilisateurs...</p>
+          <p className="text-center text-gray-500">
+            Chargement des utilisateurs...
+          </p>
         ) : (
           <table className="w-full border border-gray-300 rounded-lg">
             <thead className="bg-gray-200">
@@ -94,7 +92,9 @@ export default function PermissionsAdmin() {
                     <select
                       className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-300"
                       value={user.role}
-                      onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                      onChange={(e) =>
+                        handleRoleChange(user._id, e.target.value)
+                      }
                     >
                       <option value="admin">Admin</option>
                       <option value="technicien">Technicien</option>

@@ -63,10 +63,31 @@ const ServiceDetail = () => {
     return new Date(dateString).toLocaleDateString("fr-FR", options);
   };
 
+  const handleDelete = async () => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")) {
+      try {
+        await axios.delete(
+          `      https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        toast.success("Service supprimé avec succès");
+        navigate("/admin/services");
+      } catch (err) {
+        toast.error(
+          err.response?.data?.message || "Erreur lors de la suppression"
+        );
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-4">
       <a
-        href="/client/services"
+        href="/admin/services"
         className="text-gray-700 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
       >
         Retour
@@ -146,7 +167,13 @@ const ServiceDetail = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition"
             onClick={() => setShowModal(true)}
           >
-            Réserver
+            Modifier
+          </button>
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition"
+            onClick={handleDelete}
+          >
+            Supprimer
           </button>
         </div>
       </div>

@@ -29,12 +29,12 @@ export default function LoginModal({
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Redirection conditionnelle pour l'admin else {
-        if((response.data.user.role) == "client") {
-          navigate("/client/dashboard");
-        } else if((response.data.user.role) == "admin") {
-          navigate("/admin/dashboard");
-        }
-        console.log(response.data)
+      if (response.data.user.role == "client") {
+        navigate("/client/dashboard");
+      } else if (response.data.user.role == "admin") {
+        navigate("/admin/dashboard");
+      }
+      console.log(response.data);
 
       onClose(); // Fermer la modale après connexion
 

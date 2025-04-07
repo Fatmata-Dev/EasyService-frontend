@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import AvisCard from "../../components/cards/AvisCard";
-// import axios from 'axios';
 
 const AvisAdmin = () => {
   const { user } = useOutletContext();
   const [reviews, setReviews] = useState([]);
+  const [ratings, setRatings] = useState(() => {
+    const saved = localStorage.getItem('serviceRatings');
+    return saved ? JSON.parse(saved) : {};
+  });
 
-  // Données fictives améliorées
   const mockReviews = [
     {
       id: 1,
@@ -21,7 +23,7 @@ const AvisAdmin = () => {
     {
       id: 2,
       image: "/plomberie.jpg",
-      service: "Réparation Plomberie",
+      service: "Réparation Plomberie", 
       date: "Terminé le 26/02/2025",
       price: "15.000 XOF",
       status: "Noter",
@@ -39,37 +41,37 @@ const AvisAdmin = () => {
   ];
 
   useEffect(() => {
-    // À décommenter pour le backend
-    // axios.get('/api/avis')
-    //   .then(res => setReviews(res.data))
-    //   .catch(console.error);
-    
     setReviews(mockReviews);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('serviceRatings', JSON.stringify(ratings));
+  }, [ratings]);
+
   const handleRating = (reviewId) => {
-    // À décommenter pour le backend
-    // axios.post(`/api/avis/${reviewId}`, { rating })
-    //   .then(() => {
-    //     setReviews(reviews.filter(review => review.id !== reviewId));
-    //   });
-    alert(`Avis enregistré pour le service ${reviewId}`);
-    setReviews(reviews.filter(review => review.id !== reviewId));
+    setRatings(prev => {
+      const current = prev[reviewId] || 0;
+      return current < 5 ? { ...prev, [reviewId]: current + 1 } : prev;
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-center mb-8"> {/* Modifié ici */}
-          <h1 className="text-3xl font-bold text-gray-800 text-center">Avis</h1> {/* Modifié ici */}
+        <div className="flex justify-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Avis à donner</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map((review) => (
-            <AvisCard 
-              key={review.id} 
-              review={review} 
+          {reviews.map(review => (
+            <AvisCard
+              key={review.id}
+              review={review}
+              currentRating={ratings[review.id] || 0}
               onRate={() => handleRating(review.id)}
+              maxRating={5}
+              showButton={false}
+              isAdmin={true}
             />
           ))}
         </div>
@@ -79,3 +81,4 @@ const AvisAdmin = () => {
 };
 
 export default AvisAdmin;
+
