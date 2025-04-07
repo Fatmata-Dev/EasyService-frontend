@@ -13,7 +13,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
     description: selectedService?.description || "",
     tarif: selectedService?.tarif || "",
     duree: selectedService?.duree || "",
-    uniteDuree: selectedService?.uniteDuree || "",
+    uniteDuree: selectedService?.uniteDuree || "minutes",
     categorie: selectedService?.categories || "",
     image: fullImageUrl,
     admin: user,
@@ -80,7 +80,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
       }
 
       const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/services/ajouter/service",
+        "http://localhost:4000/api/services/ajouter/service",
         formDataToSend,
         {
           headers: {
@@ -121,13 +121,21 @@ export default function ServicesModal({ setShowModal, selectedService }) {
           }
         );
         setCategories(response.data);
+  
+        // Si aucune catégorie n'est déjà sélectionnée (nouveau service ou pas de catégorie définie)
+        if (!formData.categorie && response.data.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            categorie: selectedService?.categories || response.data[0]._id, // Prend la 1ère catégorie
+          }));
+        }
       } catch (err) {
         console.error("Erreur lors de la récupération des catégories", err);
       }
     };
-
+  
     getAllCategories();
-  }, []);
+  }, [formData, selectedService]);
 
   return (
     <div
@@ -161,6 +169,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                 type="text"
                 value={formData.nom}
                 onChange={handleInputChange}
+                required
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
@@ -169,15 +178,20 @@ export default function ServicesModal({ setShowModal, selectedService }) {
               <label className="block font-bold text-gray-700">Categorie</label>
               <select
                 name="categorie"
+                id="categorie"
                 value={formData.categorie}
                 onChange={handleInputChange}
                 className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
-                {categories.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.nom}
-                  </option>
-                ))}
+                {categories.length > 0 ? (
+                  categories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.nom}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">Chargement...</option>
+                )}
               </select>
               {showCategoryInput ? (
                 <input
@@ -187,6 +201,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                   type="text"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
+                  required
                   className="mt-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               ) : (
@@ -210,23 +225,26 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                 type="number"
                 value={formData.duree}
                 onChange={handleInputChange}
+                required
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
 
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
-                Unité Durée
+                Unité de durée
               </label>
-              <input
-                placeholder="Ex: 2 heures"
-                id="uniteDuree"
+              <select
                 name="uniteDuree"
-                type="text"
+                id="uniteDuree"
                 value={formData.uniteDuree}
                 onChange={handleInputChange}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              />
+                className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              >
+                <option value="minutes">Minutes</option>
+                <option value="heures">Heures</option>
+                <option value="jours">Jours</option>
+              </select>
             </div>
 
             <div className="mb-4 w-full">
@@ -240,6 +258,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                 type="number"
                 value={formData.tarif}
                 onChange={handleInputChange}
+                required
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
@@ -258,6 +277,7 @@ export default function ServicesModal({ setShowModal, selectedService }) {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
+                  required
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>

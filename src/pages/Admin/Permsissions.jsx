@@ -7,7 +7,7 @@ export default function PermissionsAdmin() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔹 Récupérer les utilisateurs depuis l'API
+  // Récupérer les utilisateurs depuis l'API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -19,7 +19,7 @@ export default function PermissionsAdmin() {
         }
         const data = await response.json();
         
-        console.log("Données reçues de l'API:", data); // Debug
+        console.log("Données reçues de l'API:", data);
   
         // Vérifie si data est bien un tableau avant de le stocker
         if (Array.isArray(data.users)) {
