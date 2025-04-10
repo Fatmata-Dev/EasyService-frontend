@@ -1,207 +1,158 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import DemandesCard from "../../components/cards/DemandesCards";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function DemandesAdmin() {
-  const demandes = [
-    {
-      id: 1,
-      service: "Maintenance Réseaux",
-      date: "10-03-2025",
-      client: "Mouhamed Ndiaye",
-      status: "En attente",
-    },
-    {
-      id: 2,
-      service: "Installation Serveur",
-      date: "15-04-2025",
-      client: "Awa Diop",
-      status: "En cours",
-    },
-    {
-      id: 3,
-      service: "Installation Serveur",
-      date: "15-04-2025",
-      client: "Awa Diop",
-      status: "Terminé",
-    },
-    {
-      id: 4,
-      service: "Installation Serveur",
-      date: "15-04-2025",
-      client: "Awa Diop",
-      status: "Annulé",
-    },
-    {
-      id: 5,
-      service: "Installation Serveur",
-      date: "15-04-2025",
-      client: "Awa Diop",
-      status: "En attente",
-    },
-    {
-      id: 6,
-      service: "Installation Serveur",
-      date: "15-04-2025",
-      client: "Awa Diop",
-      status: "Refusé",
-    },
-  ];
+  const [demandes, setDemandes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState("En attente");
+  const fetchServices = async () => {
+    try {
+      // 1. Récupérer les demandes
+      const response = await axios.get(
+        "https://easyservice-backend-iv29.onrender.com/api/demandes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
-  const filteredDemandes = demandes.filter(
-    (demande) => demande.status === activeTab
-  );
+      //console.log(response.data)
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "En attente":
-        return "bg-yellow-500";
-      case "En cours":
-        return "bg-blue-500";
-      case "Terminé":
-        return "bg-green-500";
-      case "Annulé":
-        return "bg-red-500";
-      case "Refusé":
-        return "bg-gray-500";
-      default:
-        return "bg-gray-500";
+      // 2. Pour chaque demande, récupérer les données associées
+      const demandesAvecDetails = await Promise.all(
+        response.data.map(async (demande) => {
+          try {
+            const [serviceResponse, clientResponse] = await Promise.all([
+              demande.service
+                ? axios.get(
+                    `https://easyservice-backend-iv29.onrender.com/api/services/${demande.service._id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "authToken"
+                        )}`,
+                      },
+                    }
+                  )
+                : Promise.resolve({ data: {} }),
+
+              demande.client
+                ? axios.get(
+                    `https://easyservice-backend-iv29.onrender.com/api/auth/users/${demande.client._id}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "authToken"
+                        )}`,
+                      },
+                    }
+                  )
+                : Promise.resolve({ data: {} }),
+            ]);
+
+            return {
+              _id: demande._id,
+              numeroDemande: demande.numeroDemande,
+              service:
+                serviceResponse.data.nom ||
+                demande.titre ||
+                "Service non spécifié",
+              date: demande.dateDemande || new Date().toLocaleDateString(),
+              dateIntervention:
+                demande.dateIntervention || new Date().toLocaleDateString(),
+              clientPrenom: clientResponse.data.prenom || "Client non spécifié",
+              clientNom: clientResponse.data.nom || "",
+              statut: demande.statut,
+              categorie: demande.categorieService,
+              description: demande.description,
+            };
+          } catch (error) {
+            console.error("Erreur lors de la récupération des détails:", error);
+            return {
+              _id: demande._id,
+              numeroDemande: demande.numeroDemande,
+              service: "Erreur de chargement",
+              date: demande.dateDemande || new Date().toLocaleDateString(),
+              dateIntervention:
+                demande.dateIntervention || new Date().toLocaleDateString(),
+              clientPrenom: "Erreur de chargement",
+              clientNom: "",
+              statut: demande.statut || "",
+              categorie: demande.categorieService || "",
+              description: demande.description || "",
+            };
+          }
+        })
+      );
+
+      setDemandes(demandesAvecDetails);
+      //console.log("Demandes avec détails:", demandesAvecDetails);
+    } catch (err) {
+      toast.error(err.message || "Erreur lors du chargement des demandes");
+      // console.error("Erreur API principale:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAccept = (id) => {
-    console.log(`Demande ${id} acceptée`);
-    // Ajoutez votre logique ici
-  };
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
-  const handleReject = (id) => {
-    console.log(`Demande ${id} refusée`);
-    // Ajoutez votre logique ici
-  };
+  const [activeTab, setActiveTab] = useState("en_attente");
+
+  const filteredDemandes = demandes.filter(
+    (demande) => demande.statut === activeTab
+  );
+  //console.log("Demandes filtrées:", filteredDemandes);
+
+  if (loading) {
+    return <div className="text-center py-10">Chargement en cours...</div>;
+  }
 
   return (
-    <div className="">
-      <h1 className="text-2xl font-bold uppercase w-full text-center pb-3">
+    <div className="container mx-auto px-4">
+      <h1 className="text-2xl font-bold uppercase text-center pb-6">
         Demandes
       </h1>
 
       {/* Onglets */}
-      <div className="flex justify-center mb-6 w-full">
-        <button
-          className={`py-2 w-full ${
-            activeTab === "En attente"
-              ? "bg-orange-500 text-white"
-              : "border border-gray-400"
-          }`}
-          onClick={() => setActiveTab("En attente")}
-        >
-          En attente
-        </button>
-        <button
-          className={`py-2 w-full ${
-            activeTab === "En cours"
-              ? "bg-orange-500 text-white"
-              : "border border-gray-400"
-          }`}
-          onClick={() => setActiveTab("En cours")}
-        >
-          En cours
-        </button>
-        <button
-          className={`py-2 w-full ${
-            activeTab === "Annulé"
-              ? "bg-orange-500 text-white"
-              : "border border-gray-400"
-          }`}
-          onClick={() => setActiveTab("Annulé")}
-        >
-          Annulés
-        </button>
-        <button
-          className={`py-2 w-full ${
-            activeTab === "Refusé"
-              ? "bg-orange-500 text-white"
-              : "border border-gray-400"
-          }`}
-          onClick={() => setActiveTab("Refusé")}
-        >
-          Refusés
-        </button>
-        <button
-          className={`py-2 w-full ${
-            activeTab === "Terminé"
-              ? "bg-orange-500 text-white"
-              : "border border-gray-400"
-          }`}
-          onClick={() => setActiveTab("Terminé")}
-        >
-          Terminés
-        </button>
+      <div className="flex flex-wrap justify-center mb-6">
+        {["en_attente", "en_cours", "annulee", "refusee", "terminee"].map(
+          (statut) => (
+            <button
+              key={statut}
+              className={`py-2 px-4 mx-1 mb-2 rounded ${
+                activeTab === statut
+                  ? "bg-orange-500 text-white font-bold"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+              onClick={() => setActiveTab(statut)}
+            >
+              {statut === "en_attente" && "En attente"}
+              {statut === "en_cours" && "En cours"}
+              {statut === "annulee" && "Annulées"}
+              {statut === "refusee" && "Refusées"}
+              {statut === "terminee" && "Terminées"}
+            </button>
+          )
+        )}
       </div>
 
       {/* Liste des demandes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-        {filteredDemandes.map((demande) => (
-          <div
-            key={demande.id}
-            className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50"
-          >
-            <h2 className="text-orange-500 font-bold text-lg mb-2">
-              INFORMATION DE LA DEMANDE
-            </h2>
-            <p>
-              <strong>ID DEMANDE :</strong> {demande.id}
-            </p>
-            <p>
-              <strong>NOM SERVICE :</strong>{" "}
-              <span className="text-orange-600">{demande.service}</span>
-            </p>
-            <p>
-              <strong>DATE DEMANDE :</strong> {demande.date}
-            </p>
-            <p>
-              <strong>CLIENT :</strong>{" "}
-              <span className="text-orange-600">{demande.client}</span>
-            </p>
-            <p>
-              <strong>TECHNICIEN :</strong>
-            </p>
-            <p>
-              <strong>DATE INTERVENTION :</strong>
-            </p>
-            <p>
-              <strong>STATUS :</strong>{" "}
-              <span
-                className={`${getStatusColor(
-                  demande.status
-                )} text-white px-2 py-1 rounded-full text-sm`}
-              >
-                {demande.status}
-              </span>
-            </p>
-
-            {/* Boutons */}
-            <div className="flex justify-between mt-4">
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={() => handleReject(demande.id)}
-              >
-                Refuser
-              </button>
-              <button
-                className="bg-orange-500 text-white px-4 py-2 rounded-md"
-                onClick={() => handleAccept(demande.id)}
-              >
-                Accepter
-              </button>
-            </div>
-
-            {/* Lien détails */}
-            <p className="text-center mt-2 text-blue-500 cursor-pointer">
-              Plus de détails
-            </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredDemandes.length > 0 ? (
+          filteredDemandes.map((demande) => (
+            <DemandesCard key={demande._id} demande={demande} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-10 text-gray-500">
+            Aucune demande trouvée pour ce statut
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

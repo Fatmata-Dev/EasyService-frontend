@@ -13,6 +13,7 @@
     "@emailjs/browser": "^4.4.1",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
+    "date-fns": "^4.1.0",
     "ldrs": "^1.1.2",
     "node": "^20.19.0",
     "prop-types": "^15.8.1",

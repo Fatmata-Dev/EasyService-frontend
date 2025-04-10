@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import ServicesModal from '../../components/Modals/ServicesModal';
 import { 
@@ -43,12 +43,12 @@ const ServiceDetailAdmin = () => {
 
   return (
     <div className="container mx-auto px-4">
-      <a
-        href="/admin/services"
+      <Link
+        to="/admin/services"
         className="text-gray-700 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
       >
         Retour
-      </a>
+      </Link>
       <h1 className="text-2xl font-bold mb-4 text-center">DÉTAIL DU SERVICE</h1>
 
       <div className="flex flex-col gap-3">

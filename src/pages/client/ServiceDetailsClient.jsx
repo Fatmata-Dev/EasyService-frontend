@@ -1,17 +1,15 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import ServicesModal from "../../components/Modals/ServicesModal";
+import ReservationModal from "../../components/Modals/ReservationModal";
 
-const ServiceDetail = () => {
+const ServiceDetailsClient = () => {
   const { id } = useParams(); // Récupère l'ID du Service depuis l'URL
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -32,7 +30,7 @@ const ServiceDetail = () => {
         //   isObject: typeof response.data.admin === "object",
         //   keys: response.data.admin ? Object.keys(response.data.admin) : null,
         // });
-        //console.log("Données du service:", response.data);
+        // console.log("Données du service:", response.data.nom);
         setService(response.data);
       } catch (err) {
         // console.error("Erreur complète:", err.response?.data);
@@ -63,35 +61,24 @@ const ServiceDetail = () => {
     return new Date(dateString).toLocaleDateString("fr-FR", options);
   };
 
-  const handleDelete = async () => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer ce service ?")) {
-      try {
-        await axios.delete(
-          `      https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        toast.success("Service supprimé avec succès");
-        navigate("/admin/services");
-      } catch (err) {
-        toast.error(
-          err.response?.data?.message || "Erreur lors de la suppression"
-        );
-      }
-    }
+  const handleServiceCreated = (newService) => {
+    setService((prev) => [...prev, newService]);
+    setShowModal(false);
+  };
+
+  const handleReservationClick = (e) => {
+    e.preventDefault();
+    setShowModal(true);
   };
 
   return (
     <div className="container mx-auto px-4">
-      <a
-        href="/admin/services"
+      <Link
+        to="/client/services"
         className="text-gray-700 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
       >
         Retour
-      </a>
+      </Link>
       <h1 className="text-2xl font-bold mb-4 text-center">DÉTAIL DU SERVICE</h1>
 
       <div className="flex flex-col gap-3">
@@ -150,30 +137,23 @@ const ServiceDetail = () => {
             </div>
           </div>
         </div>
-
         {showModal && (
-          <ServicesModal
+          <ReservationModal
             setShowModal={setShowModal}
             selectedService={{
               ...service,
               categorie: service.categorie?._id || service.categorie, // S'assurer de passer l'ID
             }}
-            isEditing={true}
+            onSuccess={handleServiceCreated}
+            serviceId={service._id} // Passez l'ID du service au modal
           />
         )}
-
-        <div className="flex justify-center gap-4 mt-6">
+        <div className="flex justify-center w-full">
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition"
-            onClick={() => setShowModal(true)}
+            onClick={handleReservationClick}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded transition-colors mt-2 text-center block sticky bottom-3 shadow-lg"
           >
-            Modifier
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition"
-            onClick={handleDelete}
-          >
-            Supprimer
+            Réserver
           </button>
         </div>
       </div>
@@ -181,4 +161,4 @@ const ServiceDetail = () => {
   );
 };
 
-export default ServiceDetail;
+export default ServiceDetailsClient;

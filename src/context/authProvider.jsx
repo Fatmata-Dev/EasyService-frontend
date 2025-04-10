@@ -17,7 +17,7 @@
 //     try {
 //       const storedToken = localStorage.getItem("authToken");
 //       if (!storedToken) return null;
-      
+
 //       const userData = JSON.parse(localStorage.getItem("user"));
 //       if (!userData?._id) return null;
 
@@ -25,7 +25,7 @@
 //         `https://easyservice-backend-iv29.onrender.com/api/users/${userData._id}`,
 //         { headers: { Authorization: `Bearer ${storedToken}` }}
 //       );
-      
+
 //       return response.data;
 //     } catch (error) {
 //       console.error("Auth verification error:", error);
@@ -38,16 +38,16 @@
 //     const initializeAuth = async () => {
 //       try {
 //         const userData = await checkAuth();
-        
+
 //         if (userData) {
 //           setUser(userData);
 //           setToken(localStorage.getItem("authToken"));
-          
+
 //           // Redirection uniquement si sur la page d'accueil
 //           if (location.pathname === "/") {
 //             const rolePath = {
 //               client: '/client/dashboard',
-//               admin: '/admin/dashboard', 
+//               admin: '/admin/dashboard',
 //               technicien: '/technicien/dashboard'
 //             };
 //             navigate(rolePath[userData.role] || '/');
@@ -72,10 +72,10 @@
 //     try {
 //       setLoading(true);
 //       const response = await axios.post(
-//         "https://easyservice-backend-iv29.onrender.com/api/auth/login", 
+//         "https://easyservice-backend-iv29.onrender.com/api/auth/login",
 //         credentials
 //       );
-      
+
 //       const { user: userData, token } = response.data;
 
 //       const normalizedUser = {
@@ -94,10 +94,10 @@
 
 //       const rolePath = {
 //         client: '/client/dashboard',
-//         admin: '/admin/dashboard', 
+//         admin: '/admin/dashboard',
 //         technicien: '/technicien/dashboard'
 //       };
-      
+
 //       navigate(rolePath[normalizedUser.role] || '/');
 //     } catch (err) {
 //       console.error("Login error:", err);
@@ -120,12 +120,12 @@
 //   }
 
 //   return (
-//     <AuthContext.Provider value={{ 
-//       user, 
-//       token, 
+//     <AuthContext.Provider value={{
+//       user,
+//       token,
 //       loading,
-//       login, 
-//       logout, 
+//       login,
+//       logout,
 //       checkAuth
 //     }}>
 //       {children}

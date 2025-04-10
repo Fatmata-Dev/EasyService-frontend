@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ServiceCard = ({ service }) => {
   return (
@@ -34,12 +35,12 @@ const ServiceCard = ({ service }) => {
 
         <div className="flex justify-between items-center">
           <span className="text-xl font-bold text-gray-900">{service.tarif} F CFA</span>
-          <a
-            href={`services/${service._id}`}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded transition-colors"
+          <Link
+            to={`/admin/services/${service._id}`}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded transition-colors hover:cursor-pointer"
           >
             Détail
-          </a>
+          </Link>
         </div>
       </div>
     </div>

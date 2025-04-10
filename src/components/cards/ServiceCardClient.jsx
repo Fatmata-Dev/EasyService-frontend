@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import ReservationModal from "../Modals/ReservationModal";
+import { Link } from "react-router-dom";
 
 const ServiceCardClient = ({ service }) => {
   const [services, setServices] = useState([]);
@@ -58,12 +59,12 @@ const ServiceCardClient = ({ service }) => {
           <span className="text-xl font-bold text-gray-900">
             {service.tarif} F CFA
           </span>
-          <a
-            href={`services/${service._id}`}
+          <Link
+            to={`/admin/services/${service._id}`}
             className="hover:font-semibold text-orange-500 text-center underline"
           >
             Détail
-          </a>
+          </Link>
         </div>
         <div className="flex justify-center w-full">
           <button
