@@ -60,7 +60,7 @@ const ServiceCardClient = ({ service }) => {
             {service.tarif} F CFA
           </span>
           <Link
-            to={`/admin/services/${service._id}`}
+            to={`/client/services/${service._id}`}
             className="hover:font-semibold text-orange-500 text-center underline"
           >
             Détail

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ServiceCard from "../cards/ServiceCard";
+import ServiceCardHome from "../cards/ServiceCardHome";
 import axios from "axios";
 import { FaLongArrowAltRight } from "react-icons/fa";
 
@@ -54,7 +54,7 @@ const ServicesSection = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
+              <ServiceCardHome key={service._id} service={service} />
             ))}
           </div>
         </div>
