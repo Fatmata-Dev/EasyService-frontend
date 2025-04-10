@@ -15,15 +15,15 @@ export default function AssignTechnicienModal({
   const [error, setError] = useState(null);
 
   const formatDate = (dateString) => {
-      return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
-    };
+    return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
+  };
 
   // Charger la liste des techniciens disponibles
   useEffect(() => {
     const fetchTechniciens = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/auth/all/techniciens",
+          "https://easyservice-backend-iv29.onrender.com/api/auth/all/techniciens",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -65,9 +65,9 @@ export default function AssignTechnicienModal({
 
     try {
       await axios.post(
-        `http://localhost:4000/api/demandes/assigner`,
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/assigner`,
         {
-        demandeId,
+          demandeId,
           technicien: selectedTechnicien,
         },
         {
@@ -197,10 +197,10 @@ export default function AssignTechnicienModal({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                Date d'intervention
+                  Date d'intervention
                 </label>
                 <div className="mt-1 p-2 bg-gray-100 rounded">
-                {formatDate(demande.dateIntervention)}
+                  {formatDate(demande.dateIntervention)}
                 </div>
               </div>
             </div>

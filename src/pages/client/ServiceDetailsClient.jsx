@@ -16,7 +16,7 @@ const ServiceDetailsClient = () => {
     const getService = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/services/${id}`,
+          `https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,

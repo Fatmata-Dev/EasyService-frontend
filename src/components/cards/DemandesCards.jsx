@@ -36,7 +36,7 @@ export default function DemandesCard({ demande, onUpdate }) {
   // const handleDelete = async (id) => {
   //   if (window.confirm("Êtes-vous sûr de vouloir supprimer cette demande ?")) {
   //     try {
-  //       await axios.delete(`http://localhost:4000/api/demandes/${id}`, {
+  //       await axios.delete(`https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`, {
   //         headers: {
   //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
   //         },
@@ -55,7 +55,7 @@ export default function DemandesCard({ demande, onUpdate }) {
     if (window.confirm("Voulez-vous rejeter cette demande ?")) {
       try {
         await axios.put(
-          `http://localhost:4000/api/demandes/${id}`,
+          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
           { statut: "refusee" },
           {
             headers: {
@@ -77,7 +77,7 @@ export default function DemandesCard({ demande, onUpdate }) {
     if (window.confirm("Voulez-vous annuler cette demande ?")) {
       try {
         await axios.put(
-          `http://localhost:4000/api/demandes/${id}`,
+          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
           { statut: "annulee" },
           {
             headers: {
@@ -99,7 +99,7 @@ export default function DemandesCard({ demande, onUpdate }) {
   // const handleAccept = async (id) => {
   //   try {
   //     await axios.put(
-  //       `http://localhost:4000/api/demandes/${id}`,
+  //       `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
   //       { statut: "en_cours" },
   //       {
   //         headers: {

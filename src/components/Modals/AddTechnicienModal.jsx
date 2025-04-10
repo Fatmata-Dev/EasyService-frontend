@@ -42,7 +42,7 @@ export default function AddTechnicienModal({ setShowModal }) {
       data.append("image", formData.image);
 
       const response = await axios.post(
-        "http://localhost:4000/api/techniciens/ajouter", // URL à ajuster en fonction du backend
+        "https://easyservice-backend-iv29.onrender.com/api/techniciens/ajouter", // URL à ajuster en fonction du backend
         data,
         {
           headers: {

@@ -10,11 +10,14 @@ export default function DemandesAdmin() {
   const fetchServices = async () => {
     try {
       // 1. Récupérer les demandes
-      const response = await axios.get("http://localhost:4000/api/demandes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
+      const response = await axios.get(
+        "https://easyservice-backend-iv29.onrender.com/api/demandes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
       //console.log(response.data)
 
@@ -25,7 +28,7 @@ export default function DemandesAdmin() {
             const [serviceResponse, clientResponse] = await Promise.all([
               demande.service
                 ? axios.get(
-                    `http://localhost:4000/api/services/${demande.service._id}`,
+                    `https://easyservice-backend-iv29.onrender.com/api/services/${demande.service._id}`,
                     {
                       headers: {
                         Authorization: `Bearer ${localStorage.getItem(
@@ -38,7 +41,7 @@ export default function DemandesAdmin() {
 
               demande.client
                 ? axios.get(
-                    `http://localhost:4000/api/auth/users/${demande.client._id}`,
+                    `https://easyservice-backend-iv29.onrender.com/api/auth/users/${demande.client._id}`,
                     {
                       headers: {
                         Authorization: `Bearer ${localStorage.getItem(

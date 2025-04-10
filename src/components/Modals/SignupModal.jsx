@@ -62,7 +62,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/register",
+        "https://easyservice-backend-iv29.onrender.com/api/auth/register",
         {
           nom: formData.nom,
           prenom: formData.prenom,
