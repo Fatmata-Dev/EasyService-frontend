@@ -7,7 +7,7 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg px-8 py-4 w-96"
+        className="bg-white rounded-lg px-8 py-4 w-96 mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-lg">Mot de passe oublié ?</h3>

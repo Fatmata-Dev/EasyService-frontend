@@ -4,7 +4,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +12,7 @@ export default function Services() {
   const fetchServices = async () => {
     try {
       const response = await axios.get(
-        "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
+        "http://localhost:4000/api/services/afficher/service",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -40,10 +39,11 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  
   return (
     <div className="container mx-auto px-4">
-      <h1 className="font-bold text-2xl text-center uppercase my-3">Services</h1>
+      <h1 className="font-bold text-2xl text-center uppercase my-3">
+        Services
+      </h1>
 
       {loading ? (
         <p>Chargement...</p>
@@ -60,4 +60,4 @@ export default function Services() {
       )}
     </div>
   );
-  }
+}

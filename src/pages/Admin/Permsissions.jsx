@@ -11,9 +11,7 @@ export default function PermissionsAdmin() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          "https://easyservice-backend-iv29.onrender.com/api/auth/users"
-        );
+        const response = await fetch("http://localhost:4000/api/auth/users");
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des utilisateurs.");
         }

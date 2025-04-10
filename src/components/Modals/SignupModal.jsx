@@ -1,58 +1,97 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function SignupModal({ onClose, onSwitchToLogin }) {
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const role = "client";
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    password: "",
+    terms: false,
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (
+      !formData.nom ||
+      !formData.prenom ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setError("Veuillez remplir tous les champs");
+      return false;
+    }
+
+    if (!formData.terms) {
+      setError("Veuillez accepter les conditions générales");
+      return false;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setError("Veuillez entrer une adresse email valide");
+      return false;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const nomError = document.querySelector(".nom.error");
-    const emailError = document.querySelector(".email.error");
-    const passwordError = document.querySelector(".password.error");
-    // const termsError = document.querySelector(".terms.error");
-    // const terms = document.getElementById("terms");
+    if (!validateForm()) {
+      return;
+    }
 
-    // termsError.innerHTML = "";
+    setIsSubmitting(true);
 
-    // if (!terms.checked)
-    //   termsError.innerHTML = "Veuillez valider les conditions générales";
-
-    await axios
-      .post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/register",
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/register",
         {
-          nom,
-          prenom,
-          email,
-          password,
-          role,
+          nom: formData.nom,
+          prenom: formData.prenom,
+          email: formData.email,
+          password: formData.password,
+          role: "client",
         },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
-      )
-      .then((res) => {
-        // console.log(res);
-        if (res.data.errors) {
-          if (res.data.errors.nom) nomError.innerHTML = res.data.errors.nom;
-          if (res.data.errors.email)
-            emailError.innerHTML = res.data.errors.email;
-          if (res.data.errors.password)
-            passwordError.innerHTML = res.data.errors.password;
-        } else {
-          onSwitchToLogin(true);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      );
+
+      if (response.data.errors) {
+        setError(response.data.message || "Erreur lors de l'inscription");
+        toast.error(response.data.message || "Erreur lors de l'inscription");
+      } else {
+        toast.success("Inscription réussie !");
+        onSwitchToLogin();
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Erreur lors de l'inscription");
+      toast.error(
+        err.response?.data?.message || "Erreur lors de l'inscription"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -61,12 +100,19 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg px-8 py-4 w-96"
+        className="bg-white rounded-lg px-8 py-4 w-96 flex-wrap mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-bold mb-6 text-center uppercase">
           Inscription
         </h2>
+
+        {error && (
+          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="prenom" className="block font-bold text-gray-700">
@@ -77,25 +123,29 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               id="prenom"
               name="prenom"
               type="text"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
+              value={formData.prenom}
+              onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="nom" className="block font-bold text-gray-700">
               Nom
             </label>
             <input
-              placeholder="Votre prénom et nom"
+              placeholder="Votre nom"
               id="nom"
               name="nom"
               type="text"
-              value={nom}
-              onChange={(e) => setNom(e.target.value)}
+              value={formData.nom}
+              onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="email" className="block font-bold text-gray-700">
               Email
@@ -105,49 +155,71 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               id="email"
               name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              required
             />
           </div>
+
           <div className="mb-4">
             <label htmlFor="password" className="block font-bold text-gray-700">
               Mot de passe
             </label>
             <input
-              placeholder="Votre Mot de passe"
+              placeholder="Au moins 6 caractères"
               id="password"
               name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              required
+              minLength={6}
             />
           </div>
-          <div className="flex items-center mb-4">
-            <input
-              id="terms"
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm"
-            />
+
+          <div className="flex items-start mb-4">
+            <div className="flex items-center h-5">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                checked={formData.terms}
+                onChange={handleChange}
+                className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                required
+              />
+            </div>
             <label
               htmlFor="terms"
-              className="ms-2 text-md font-medium text-gray-700"
+              className="ms-2 text-sm font-medium text-gray-700"
             >
               J'accepte les{" "}
-              <a href="#" className="text-blue-600 hover:underline">
-                termes et la politique
+              <a
+                href="/conditions"
+                className="text-orange-600 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                conditions générales
               </a>
-              .
             </label>
           </div>
+
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white font-bold py-2 my-4 rounded hover:bg-orange-600"
+            disabled={isSubmitting}
+            className={`w-full bg-orange-500 text-white font-bold py-2 my-4 rounded ${
+              isSubmitting
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-orange-600"
+            }`}
           >
-            Sinscrire
+            {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
           </button>
-          <p>
+
+          <p className="text-center text-gray-600">
             Vous avez déjà un compte ?{" "}
             <button
               type="button"

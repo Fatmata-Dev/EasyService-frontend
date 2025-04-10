@@ -35,7 +35,7 @@ const SidebarAdmin = () => {
           className="w-12 h-12 rounded-full"
         />
         <div>
-          <p className="font-semibold text-sm">{prenom && nom ? `${prenom} ${nom}` : "Utilisateur non connecté"}</p>
+          <p className="font-semibold text-sm capitalize mb-1">{prenom && nom ? `${prenom} ${nom}` : "Utilisateur non connecté"}</p>
           <p className="text-gray-500 text-xs flex items-center">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span> en ligne
           </p>
