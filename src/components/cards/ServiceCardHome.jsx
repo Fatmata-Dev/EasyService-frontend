@@ -47,4 +47,4 @@ const ServiceCardHome = ({ service }) => {
   );
 };
 
-export default ServiceCard;
+export default ServiceCardHome;
