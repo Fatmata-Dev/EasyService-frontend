@@ -17,7 +17,7 @@ export default function PermissionsAdmin() {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          "http://localhost:4000/api/auth/users",
+          "https://easyservice-backend-iv29.onrender.com/api/auth/users",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -60,7 +60,7 @@ export default function PermissionsAdmin() {
       if (!userToUpdate) return;
 
       const response = await axios.put(
-        `http://localhost:4000/api/auth/users/${userId}`,
+        `https://easyservice-backend-iv29.onrender.com/api/auth/users/${userId}`,
         { role: userToUpdate.role },
         {
           headers: {

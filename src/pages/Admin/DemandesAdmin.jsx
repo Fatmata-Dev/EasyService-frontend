@@ -15,11 +15,14 @@ export default function DemandesAdmin() {
       setLoading(true);
 
       // 1. Récupérer toutes les demandes avec les services et clients inclus
-      const response = await axios.get("http://localhost:4000/api/demandes", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-      });
+      const response = await axios.get(
+        "https://easyservice-backend-iv29.onrender.com/api/demandes",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
       // 2. Construire directement les données finales
       const demandesAvecDetails = response.data.map((demande) => {

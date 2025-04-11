@@ -23,7 +23,7 @@ export default function AssignTechnicienModal({
     const fetchTechniciens = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/auth/all/techniciens",
+          "https://easyservice-backend-iv29.onrender.com/api/auth/all/techniciens",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -65,7 +65,7 @@ export default function AssignTechnicienModal({
 
     try {
       await axios.post(
-        `http://localhost:4000/api/demandes/assigner`,
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/assigner`,
         {
           demandeId,
           technicien: selectedTechnicien,
