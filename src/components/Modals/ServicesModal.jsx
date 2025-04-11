@@ -1,39 +1,53 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
-import { 
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import {
   useCreateServiceMutation,
   useUpdateServiceMutation,
   useGetCategoriesQuery,
-  useCreateCategoryMutation
-} from '../../services/servicesApi';
+  useCreateCategoryMutation,
+} from "../../services/servicesApi";
 
-const ServicesModal = ({ 
-  setShowModal, 
-  selectedService, 
-  isEditing, 
-  onSuccess 
+const ServicesModal = ({
+  setShowModal,
+  selectedService,
+  isEditing,
+  onSuccess,
 }) => {
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
   const { data: categories = [] } = useGetCategoriesQuery();
   const [createCategory] = useCreateCategoryMutation();
-  
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm();
   const [showCategoryInput, setShowCategoryInput] = useState(false);
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-  
+
   const userData = JSON.parse(localStorage.getItem("user"));
   const userId = userData?.id;
-  const selectedCategory = watch('categorie');
+  const selectedCategory = watch("categorie");
 
   useEffect(() => {
     if (selectedService) {
-      const fields = ['nom', 'description', 'tarif', 'duree', 'uniteDuree', 'categorie', 'image'];
-      fields.forEach(field => {
+      const fields = [
+        "nom",
+        "description",
+        "tarif",
+        "duree",
+        "uniteDuree",
+        "categorie",
+        "image",
+      ];
+      fields.forEach((field) => {
         const value = selectedService[field];
-        if (value) setValue(field, field === 'categorie' ? value._id : value);
+        if (value) setValue(field, field === "categorie" ? value._id : value);
       });
       setImagePreview(selectedService.image);
     }
@@ -41,11 +55,11 @@ const ServicesModal = ({
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      setValue('image', file);
+    if (file && file.type.startsWith("image/")) {
+      setValue("image", file);
       setImagePreview(URL.createObjectURL(file));
     } else {
-      toast.error('Veuillez sélectionner une image valide');
+      toast.error("Veuillez sélectionner une image valide");
     }
   };
 
@@ -54,10 +68,10 @@ const ServicesModal = ({
 
     try {
       const response = await createCategory({ nom: newCategory }).unwrap();
-      setValue('categorie', response._id);
+      setValue("categorie", response._id);
       setShowCategoryInput(false);
-      setNewCategory('');
-      toast.success('Catégorie créée avec succès');
+      setNewCategory("");
+      toast.success("Catégorie créée avec succès");
     } catch (err) {
       toast.error(err.data?.message || "Erreur lors de la création");
     }
@@ -66,14 +80,14 @@ const ServicesModal = ({
   // CORRECTION APPLIQUÉE ICI 👇
   const onSubmit = async (data) => {
     try {
-      if (!userId) throw new Error('Authentification requise');
-      if (!data.categorie) throw new Error('Catégorie obligatoire');
+      if (!userId) throw new Error("Authentification requise");
+      if (!data.categorie) throw new Error("Catégorie obligatoire");
 
       const formData = new FormData();
-      
+
       // Séparation de l'image des autres données
       const { image, ...otherData } = data;
-      
+
       // Ajout des autres champs
       Object.entries(otherData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
@@ -83,66 +97,75 @@ const ServicesModal = ({
 
       // Ajout conditionnel de l'image
       if (image instanceof File) {
-        formData.append('image', image);
+        formData.append("image", image);
       }
 
-      formData.append('admin', userId);
+      formData.append("admin", userId);
 
       if (isEditing && selectedService?._id) {
-        await updateService({ 
-          id: selectedService._id, 
-          body: formData 
+        await updateService({
+          id: selectedService._id,
+          body: formData,
         }).unwrap();
-        toast.success('Service modifié avec succès');
+        toast.success("Service modifié avec succès");
       } else {
         await createService(formData).unwrap();
-        toast.success('Service créé avec succès');
+        toast.success("Service créé avec succès");
       }
 
       // onSuccess();
       setShowModal(false);
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error("Erreur:", error);
       toast.error(
-        error.data?.message || 
-        error.message || 
-        'Erreur lors de la sauvegarde'
+        error.data?.message || error.message || "Erreur lors de la sauvegarde"
       );
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={() => setShowModal(false)}>
-      
-      <div className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}>
-
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={() => setShowModal(false)}
+    >
+      <div
+        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
           {isEditing ? "Modifier le service" : "Ajouter un service"}
         </h3>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
-            
             {/* Nom du Service */}
             <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">Nom du Service *</label>
+              <label className="block font-bold text-gray-700">
+                Nom du Service *
+              </label>
               <input
-                {...register('nom', { 
-                  required: 'Ce champ est obligatoire',
-                  maxLength: { value: 50, message: 'Maximum 50 caractères' }
+                {...register("nom", {
+                  required: "Ce champ est obligatoire",
+                  maxLength: { value: 50, message: "Maximum 50 caractères" },
                 })}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
-              {errors.nom && <p className="text-red-500 text-sm mt-1">{errors.nom.message}</p>}
+              {errors.nom && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.nom.message}
+                </p>
+              )}
             </div>
 
             {/* Catégorie */}
             <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">Catégorie *</label>
+              <label className="block font-bold text-gray-700">
+                Catégorie *
+              </label>
               <select
-                {...register('categorie', { required: 'Ce champ est obligatoire' })}
+                {...register("categorie", {
+                  required: "Ce champ est obligatoire",
+                })}
                 className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
                 <option value="">Sélectionnez une catégorie</option>
@@ -152,7 +175,7 @@ const ServicesModal = ({
                   </option>
                 ))}
               </select>
-              
+
               {showCategoryInput ? (
                 <div className="mt-2 flex gap-2">
                   <input
@@ -177,7 +200,11 @@ const ServicesModal = ({
                   Créer une nouvelle catégorie
                 </p>
               )}
-              {errors.categorie && <p className="text-red-500 text-sm mt-1">{errors.categorie.message}</p>}
+              {errors.categorie && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.categorie.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -187,31 +214,46 @@ const ServicesModal = ({
               <label className="block font-bold text-gray-700">Durée</label>
               <input
                 type="number"
-                {...register('duree', { min: 0 })}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              />
-            </div>
-            
-            <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">Unité Durée</label>
-              <input
-                type="text"
-                {...register('uniteDuree')}
+                {...register("duree", { min: 0 })}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
 
             <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">Tarif (XOF) *</label>
+              <label className="block font-bold text-gray-700">
+                Unité Durée
+              </label>
+              <select
+                {...register("uniteDuree")}
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              >
+                <option value="">Sélectionnez une unité</option>
+                <option value="heures">Heures</option>
+                <option value="minutes">Minutes</option>
+                <option value="jours">Jours</option>
+              </select>
+            </div>
+
+            <div className="mb-4 w-full">
+              <label className="block font-bold text-gray-700">
+                Tarif (XOF) *
+              </label>
               <input
                 type="number"
-                {...register('tarif', { 
-                  required: 'Ce champ est obligatoire',
-                  min: { value: 0, message: 'Le tarif ne peut pas être négatif' }
+                {...register("tarif", {
+                  required: "Ce champ est obligatoire",
+                  min: {
+                    value: 0,
+                    message: "Le tarif ne peut pas être négatif",
+                  },
                 })}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
-              {errors.tarif && <p className="text-red-500 text-sm mt-1">{errors.tarif.message}</p>}
+              {errors.tarif && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.tarif.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -219,18 +261,20 @@ const ServicesModal = ({
           <div className="mb-4 w-full">
             <label className="block font-bold text-gray-700">Description</label>
             <textarea
-              {...register('description', { maxLength: 500 })}
+              {...register("description", { maxLength: 500 })}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               rows="3"
             />
             <p className="text-right text-sm text-gray-500 mt-1">
-              {watch('description')?.length || 0}/500
+              {watch("description")?.length || 0}/500
             </p>
           </div>
 
           {/* Image */}
           <div className="mb-4 w-full">
-            <label className="block font-bold text-gray-700">Image {!isEditing && '(Recommandée)'}</label>
+            <label className="block font-bold text-gray-700">
+              Image {!isEditing && "(Recommandée)"}
+            </label>
             <div className="flex justify-center items-center w-full h-[200px] border border-gray-400 rounded relative">
               <div className="w-fit flex flex-col justify-center items-center">
                 <input
@@ -277,7 +321,7 @@ const ServicesModal = ({
               disabled={isCreating || isUpdating}
               className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:bg-orange-300"
             >
-              {isCreating || isUpdating ? 'Enregistrement...' : 'Enregistrer'}
+              {isCreating || isUpdating ? "Enregistrement..." : "Enregistrer"}
             </button>
           </div>
         </form>
