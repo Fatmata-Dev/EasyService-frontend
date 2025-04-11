@@ -13,8 +13,8 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
         <h3 className="font-bold text-lg">Mot de passe oublié ?</h3>
         <form>
           <p className="my-2">
-            Entrez votre adresse e-mail ci-dessous et nous vous enverrons des instructions pour
-            modifier votre mot de passe.
+            Entrez votre adresse e-mail ci-dessous et nous vous enverrons des
+            instructions pour modifier votre mot de passe.
           </p>
           <div className="mb-2">
             <label htmlFor="email" className="block font-bold text-gray-700">
@@ -25,7 +25,7 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
               id="email"
               name="email"
               type="email"
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
             />
           </div>
           <button

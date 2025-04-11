@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
-import ServicesModal from '../../components/Modals/ServicesModal';
-import { 
+import { useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import ServicesModal from "../../components/Modals/ServicesModal";
+import {
   useGetServiceByIdQuery,
-  useDeleteServiceMutation 
-} from '../../services/servicesApi';
+  useDeleteServiceMutation,
+} from "../../services/servicesApi";
 
 const ServiceDetailAdmin = () => {
   const { id } = useParams();
@@ -37,9 +37,14 @@ const ServiceDetailAdmin = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center py-8">Chargement en cours...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">Erreur de chargement</div>;
-  if (!service) return <div className="text-center py-8">Service non trouvé</div>;
+  if (isLoading)
+    return <div className="text-center py-8">Chargement en cours...</div>;
+  if (error)
+    return (
+      <div className="text-center py-8 text-red-500">Erreur de chargement</div>
+    );
+  if (!service)
+    return <div className="text-center py-8">Service non trouvé</div>;
 
   return (
     <div className="container mx-auto px-4">
@@ -118,13 +123,13 @@ const ServiceDetailAdmin = () => {
 
         <div className="flex justify-center gap-4 mt-6">
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded transition"
             onClick={() => setShowModal(true)}
           >
             Modifier
           </button>
           <button
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md transition"
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded transition"
             onClick={handleDelete}
           >
             Supprimer

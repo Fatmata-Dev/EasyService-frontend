@@ -46,7 +46,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
     //client: selectedService || user,
     dateIntervention: selectedService?.dateIntervention || "",
   });
-  console.log(formData.tarif);
+  //console.log(formData.tarif);
 
   useEffect(() => {
     if (formData.duree && formData.uniteDuree) {
@@ -112,7 +112,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
 
     try {
       const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/demandes",
+        "http://localhost:4000/api/demandes",
         demandeData,
         {
           headers: {
@@ -146,7 +146,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
     const getAllCategories = async () => {
       try {
         const response = await axios.get(
-          "https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
+          "http://localhost:4000/api/categories/all/categories",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -194,7 +194,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 type="text"
                 disabled
                 value={formData.serviceName}
-                className="block w-full rounded-md bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               />
             </div>
 
@@ -206,7 +206,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 value={formData.categorie}
                 disabled
                 onChange={handleInputChange}
-                className="block w-full rounded-md bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               >
                 {categories.length > 0 ? (
                   categories.map((item) => (
@@ -229,7 +229,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               type="text"
               disabled
               value={formData.description}
-              className="py-2 block w-full rounded-md bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+              className="py-2 block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
             />
           </div>
 
@@ -245,7 +245,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 value={formData.duree}
                 onChange={handleInputChange}
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
 
@@ -259,7 +259,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 value={formData.uniteDuree}
                 onChange={handleInputChange}
                 required
-                className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="py-2 block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
                 <option value="minutes">Minutes</option>
                 <option value="heures">Heures</option>
@@ -277,7 +277,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 type="number"
                 disabled
                 value={formData.tarif}
-                className="block w-full rounded-md bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               />
               <p className="text-xs text-gray-500 mt-1">
                 {formData.uniteDuree === "heures" &&
@@ -302,7 +302,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 type="datetime-local"
                 value={formData.dateIntervention}
                 onChange={handleInputChange}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
 
@@ -316,7 +316,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 type="text"
                 disabled
                 placeholder="A définir par l'admin"
-                className="block w-full rounded-md bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               />
             </div>
           </div>

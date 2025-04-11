@@ -62,7 +62,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
     try {
       const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/register",
+        "http://localhost:4000/api/auth/register",
         {
           nom: formData.nom,
           prenom: formData.prenom,
@@ -125,7 +125,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               type="text"
               value={formData.prenom}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               required
             />
           </div>
@@ -141,7 +141,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               type="text"
               value={formData.nom}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               required
             />
           </div>
@@ -157,7 +157,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               required
             />
           </div>
@@ -173,7 +173,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               type="password"
               value={formData.password}
               onChange={handleChange}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               required
               minLength={6}
             />

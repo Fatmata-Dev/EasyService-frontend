@@ -7,8 +7,9 @@ import { useNavigate } from "react-router-dom";
 import AssignTechnicienModal from "../Modals/AssignerTechnicienModal";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { memo } from "react";
 
-export default function DemandesCard({ demande, onUpdate }) {
+const DemandesCard = memo(({ demande, onUpdate }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const navigate = useNavigate();
 
@@ -36,7 +37,7 @@ export default function DemandesCard({ demande, onUpdate }) {
   // const handleDelete = async (id) => {
   //   if (window.confirm("Êtes-vous sûr de vouloir supprimer cette demande ?")) {
   //     try {
-  //       await axios.delete(`https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`, {
+  //       await axios.delete(`http://localhost:4000/api/demandes/${id}`, {
   //         headers: {
   //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
   //         },
@@ -55,7 +56,7 @@ export default function DemandesCard({ demande, onUpdate }) {
     if (window.confirm("Voulez-vous rejeter cette demande ?")) {
       try {
         await axios.put(
-          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
+          `http://localhost:4000/api/demandes/${id}`,
           { statut: "refusee" },
           {
             headers: {
@@ -77,7 +78,7 @@ export default function DemandesCard({ demande, onUpdate }) {
     if (window.confirm("Voulez-vous annuler cette demande ?")) {
       try {
         await axios.put(
-          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
+          `http://localhost:4000/api/demandes/${id}`,
           { statut: "annulee" },
           {
             headers: {
@@ -95,26 +96,6 @@ export default function DemandesCard({ demande, onUpdate }) {
       }
     }
   };
-
-  // const handleAccept = async (id) => {
-  //   try {
-  //     await axios.put(
-  //       `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-  //       { statut: "en_cours" },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //         },
-  //       }
-  //     );
-  //     toast.success("Demande acceptée avec succès");
-  //     navigate("/admin/demandes");
-  //   } catch (err) {
-  //     toast.error(
-  //       err.response?.data?.message || "Erreur lors de l'acceptation de la demande"
-  //     );
-  //   }
-  // };
 
   const handleAssignSuccess = () => {
     onUpdate && onUpdate(); // Rafraîchir la liste des demandes
@@ -178,13 +159,13 @@ export default function DemandesCard({ demande, onUpdate }) {
           <div className="flex flex-col">
             <div className="flex justify-between mt-4">
               <button
-                className="bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600"
+                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
                 onClick={() => handleReject(demande._id)}
               >
                 Refuser
               </button>
               <button
-                className="bg-orange-500 text-white px-4 py-1.5 rounded-md hover:bg-orange-600"
+                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
                 onClick={() => setShowAssignModal(true)}
               >
                 Accepter
@@ -205,14 +186,14 @@ export default function DemandesCard({ demande, onUpdate }) {
           <div className="flex flex-col">
             <div className="flex justify-between mt-4">
               <button
-                className="bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600"
+                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
                 onClick={() => handleCancel(demande._id)}
               >
                 Annuler
               </button>
               <a
                 href={`demandes/${demande._id}`}
-                className="bg-orange-500 text-white px-4 py-1.5 rounded-md hover:bg-orange-600"
+                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
               >
                 Détail
               </a>
@@ -247,4 +228,6 @@ export default function DemandesCard({ demande, onUpdate }) {
       )}
     </div>
   );
-}
+});
+
+export default DemandesCard;
