@@ -1,17 +1,19 @@
 import { useState } from "react";
 
-export default function DemandesModal({setShowModal}) {
+export default function DemandesModal({ setShowModal }) {
   const [imagePreview, setImagePreview] = useState();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    onClick={() => setShowModal(false)}
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={() => setShowModal(false)}
     >
-      <div className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
-      onClick={(e) => e.stopPropagation()}
+      <div
+        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
       >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
-             Ajouter un service
+          Ajouter un service
         </h3>
         <form>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
@@ -26,23 +28,19 @@ export default function DemandesModal({setShowModal}) {
                   name="nom"
                   type="text"
                   autoComplete="given-nom"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                  className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>
             </div>
             <div className="mb-4 w-full">
-              <label
-                className="block font-bold text-gray-700"
-              >
-                Catégorie
-              </label>
+              <label className="block font-bold text-gray-700">Catégorie</label>
               <div>
                 <input
                   placeholder="Mettez la catégorie"
                   id="categorie"
                   name="categorie"
                   type="text"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                  className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -59,30 +57,26 @@ export default function DemandesModal({setShowModal}) {
                   name="duree"
                   type="text"
                   autoComplete="given-duree"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                  className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>
             </div>
             <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">
-                Tarif
-              </label>
+              <label className="block font-bold text-gray-700">Tarif</label>
               <div>
                 <input
                   placeholder="Mettez le tarif"
                   id="tarif"
                   name="tarif"
                   type="text"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                  className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>
             </div>
           </div>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             <div className="mb-4 w-full">
-              <label
-                className="block font-bold text-gray-700"
-              >
+              <label className="block font-bold text-gray-700">
                 Description
               </label>
               <div>
@@ -91,16 +85,14 @@ export default function DemandesModal({setShowModal}) {
                   id="description"
                   name="description"
                   autoComplete="given-description"
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                  className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 />
               </div>
             </div>
           </div>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             <div className="mb-4 w-full">
-              <label className="block font-bold text-gray-700">
-                Image
-              </label>
+              <label className="block font-bold text-gray-700">Image</label>
               <div className="flex justify-center items-center w-full h-[200px] border border-gray-400 rounded">
                 <div className="w-fit flex flex-col justify-center items-center">
                   <input

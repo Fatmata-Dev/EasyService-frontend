@@ -40,7 +40,7 @@ const ServiceDetails = () => {
     const getService = async () => {
       try {
         const response = await axios.get(
-          `https://easyservice-backend-iv29.onrender.com/api/services/${id}`,
+          `http://localhost:4000/api/services/${id}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -154,7 +154,7 @@ const ServiceDetails = () => {
         </div>
         <div className="flex justify-center lg:justify-end mt-6 sticky bottom-3">
           <button
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 shadow-lg rounded-md transition"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 shadow-lg rounded transition"
             onClick={handleReservation}
           >
             Réserver ce service

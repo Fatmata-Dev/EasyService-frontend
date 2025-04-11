@@ -77,8 +77,6 @@ export default function DemandesAdmin() {
     // Ajoutez votre logique ici
   };
 
-
-
   return (
     <div className="">
       <h1 className="text-2xl font-bold uppercase w-full text-center pb-3">
@@ -88,7 +86,7 @@ export default function DemandesAdmin() {
       {/* Bouton pour ouvrir la modale */}
       <div className="flex justify-end mb-4">
         <button
-          className="bg-orange-500 text-white px-4 py-2 rounded-md flex items-center"
+          className="bg-orange-500 text-white px-4 py-2 rounded flex items-center"
           onClick={() => setShowModal(true)}
         >
           <IoIosAdd className="mr-2" /> Ajouter une demande
@@ -196,16 +194,15 @@ export default function DemandesAdmin() {
             {/* Boutons */}
             <div className="flex justify-between mt-4">
               <p className="mt-2 text-blue-500 cursor-pointer">
-              Plus de détails
-            </p>
+                Plus de détails
+              </p>
               <button
-                className="bg-orange-500 text-white px-4 py-2 rounded-md"
+                className="bg-orange-500 text-white px-4 py-2 rounded"
                 onClick={() => handleAccept(demande.id)}
               >
                 Accepter
               </button>
             </div>
-            
           </div>
         ))}
       </div>

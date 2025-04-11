@@ -148,7 +148,7 @@ const ServicesModal = ({
                   required: "Ce champ est obligatoire",
                   maxLength: { value: 50, message: "Maximum 50 caractères" },
                 })}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
               {errors.nom && (
                 <p className="text-red-500 text-sm mt-1">
@@ -166,7 +166,7 @@ const ServicesModal = ({
                 {...register("categorie", {
                   required: "Ce champ est obligatoire",
                 })}
-                className="py-2 block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="py-2 block w-full rounded px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
                 <option value="">Sélectionnez une catégorie</option>
                 {categories.map((item) => (
@@ -181,7 +181,7 @@ const ServicesModal = ({
                   <input
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                    className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                     placeholder="Nouvelle catégorie"
                   />
                   <button
@@ -215,7 +215,7 @@ const ServicesModal = ({
               <input
                 type="number"
                 {...register("duree", { min: 0 })}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
 
@@ -225,7 +225,7 @@ const ServicesModal = ({
               </label>
               <select
                 {...register("uniteDuree")}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="py-2 block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               >
                 <option value="">Sélectionnez une unité</option>
                 <option value="heures">Heures</option>
@@ -247,7 +247,7 @@ const ServicesModal = ({
                     message: "Le tarif ne peut pas être négatif",
                   },
                 })}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
               {errors.tarif && (
                 <p className="text-red-500 text-sm mt-1">
@@ -262,7 +262,7 @@ const ServicesModal = ({
             <label className="block font-bold text-gray-700">Description</label>
             <textarea
               {...register("description", { maxLength: 500 })}
-              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               rows="3"
             />
             <p className="text-right text-sm text-gray-500 mt-1">

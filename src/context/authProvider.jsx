@@ -22,7 +22,7 @@
 //       if (!userData?._id) return null;
 
 //       const response = await axios.get(
-//         `https://easyservice-backend-iv29.onrender.com/api/users/${userData._id}`,
+//         `http://localhost:4000/api/users/${userData._id}`,
 //         { headers: { Authorization: `Bearer ${storedToken}` }}
 //       );
 
@@ -72,7 +72,7 @@
 //     try {
 //       setLoading(true);
 //       const response = await axios.post(
-//         "https://easyservice-backend-iv29.onrender.com/api/auth/login",
+//         "http://localhost:4000/api/auth/login",
 //         credentials
 //       );
 

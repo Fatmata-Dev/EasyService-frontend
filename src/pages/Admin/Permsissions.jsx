@@ -1,36 +1,39 @@
 import { useState, useEffect } from "react";
 import AddTechnicienModal from "../../components/Modals/AddTechnicienModal";
 import { IoIosAdd } from "react-icons/io";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function PermissionsAdmin() {
   const [showModal, setShowModal] = useState(false);
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
 
-  // 🔹 Récupérer les utilisateurs depuis l'API
+  // Récupérer les utilisateurs depuis l'API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(
-          "https://easyservice-backend-iv29.onrender.com/api/auth/users"
+        setIsLoading(true);
+        const response = await axios.get(
+          "http://localhost:4000/api/auth/users",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des utilisateurs.");
-        }
-        const data = await response.json();
 
-        console.log("Données reçues de l'API:", data); // Debug
-
-        // Vérifie si data est bien un tableau avant de le stocker
-        if (Array.isArray(data.users)) {
-          setUsers(data.users); // Utilise uniquement le tableau des utilisateurs
+        if (response.data.users) {
+          setUsers(response.data.users);
         } else {
-          console.error("L'API ne renvoie pas un tableau:", data);
-          setUsers([]); // Évite l'erreur en mettant un tableau vide
+          setUsers([]);
         }
       } catch (error) {
         console.error(error);
-        setUsers([]); // Gestion de l'erreur : stocke un tableau vide pour éviter l'erreur .map()
+        setError("Erreur lors de la récupération des utilisateurs");
+        toast.error("Erreur lors de la récupération des utilisateurs");
       } finally {
         setIsLoading(false);
       }
@@ -39,11 +42,46 @@ export default function PermissionsAdmin() {
     fetchUsers();
   }, []);
 
-  // 🔹 Met à jour le rôle d'un utilisateur (localement)
-  const handleRoleChange = (id, newRole) => {
-    setUsers(
-      users.map((user) => (user._id === id ? { ...user, role: newRole } : user))
+  const handleRoleChange = (userId, newRole) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user._id === userId ? { ...user, role: newRole } : user
+      )
     );
+    setEditingUser(userId);
+  };
+
+  const handleSubmit = async (userId) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const userToUpdate = users.find((user) => user._id === userId);
+      if (!userToUpdate) return;
+
+      const response = await axios.put(
+        `http://localhost:4000/api/auth/users/${userId}`,
+        { role: userToUpdate.role },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Rôle mis à jour avec succès");
+        setEditingUser(null);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Erreur lors de la mise à jour");
+      toast.error(
+        err.response?.data?.message || "Erreur lors de la mise à jour"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,21 +91,23 @@ export default function PermissionsAdmin() {
           Gestion des Permissions
         </h1>
 
-        {/* Affichage du modal */}
         {showModal && <AddTechnicienModal setShowModal={setShowModal} />}
 
-        {/* Bouton pour afficher le modal */}
         <button
-          className="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded-lg flex items-center text-md hover:bg-orange-500 hover:text-white transition"
+          className="px-4 py-2 text-orange-500 border-2 border-orange-500 rounded flex items-center text-md hover:bg-orange-500 hover:text-white transition"
           onClick={() => setShowModal(true)}
         >
-          <IoIosAdd className="text-3xl mr-2" />
+          <IoIosAdd className="mr-2" />
           Ajouter un Technicien
         </button>
       </div>
 
+      {error && (
+        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
+      )}
+
       <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
-        {isLoading ? (
+        {isLoading && users.length === 0 ? (
           <p className="text-center text-gray-500">
             Chargement des utilisateurs...
           </p>
@@ -78,6 +118,7 @@ export default function PermissionsAdmin() {
                 <th className="py-3 px-4">ID</th>
                 <th className="py-3 px-4">Prénom</th>
                 <th className="py-3 px-4">Nom</th>
+                <th className="py-3 px-4">Email</th>
                 <th className="py-3 px-4">Rôle</th>
                 <th className="py-3 px-4">Actions</th>
               </tr>
@@ -86,24 +127,39 @@ export default function PermissionsAdmin() {
               {users.map((user, index) => (
                 <tr key={user._id} className="border-b border-gray-300">
                   <td className="py-3 px-4">{index + 1}</td>
-                  <td className="py-3 px-4">{user.prenom}</td>
-                  <td className="py-3 px-4">{user.nom}</td>
+                  <td className="py-3 px-4 capitalize">{user.prenom}</td>
+                  <td className="py-3 px-4 capitalize">{user.nom}</td>
+                  <td className="py-3 px-4">{user.email}</td>
                   <td className="py-3 px-4">
-                    <select
-                      className="border border-gray-300 p-2 rounded-md focus:ring focus:ring-blue-300"
-                      value={user.role}
-                      onChange={(e) =>
-                        handleRoleChange(user._id, e.target.value)
-                      }
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="technicien">Technicien</option>
-                      <option value="client">Client</option>
-                    </select>
+                    <label>
+                      <select
+                        name="role"
+                        className="border border-gray-300 p-2 rounded focus:ring focus:ring-blue-300"
+                        value={user.role}
+                        onChange={(e) =>
+                          handleRoleChange(user._id, e.target.value)
+                        }
+                        disabled={isLoading && editingUser === user._id}
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="technicien">Technicien</option>
+                        <option value="client">Client</option>
+                      </select>
+                    </label>
                   </td>
                   <td className="py-3 px-4">
-                    <button className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition">
-                      Sauvegarder
+                    <button
+                      className={`px-4 py-2 rounded transition ${
+                        editingUser === user._id
+                          ? "bg-orange-500 text-white hover:bg-orange-600"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                      onClick={() => handleSubmit(user._id)}
+                      disabled={isLoading && editingUser === user._id}
+                    >
+                      {isLoading && editingUser === user._id
+                        ? "En cours..."
+                        : "Sauvegarder"}
                     </button>
                   </td>
                 </tr>
