@@ -39,13 +39,13 @@ export default function AddTechnicienModal({ setShowModal }) {
       data.append("role", formData.role);
 
       const response = await axios.post(
-        "http://localhost:4000/api/auth/creer/technicien",
+        "https://easyservice-backend-iv29.onrender.com/api/auth/creer/technicien",
         data,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          }
+          },
         }
       );
 
@@ -66,25 +66,25 @@ export default function AddTechnicienModal({ setShowModal }) {
     }
   };
 
-    useEffect(() => {
-      const getAllCategories = async () => {
-        try {
-          const response = await axios.get(
-            "http://localhost:4000/api/categories/all/categories",
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
-          setCategories(response.data);
-        } catch (err) {
-          console.error("Erreur lors de la récupération des catégories", err);
-        }
-      };
-  
-      getAllCategories();
-    }, []);
+  useEffect(() => {
+    const getAllCategories = async () => {
+      try {
+        const response = await axios.get(
+          "https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        setCategories(response.data);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des catégories", err);
+      }
+    };
+
+    getAllCategories();
+  }, []);
 
   return (
     <div
@@ -141,7 +141,6 @@ export default function AddTechnicienModal({ setShowModal }) {
               />
             </div>
           </div>
-
 
           {/* Téléphone & Métier */}
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
@@ -200,7 +199,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                   <option value="">Chargement...</option>
                 )}
               </select>
-              </div>
+            </div>
           </div>
 
           <h4 className="font-bold text-gray-700 my-2">
@@ -237,10 +236,9 @@ export default function AddTechnicienModal({ setShowModal }) {
             </div>
           </div>
 
-
           {/* Bouton d'enregistrement */}
           <div className="flex justify-end gap-3">
-          <button
+            <button
               type="button"
               onClick={() => setShowModal(false)}
               className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
