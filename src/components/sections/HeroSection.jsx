@@ -20,6 +20,14 @@ const slideInRight = {
   }
 };
 
+// Configuration d'hover pour les images
+const imageHover = {
+  hover: { 
+    scale: 1.05,
+    transition: { duration: 0.6, ease: "easeOut" } 
+  }
+};
+
 export default function HeroSection() {
   return (
     <section id="home" className="bg-gray-50 p-4">
@@ -58,74 +66,92 @@ export default function HeroSection() {
           </motion.div>
         </motion.div>
 
+        {/* Section images avec animations */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           className="grid grid-cols-2 w-100 md:w-1/2"
         >
-          <img 
+          <motion.img 
             src="/mecano.jpg" 
-            alt="Mécanicien" 
-            className="h-full object-cover"
+            alt="Mécanicien"
+            className="h-full object-cover cursor-pointer"
+            whileHover="hover"
+            variants={imageHover}
           />
           <div className="flex flex-col">
             <motion.img 
               src="/13430.jpg" 
-              alt="Service client" 
+              alt="Service client"
+              className="cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
+              whileHover="hover"
+              variants={imageHover}
             />
             <motion.img 
               src="/dev.jpg" 
-              alt="Développement" 
+              alt="Développement"
+              className="cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
+              whileHover="hover"
+              variants={imageHover}
             />
           </div>
         </motion.div>
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, x: -50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-        className="flex flex-col items-center sm:flex-row md:px-12 md:mx-12"
-      >
-        <div className="max-h-lg md:w-1/2">
+      {/* Section Femme */}
+      <div className="flex flex-col items-center sm:flex-row md:px-12 md:mx-12">
+        <motion.div 
+          initial={{ opacity: 0, x: -100 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-h-lg md:w-1/2"
+        >
           <img src="/femme.png" alt="Client recherchant un service" />
-        </div>
+        </motion.div>
+        
         <motion.p 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, x: 100 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-xl text-center sm:text-left font-bold md:w-1/2 md:text-3xl"
         >
           Vous êtes à la recherche d'experts pour un service
         </motion.p>
-      </motion.div>
+      </div>
 
-      <motion.div 
-        initial={{ opacity: 0, x: 50 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-        className="flex flex-col-reverse items-center sm:flex-row md:px-12 md:mx-12"
-      >
+      {/* Section Technicien */}
+      <div className="flex flex-col-reverse items-center sm:flex-row md:px-12 md:mx-12">
         <motion.p 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, x: -100 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-xl text-center sm:text-left font-bold md:w-1/2 md:text-3xl"
         >
           Vous êtes un technicien à la recherche de clients
         </motion.p>
-        <div className="max-h-lg w-3/5">
+        
+        <motion.div 
+          initial={{ opacity: 0, x: 100 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-h-lg w-3/5"
+        >
           <img src="/black man.png" alt="Technicien professionnel" />
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
+      {/* Section Conclusion */}
       <motion.p 
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}

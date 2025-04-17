@@ -111,13 +111,14 @@ export default function Navbar({ defaultSection }) {
         <div className="flex gap-4">
           <button
             onClick={() => setShowLogin(true)}
-            className="bg-white text-orange-500 font-bold px-2 py-1 sm:px-6 sm:py-2 rounded border-2 border-orange-500 hover:bg-orange-500 hover:text-white transition-colors duration-300"
+            className="bg-white text-orange-500 font-bold px-2 py-1 sm:px-6 sm:py-2 rounded-full border-2 border-orange-500
+            hover:bg-orange-500 hover:text-white transition-colors duration-300"
           >
             Connexion
           </button>
           <button
             onClick={() => setShowSignup(true)}
-            className="bg-white text-orange-500 font-bold px-2 py-1 sm:px-6 sm:py-2 rounded border-2 border-orange-500 hover:bg-orange-500 hover:text-white transition-colors duration-300"
+            className="bg-white text-orange-500 font-bold px-2 py-1 sm:px-6 sm:py-2 rounded-full border-2 border-orange-500 hover:bg-orange-500 hover:text-white transition-colors duration-300"
           >
             Inscription
           </button>
