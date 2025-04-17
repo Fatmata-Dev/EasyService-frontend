@@ -68,7 +68,7 @@ export default function Navbar({ defaultSection }) {
         </div>
 
         <div className="flex justify-center hidden lg:flex">
-          <div className="flex items-center border-2 border-orange-500 rounded-full px-2 py-2">
+          <div className="flex items-center border-2 border-orange-500 rounded-full px-1 py-2">
             {["home", "services", "testimonials", "contact"].map((section) => (
               <div key={section}>
                 {location.pathname === "/" ? (

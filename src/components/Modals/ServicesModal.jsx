@@ -17,6 +17,8 @@ const ServicesModal = ({
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
   const { data: categories = [] } = useGetCategoriesQuery();
+  console.log("Catégories:", categories);
+
   const [createCategory] = useCreateCategoryMutation();
 
   const {
@@ -48,10 +50,24 @@ const ServicesModal = ({
       fields.forEach((field) => {
         const value = selectedService[field];
         if (value) setValue(field, field === "categorie" ? value._id : value);
+        console.log("selectedService", selectedService);
       });
       setImagePreview(selectedService.image);
     }
   }, [selectedService, setValue]);
+
+  useEffect(() => {
+    if (categories.length > 0 && selectedService) {
+      const selectedCategory = categories.find(
+        (cat) => cat._id === selectedService.categorie
+      );
+      console.log("Catégorie trouvée :", selectedCategory);
+    }
+  }, [categories, selectedService]);
+
+  //   console.log("selectedService:", selectedService);
+  // console.log("categorie dans form:", watch("categorie"));
+  // console.log("categories:", categories);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -162,19 +178,23 @@ const ServicesModal = ({
               <label className="block font-bold text-gray-700">
                 Catégorie *
               </label>
-              <select
-                {...register("categorie", {
-                  required: "Ce champ est obligatoire",
-                })}
-                className="py-2 block w-full rounded px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              >
-                <option value="">Sélectionnez une catégorie</option>
-                {categories.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.nom}
-                  </option>
-                ))}
-              </select>
+              {categories.length === 0 ? (
+                <p>Chargement des catégories...</p>
+              ) : (
+                <select
+                  {...register("categorie", {
+                    required: "Ce champ est obligatoire",
+                  })}
+                  className="py-2 block w-full rounded px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                >
+                  <option value="">Sélectionnez une catégorie</option>
+                  {categories.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.nom}
+                    </option>
+                  ))}
+                </select>
+              )}
 
               {showCategoryInput ? (
                 <div className="mt-2 flex gap-2">
@@ -312,7 +332,7 @@ const ServicesModal = ({
             <button
               type="button"
               onClick={() => setShowModal(false)}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Annuler
             </button>

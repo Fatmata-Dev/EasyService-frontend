@@ -41,6 +41,10 @@ export default function LoginModal({
 
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem(
+        "message",
+        `Binevenu(e) ${response.data.user.prenom} ${response.data.user.nom}, vous êtes connecté en tant que ${response.data.user.role}`
+      );
 
       if ((response.data.token && response.data.user.role) || isConnected) {
         if (isConnected) {

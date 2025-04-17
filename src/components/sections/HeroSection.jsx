@@ -133,9 +133,9 @@ export default function HeroSection() {
         transition={{ duration: 0.9 }}
         className="text-xl font-bold sm:text-2xl md:text-3xl sm:mx-0 text-center mt-12 md:px-12 md:mx-12 mb-4"
       >
-        <span className="text-orange-500">Easy Service</span> est la
+        <motion.span className="text-orange-500">Easy Service</motion.span> est la
         plateforme qu’il vous faut, alors n’hésitez pas car chez nous{" "}
-        <span className="text-orange-500">la satisfaction est garantie</span>.
+        <motion.span className="text-orange-500">la satisfaction est garantie</motion.span>.
       </motion.p>
     </section>
   );

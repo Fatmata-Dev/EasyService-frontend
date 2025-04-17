@@ -11,6 +11,9 @@ const ServiceDetailsClient = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [commentaires, setCommentaires] = useState([]);
+  const [nouveauCommentaire, setNouveauCommentaire] = useState("");
+  const [note, setNote] = useState(5); // note sur 5
 
   useEffect(() => {
     const getService = async () => {
@@ -32,6 +35,7 @@ const ServiceDetailsClient = () => {
         // });
         // console.log("Données du service:", response.data.nom);
         setService(response.data);
+        setCommentaires(response.data.commentaires || []);
       } catch (err) {
         // console.error("Erreur complète:", err.response?.data);
         setError(err.response?.data?.message || "Erreur serveur");
@@ -71,6 +75,37 @@ const ServiceDetailsClient = () => {
     setShowModal(true);
   };
 
+  const envoyerCommentaire = async () => {
+    if (!nouveauCommentaire.trim()) {
+      toast.error("Le commentaire ne peut pas être vide.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://easyservice-backend-iv29.onrender.com/api/services/${id}/commentaires`,
+        {
+          commentaire: nouveauCommentaire,
+          note: Number(note),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setCommentaires((prev) => [response.data, ...prev]);
+      setNouveauCommentaire("");
+      setNote(5);
+      toast.success("Commentaire ajouté !");
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du commentaire :", error);
+      toast.error("Erreur lors de l'envoi du commentaire.");
+    }
+  };
+
   return (
     <div className="container mx-auto px-4">
       <Link
@@ -82,58 +117,60 @@ const ServiceDetailsClient = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">DÉTAIL DU SERVICE</h1>
 
       <div className="flex flex-col gap-3">
-        <div className="flex justify-center">
-          <img
-            src={service.image || "Image indisponible"}
-            alt={service.nom || "Image indisponible"}
-            className="max-w-full sm:max-w-lg rounded-lg shadow-md h-[300px]"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "Image indisponible";
-            }}
-          />
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-2/3">
-            <h2 className="text-xl font-bold mb-2 text-orange-500">
-              {service.nom?.toUpperCase()}
-            </h2>
-            <p className="text-gray-700 mb-4 font-semibold">
-              {service.categorie?.nom || "Catégorie non spécifiée"}
-            </p>
-
-            <p className="text-gray-700 whitespace-pre-line">
-              {service.description || "Aucune description disponible"}
-            </p>
+        <div className="flex flex-col lg:flex-row md:justify-between gap-5 lg:gap-7 lg:gap-2">
+          <div className="flex justify-center itemes-center w-1/2">
+            <img
+              src={service.image || "Image indisponible"}
+              alt={service.nom || "Image indisponible"}
+              className="max-w-full rounded-lg shadow-md"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "Image indisponible";
+              }}
+            />
           </div>
 
-          <div className="lg:w-1/3">
-            <div className="bg-orange-50 shadow-md p-6 rounded-lg border border-orange-100">
-              <p className="mb-3">
-                <strong>TARIF :</strong>{" "}
-                {service.tarif ? `${service.tarif} FCFA` : "Non spécifié"}
+          <div className="flex flex-col gap-4 w-1/2">
+            <div className="lg:w-full">
+              <h2 className="text-xl font-bold mb-2 text-orange-500">
+                {service.nom?.toUpperCase()}
+              </h2>
+              <p className="text-gray-700 mb-4 font-semibold">
+                {service.categorie?.nom || "Catégorie non spécifiée"}
               </p>
-              <p className="mb-3">
-                <strong>DUREE :</strong>{" "}
-                {service.duree
-                  ? `${service.duree} ${service.uniteDuree || ""}`
-                  : "Non spécifiée"}
+
+              <p className="text-gray-700 whitespace-pre-line">
+                {service.description || "Aucune description disponible"}
               </p>
-              <p className="mb-3">
-                <strong>DATE INTERVENTION :</strong>{" "}
-                {formatDate(service.dateIntervention)}
-              </p>
-              <p className="text-sm text-gray-600 mt-4">
-                Ajouté le{" "}
-                {service.createDate
-                  ? new Date(service.createDate).toLocaleDateString("fr-FR")
-                  : "date inconnue"}{" "}
-                par l&apos;admin{" "}
-                <strong className="text-orange-500 uppercase">
-                  {service.admin?.prenom} {service.admin?.nom}
-                </strong>
-              </p>
+            </div>
+
+            <div className="lg:w-fit w-full">
+              <div className="bg-orange-50 shadow-md p-6 rounded-lg border border-orange-100 w-full">
+                <p className="mb-3">
+                  <strong>TARIF :</strong>{" "}
+                  {service.tarif ? `${service.tarif} FCFA` : "Non spécifié"}
+                </p>
+                <p className="mb-3">
+                  <strong>DUREE :</strong>{" "}
+                  {service.duree
+                    ? `${service.duree} ${service.uniteDuree || ""}`
+                    : "Non spécifiée"}
+                </p>
+                <p className="mb-3">
+                  <strong>DATE INTERVENTION :</strong>{" "}
+                  {formatDate(service.dateIntervention)}
+                </p>
+                <p className="text-sm text-gray-600 mt-4">
+                  Ajouté le{" "}
+                  {service.createDate
+                    ? new Date(service.createDate).toLocaleDateString("fr-FR")
+                    : "date inconnue"}{" "}
+                  par l'admin{" "}
+                  <strong className="text-orange-500 uppercase">
+                    {service.admin?.prenom} {service.admin?.nom}
+                  </strong>
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -148,10 +185,73 @@ const ServiceDetailsClient = () => {
             serviceId={service._id} // Passez l'ID du service au modal
           />
         )}
-        <div className="flex justify-center w-full">
+
+        <div className="mt-8 w-full">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Commentaires et notes
+          </h2>
+
+          {commentaires.length === 0 ? (
+            <p className="text-gray-600">Aucun commentaire pour ce service.</p>
+          ) : (
+            <ul className="space-y-4">
+              {commentaires.map((com, index) => (
+                <li
+                  key={index}
+                  className="bg-white p-4 shadow rounded border border-gray-100"
+                >
+                  <p className="text-gray-700">{com.commentaire}</p>
+                  <p className="text-sm text-orange-500 mt-1">
+                    Note : {com.note} / 5
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Par {com.utilisateur?.prenom || "Anonyme"} le{" "}
+                    {new Date(com.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Formulaire de commentaire */}
+          <div className="mt-6">
+            <h3 className="text-lg font-medium mb-2">Laisser un commentaire</h3>
+            <textarea
+              value={nouveauCommentaire}
+              onChange={(e) => setNouveauCommentaire(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+              rows="3"
+              placeholder="Écrivez votre avis ici..."
+            ></textarea>
+            <div className="flex items-center justify-between mt-2">
+              <label className="text-gray-600">
+                Note :
+                <select
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="ml-2 border rounded px-2 py-1"
+                >
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                onClick={envoyerCommentaire}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded"
+              >
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className=" sticky bottom-3 flex justify-center w-full">
           <button
             onClick={handleReservationClick}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1 rounded transition-colors mt-2 text-center block sticky bottom-3 shadow-lg"
+            className="bg-orange-500 hover:bg-orange-600 text-white px-16 py-1 rounded transition-colors mt-2 text-center block sticky bottom-3 shadow-lg"
           >
             Réserver
           </button>

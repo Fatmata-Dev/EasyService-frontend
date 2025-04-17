@@ -26,7 +26,6 @@ import MessagesTechniciens from "../pages/Technicien/Messages";
 import AvisTechniciens from "../pages/Technicien/Avis";
 import ContactTechniciens from "../pages/Technicien/Contact";
 import TechnicienHome from "../pages/Technicien/Technicien";
-import Disponibilites from "../pages/Technicien/Disponibiltes";
 import ServiceDetails from "../pages/ServiceDetails";
 import DetailsDemandeClient from "../pages/client/DetailsDemandeClient";
 import DetailsDemandeAdmin from "../pages/Admin/DetailsDemandesAdmin";
@@ -80,7 +79,6 @@ export default function AppRoutes() {
           <Route path="/technicien" element={<TechnicienHome />}>
             <Route index element={<DashboardTechniciens />} />
             <Route path="dashboard" element={<DashboardTechniciens />} />
-            <Route path="disponibilites" element={<Disponibilites />} />
             <Route path="interventions" element={<Intervention />} />
             <Route path="interventions/:id" element={<InterventionDetails />} />
             <Route path="messages" element={<MessagesTechniciens />} />
