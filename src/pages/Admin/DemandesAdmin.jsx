@@ -25,6 +25,7 @@ export default function DemandesAdmin() {
       );
 
       // 2. Construire directement les données finales
+      console.log(response.data.length);
       const demandesAvecDetails = response.data.map((demande) => {
         // Vérifier si le service est un objet complet ou juste un ID
         const serviceObj =
@@ -38,6 +39,12 @@ export default function DemandesAdmin() {
             ? demande.client
             : { _id: demande.client, prenom: "Client", nom: "inconnu" };
 
+        // Vérifier si le client est un objet complet ou juste un ID
+        const TechnicienObj =
+          typeof demande.technicien === "object"
+            ? demande.technicien
+            : { _id: demande.technicien, prenom: "Technicien", nom: "inconnu" };
+
         return {
           _id: demande._id,
           numeroDemande: demande.numeroDemande,
@@ -50,6 +57,8 @@ export default function DemandesAdmin() {
           statut: demande.statut,
           categorie: demande.categorieService,
           description: demande.description,
+          technicienPrenom: TechnicienObj?.prenom || "À définir",
+          technicienNom: TechnicienObj?.nom || "",
         };
       });
 

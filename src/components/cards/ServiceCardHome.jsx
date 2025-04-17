@@ -1,9 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from 'framer-motion';
 
 const ServiceCardHome = ({ service }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <motion.div 
+    initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative h-48 overflow-hidden">
       {service.image && (
         <img
@@ -43,7 +48,7 @@ const ServiceCardHome = ({ service }) => {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

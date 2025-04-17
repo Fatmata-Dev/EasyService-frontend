@@ -3,12 +3,19 @@ import SidebarTechnicien from "../../components/Technicien/SidebarTechnicien";
  import Header from "../../components/Header/Header";
  import { useState, useEffect } from "react";
  import { useNavigate } from "react-router-dom";
+ import toast from "react-hot-toast";
  // import axios from 'axios';
  
  const TechnicienHome = () => {
    const [technicien, setTechnicien] = useState(null);
    const [isScrolled, setIsScrolled] = useState(false);
    const token = localStorage.getItem("authToken");
+     const message = localStorage.getItem('message');
+   
+     if(message) {
+       toast.success(message, {duration:5000});
+       localStorage.removeItem('message');
+     }
  
    const navigate = useNavigate();
  

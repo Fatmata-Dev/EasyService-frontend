@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
  import { FaLongArrowAltRight } from "react-icons/fa";
  
- 
  const data = [
      {
        id: 1,
@@ -28,7 +27,7 @@ import { Link } from "react-router-dom";
          <div className="flex flex-col gap-5">
            <div className="bg-gray-100 rounded-lg">
              <h3 className="uppercase text-center font-bold text-lg mt-2">
-               Demandes
+               Interventions
              </h3>
      
      
@@ -105,13 +104,6 @@ import { Link } from "react-router-dom";
              </div>
            </div>
      
-           {/* Services */}
-           <div className="bg-gray-100 rounded-lg py-3">
-             <h3 className="uppercase text-center font-bold text-lg mb-3">
-               Services
-             </h3>
-             <div className="flex"></div>
-           </div>
          </div>
        );
  }

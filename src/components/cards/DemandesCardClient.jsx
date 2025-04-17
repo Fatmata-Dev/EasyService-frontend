@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import ReservationModal from "../Modals/ReservationModal";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,7 +8,7 @@ import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { memo } from "react";
 
-const DemandesCard = memo(({ demande, onUpdate }) => {
+const DemandesCardClient = memo(({ demande, onUpdate }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const navigate = useNavigate();
 
@@ -145,12 +144,12 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
           <strong className="font-bold pe-2">DATE DEMANDE :</strong>{" "}
           <span>{formatDate(demande.date)}</span>
         </p>
-        <p className="flex flex-wrap">
+        {/* <p className="flex flex-wrap">
           <strong className="font-bold pe-2">CLIENT :</strong>{" "}
           <span className="text-orange-600">
             {demande.clientPrenom} {demande.clientNom}
           </span>
-        </p>
+        </p> */}
         <p className="flex flex-wrap">
           <strong className="font-bold pe-2">TECHNICIEN :</strong>{" "}
           <span>
@@ -185,20 +184,20 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
             <div className="flex justify-between mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
-                onClick={() => handleReject(demande._id)}
+                onClick={() => handleCancel(demande._id)}
               >
-                Refuser
+                Annuler
               </button>
               <button
                 className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
                 onClick={() => setShowAssignModal(true)}
               >
-                Accepter
+                Modifier
               </button>
             </div>
             <div className="flex justify-center">
               <Link
-                to={`/admin/demandes/${demande._id}`}
+                to={`/client/demandes/${demande._id}`}
                 className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
               >
                 Plus de détails
@@ -225,7 +224,7 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
             </div>
             <div className="flex justify-center">
               <Link
-                to={`/admin/demandes/${demande._id}`}
+                to={`/client/demandes/${demande._id}`}
                 className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
               >
                 Plus de détails
@@ -259,7 +258,7 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
           <div className="flex flex-col">
             <div className="flex justify-center">
               <Link
-                to={`/admin/demandes/${demande._id}`}
+                to={`/client/demandes/${demande._id}`}
                 className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
               >
                 Plus de détails
@@ -282,4 +281,4 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
   );
 });
 
-export default DemandesCard;
+export default DemandesCardClient;

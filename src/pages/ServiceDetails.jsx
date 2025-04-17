@@ -84,14 +84,14 @@ const ServiceDetails = () => {
     <div>
       <Navbar defaultSection={"services"} />
 
-      <div className="mx-8 py-4">
+      <div className="mx-8 mt-2">
         <Link
           to="/"
-          className="text-gray-700 px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+          className="text-white-700 px-2 py-1 h-fit bg-gray-500 hover:bg-gray-300 rounded"
         >
           Retour
         </Link>
-        <h1 className="text-2xl font-bold my-4 text-center">
+        <h1 className="text-2xl font-bold my-4 text-center self-center">
           DÉTAIL DU SERVICE
         </h1>
 

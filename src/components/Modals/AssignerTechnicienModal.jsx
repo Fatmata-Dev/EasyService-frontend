@@ -32,8 +32,11 @@ export default function AssignTechnicienModal({
         );
 
         if (Array.isArray(response.data.techniciens)) {
-          setTechniciens(response.data.techniciens);
-          //console.log(response.data.techniciens);
+          const validTechniciens = response.data.techniciens.filter(
+            (tech) => tech._id && tech.prenom && tech.nom
+          );
+          setTechniciens(validTechniciens);
+          console.log(response.data.techniciens);
         } else {
           //console.log(response.data.techniciens);
           setError("Format de données inattendu");
@@ -55,20 +58,25 @@ export default function AssignTechnicienModal({
     e.preventDefault();
     setIsLoading(true);
 
+    console.log("Données à envoyer:", {
+      demandeId: demande._id,
+      technicienId: selectedTechnicien,
+    });
+
     if (!selectedTechnicien) {
       toast.error("Veuillez sélectionner un technicien");
       setIsLoading(false);
       return;
     }
 
-    const demandeId = demande._id;
+    //const demandeId = demande._id;
 
     try {
-      await axios.post(
+      const response = await axios.post(
         `https://easyservice-backend-iv29.onrender.com/api/demandes/assigner`,
         {
-          demandeId,
-          technicien: selectedTechnicien,
+          demandeId: demande._id,
+          technicienId: selectedTechnicien,
         },
         {
           headers: {
@@ -76,6 +84,8 @@ export default function AssignTechnicienModal({
           },
         }
       );
+
+      console.log(response);
 
       toast.success("Technicien assigné avec succès");
       onAssignSuccess(); // Rafraîchir la liste des demandes
@@ -183,7 +193,7 @@ export default function AssignTechnicienModal({
                     {techniciens.length > 0 ? (
                       techniciens.map((tech) => (
                         <option key={tech._id} value={tech._id}>
-                          {tech.prenom} {tech.nom} - {tech.specialite}
+                          {tech.prenom} {tech.nom} - {tech.metier}
                         </option>
                       ))
                     ) : (

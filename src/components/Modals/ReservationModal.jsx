@@ -11,32 +11,12 @@ export default function ReservationModal({ setShowModal, selectedService }) {
   const user = userData?.id;
   //const serviceId = selectedService?._id;
   const [categories, setCategories] = useState([]);
-
-  // Tarifs de base
-  const TARIF_MINUTES = 50; // 50 FCFA par minutes
-  const TARIF_HORAIRE = 3000; // 3000 FCFA par heure
-  const TARIF_QUOTIDIEN = 30000; // 30000 FCFA par jour (6 heures de travail)
-
-  // Fonction pour calculer le tarif en fonction de l'unité de durée
-  const calculateTarif = (duree, uniteDuree) => {
-    const dureeNum = Number(duree) || 0;
-    let total = 0;
-
-    if (uniteDuree === "minutes") {
-      total = Math.ceil(dureeNum) * TARIF_MINUTES;
-    } else if (uniteDuree === "heures") {
-      total = Math.ceil(dureeNum) * TARIF_HORAIRE;
-    } else if (uniteDuree === "jours") {
-      total = Math.ceil(dureeNum) * TARIF_QUOTIDIEN;
-    }
-
-    return total;
-  };
+  const [isLoading, setIsLoading] = useState();
 
   const [formData, setFormData] = useState({
     service: selectedService?._id || "",
     serviceName: selectedService?.nom || selectedService?.service || "", // Pour l'affichage
-    //categorie: selectedService?.categories || "",
+    categorie: selectedService?.categorie || "",
     description: selectedService?.description || "",
     tarif: selectedService?.tarif || 0,
     duree: selectedService?.duree || 0,
@@ -48,17 +28,47 @@ export default function ReservationModal({ setShowModal, selectedService }) {
   });
   //console.log(formData.tarif);
 
+  const calculateTarif = (duree, uniteDuree, tarifBase) => {
+    const dureeNum = Number(duree) || 0;
+    const tarifNum = Number(tarifBase) || 0;
+
+    // Conversion en heures pour calcul standard
+    let heuresEquivalentes = dureeNum;
+
+    if (uniteDuree === "minutes") {
+      heuresEquivalentes = dureeNum / 60;
+    } else if (uniteDuree === "jours") {
+      heuresEquivalentes = dureeNum * 24;
+    }
+
+    // Calcul du tarif total avec arrondi
+    const tarifTotal = Math.ceil(heuresEquivalentes * tarifNum);
+
+    // Minimum d'1 heure de facturation
+    return tarifTotal < tarifNum ? tarifNum : tarifTotal;
+  };
+
+  // Dans votre useEffect de calcul
   useEffect(() => {
-    if (formData.duree && formData.uniteDuree) {
-      const newTarif = calculateTarif(formData.duree, formData.uniteDuree);
+    if (formData.duree && formData.uniteDuree && formData.tarif) {
+      const newTarif = calculateTarif(
+        formData.duree,
+        formData.uniteDuree,
+        selectedService?.tarif || formData.tarif
+      );
+
       setFormData((prev) => ({
         ...prev,
         tarif: newTarif,
       }));
     }
-  }, [formData.duree, formData.uniteDuree]);
+  }, [
+    formData.duree,
+    formData.uniteDuree,
+    selectedService?.tarif,
+    formData.tarif,
+  ]);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
@@ -71,6 +81,13 @@ export default function ReservationModal({ setShowModal, selectedService }) {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+
+    if (formData.duree <= 0) {
+      setError("La durée doit être supérieure à 0.");
+      toast.error("Durée invalide.");
+      setIsLoading(false);
+      return;
+    }
 
     if (!user || typeof user !== "string" || user === "undefined") {
       setError("Identifiant client invalide");
@@ -108,7 +125,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       technicien: formData.technicien || null,
     };
 
-    console.log("Données à envoyer:", demandeData);
+    // console.log("Données à envoyer:", demandeData);
 
     try {
       const response = await axios.post(
@@ -122,8 +139,8 @@ export default function ReservationModal({ setShowModal, selectedService }) {
         }
       );
 
-      toast.success("Demande envoyée avec succès !");
-      console.log("Réponse de l'API:", response.data);
+      toast.success(response || "Demande envoyée avec succès !");
+      // console.log("Réponse de l'API:", response.data);
       setShowModal(false);
     } catch (err) {
       console.error("Erreur lors de l'envoi de la demande", err);
@@ -281,11 +298,17 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               />
               <p className="text-xs text-gray-500 mt-1">
                 {formData.uniteDuree === "heures" &&
-                  `Tarif: ${TARIF_HORAIRE.toLocaleString()} FCFA/heure`}
+                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
+                    formData.duree
+                  } heure(s))`}
                 {formData.uniteDuree === "jours" &&
-                  `Tarif: ${TARIF_QUOTIDIEN.toLocaleString()} FCFA/jour (24 heures)`}
+                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
+                    formData.duree
+                  } jour(s) = ${formData.duree * 24} heures)`}
                 {formData.uniteDuree === "minutes" &&
-                  `Tarif: ${Math.ceil(TARIF_HORAIRE / 60)} FCFA/minute`}
+                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
+                    formData.duree
+                  } minute(s) = ${(formData.duree / 60).toFixed(2)} heures)`}
               </p>
             </div>
           </div>
