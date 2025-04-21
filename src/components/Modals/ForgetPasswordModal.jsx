@@ -1,6 +1,30 @@
 import React from "react";
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
+  const [error, setError] = useState("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    try {
+      const response = await axios.post(
+        "https://easyservice-backend-iv29.onrender.com/api/auth/forgot-password",
+        { email }
+      );
+      alert(response.data.message);
+      onClose(); // Fermer la modale après l'envoi de l'email
+      toast.success("Email de réinitialisation envoyé avec succès !");
+    } catch (error) {
+      console.error(
+        "Erreur lors de l'envoi de l'email de réinitialisation :",
+        error
+      );
+      setError("Erreur lors de l'envoi de l'email de réinitialisation");
+      toast.error("Erreur lors de l'envoi de l'email de réinitialisation");
+    }
+  };
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -11,7 +35,12 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-lg">Mot de passe oublié ?</h3>
-        <form>
+        {error && (
+          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
           <p className="my-2">
             Entrez votre adresse e-mail ci-dessous et nous vous enverrons des
             instructions pour modifier votre mot de passe.

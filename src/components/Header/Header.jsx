@@ -58,7 +58,7 @@ const Header = ({ user }) => {
     <div className="bg-gray-50 sticky top-0 z-10 p-2 w-full">
       <div className="flex items-center justify-between mx-3">
         <FiMenu className="text-3xl md:hidden" />
-        <Link to="home" className="ml-8 hidden md:block">
+        <Link to="dashboard" className="ml-8 hidden md:block">
           <img src={logo} alt="Easy Service Logo" className="h-12 w-32" />
         </Link>
         {/* Barre de recherche */}

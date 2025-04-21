@@ -6,14 +6,14 @@ import toast from "react-hot-toast";
 import ReservationModal from "../../components/Modals/ReservationModal";
 
 const ServiceDetailsClient = () => {
-  const { id } = useParams(); // Récupère l'ID du Service depuis l'URL
+  const { id } = useParams();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [commentaires, setCommentaires] = useState([]);
   const [nouveauCommentaire, setNouveauCommentaire] = useState("");
-  const [note, setNote] = useState(5); // note sur 5
+  const [note, setNote] = useState(5);
 
   useEffect(() => {
     const getService = async () => {
@@ -27,17 +27,9 @@ const ServiceDetailsClient = () => {
             },
           }
         );
-        // console.log("Structure complète des données:", {
-        //   data: response.data,
-        //   admin: response.data.admin,
-        //   isObject: typeof response.data.admin === "object",
-        //   keys: response.data.admin ? Object.keys(response.data.admin) : null,
-        // });
-        // console.log("Données du service:", response.data.nom);
         setService(response.data);
         setCommentaires(response.data.commentaires || []);
       } catch (err) {
-        // console.error("Erreur complète:", err.response?.data);
         setError(err.response?.data?.message || "Erreur serveur");
       } finally {
         setLoading(false);
@@ -46,14 +38,46 @@ const ServiceDetailsClient = () => {
     getService();
   }, [id]);
 
-  if (loading)
-    return <div className="text-center py-8">Chargement en cours...</div>;
-  if (error)
-    return <div className="text-center py-8 text-red-500">{error}</div>;
-  if (!service)
-    return <div className="text-center py-8">Service non trouvé</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500 mb-4"></div>
+          <p className="text-gray-600">Chargement des détails du service...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Formatage de la date
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        <div className="text-xl font-bold mb-2">Erreur</div>
+        <p>{error}</p>
+        <Link
+          to="/client/services"
+          className="mt-4 inline-block text-orange-500 hover:underline"
+        >
+          Retour aux services
+        </Link>
+      </div>
+    );
+  }
+
+  if (!service) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-xl font-bold mb-2">Service non trouvé</div>
+        <Link
+          to="/client/services"
+          className="mt-4 inline-block text-orange-500 hover:underline"
+        >
+          Retour aux services
+        </Link>
+      </div>
+    );
+  }
+
   const formatDate = (dateString) => {
     if (!dateString) return "Date non spécifiée";
     const options = {
@@ -179,10 +203,10 @@ const ServiceDetailsClient = () => {
             setShowModal={setShowModal}
             selectedService={{
               ...service,
-              categorie: service.categorie?._id || service.categorie, // S'assurer de passer l'ID
+              categorie: service.categorie?._id || service.categorie,
             }}
             onSuccess={handleServiceCreated}
-            serviceId={service._id} // Passez l'ID du service au modal
+            serviceId={service._id}
           />
         )}
 
@@ -213,7 +237,6 @@ const ServiceDetailsClient = () => {
             </ul>
           )}
 
-          {/* Formulaire de commentaire */}
           <div className="mt-6">
             <h3 className="text-lg font-medium mb-2">Laisser un commentaire</h3>
             <textarea

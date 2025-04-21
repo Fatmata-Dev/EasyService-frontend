@@ -223,8 +223,8 @@ export default function Demands() {
   }
 
   return (
-    <div className="container mx-auto xl:px-4">
-      <div className="flex justify-between items-center mb-3">
+    <div className="md:container md:mx-auto xl:px-4">
+      <div className="flex sm:justify-between justify-center items-center mb-3 lg:flex-wrap gap-2">
         <h1 className="text-2xl font-bold uppercase text-center">Demandes</h1>
 
         <h2 className="text-md bg-orange-100 rounded p-2">

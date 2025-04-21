@@ -51,24 +51,73 @@ const DemandesCardClient = memo(({ demande, onUpdate }) => {
   //   }
   // };
 
-  const handleReject = async (id) => {
-    if (window.confirm("Voulez-vous rejeter cette demande ?")) {
+  const GenerateFacture = async (id) => {
+    if (window.confirm("Voulez-vous générer la facture ?")) {
       try {
-        await axios.put(
+        const demande = await axios.get(
           `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-          { statut: "refusee" },
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
         );
-        toast.success("Demande rejetée avec succès");
-        navigate("/admin/demandes");
+
+        console.log("la demande : ", demande.data);
+        console.log("les données envoyées : ", {
+          montant: demande.data.tarif,
+          service: demande.data?.service?._id,
+          technicien: demande.data?.technicien?._id,
+          client: demande.data?.client?._id,
+          admin: "67da88347e9d8aefcaa19120",
+          refDemande: demande.data._id,
+        });
+
+        const data = new FormData();
+        data.append("montant", demande.data.tarif);
+        data.append("service", demande.data?.service?._id);
+        data.append("technicien", demande.data?.technicien?._id);
+        data.append("client", demande.data?.client?._id);
+        data.append("admin", "67da88347e9d8aefcaa19120");
+        data.append("refDemande", demande.data._id);
+
+        if (demande.status == 200) {
+          try {
+            const response = await axios.post(
+              `https://easyservice-backend-iv29.onrender.com/api/factures/creer/facture`,
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                },
+              }
+            );
+
+            // console.log("les données envoyées : ", {
+            //   montant: demande.data.tarif,
+            //   service: demande.data?.service?._id,
+            //   technicien: demande.data?.technicien?._id,
+            //   client: demande.data?.client?._id,
+            //   admin: "67da88347e9d8aefcaa19120",
+            //   refDemande: demande.data._id,
+            // });
+
+            console.log("la facture : ", response.data);
+
+            if (response) {
+              toast.success("Facture générée avec succès");
+              navigate("/demandes");
+            }
+          } catch (e) {
+            console.log(e.response?.data?.message);
+            toast.error("Erreur lors de la génération de la facture");
+          }
+        }
       } catch (err) {
         toast.error(
           err.response?.data?.message || "Erreur lors du rejet de la demande"
         );
+        console.log(err.response?.data?.message);
       }
     }
   };
@@ -133,35 +182,35 @@ const DemandesCardClient = memo(({ demande, onUpdate }) => {
           Informations demande
         </h2>
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">N&deg; DEMANDE :</strong>{" "}
+          <strong className="font-semibold pe-2">N&deg; DEMANDE :</strong>{" "}
           <span>{demande.numeroDemande}</span>
         </p>
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">NOM SERVICE :</strong>{" "}
+          <strong className="font-semibold pe-2">NOM SERVICE :</strong>{" "}
           <span className="text-orange-600">{demande.service}</span>
         </p>
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">DATE DEMANDE :</strong>{" "}
+          <strong className="font-semibold pe-2">DATE DEMANDE :</strong>{" "}
           <span>{formatDate(demande.date)}</span>
         </p>
         {/* <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">CLIENT :</strong>{" "}
+          <strong className="font-semibold pe-2">CLIENT :</strong>{" "}
           <span className="text-orange-600">
             {demande.clientPrenom} {demande.clientNom}
           </span>
         </p> */}
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">TECHNICIEN :</strong>{" "}
+          <strong className="font-semibold pe-2">TECHNICIEN :</strong>{" "}
           <span>
             {demande.technicienPrenom} {demande.technicienNom}
           </span>
         </p>
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">DATE INTERVENTION :</strong>{" "}
+          <strong className="font-semibold pe-2">DATE INTERVENTION :</strong>{" "}
           <span>{formatDate(demande.dateIntervention)}</span>
         </p>
         <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">STATUT :</strong>{" "}
+          <strong className="font-semibold pe-2">STATUT :</strong>{" "}
           <span
             className={`${getStatutColor(
               demande.statut
@@ -252,9 +301,7 @@ const DemandesCardClient = memo(({ demande, onUpdate }) => {
           </div>
         )} */}
 
-        {(demande.statut === "annulee" ||
-          demande.statut === "refusee" ||
-          demande.statut === "terminee") && (
+        {(demande.statut === "annulee" || demande.statut === "refusee") && (
           <div className="flex flex-col">
             <div className="flex justify-center">
               <Link
@@ -263,6 +310,25 @@ const DemandesCardClient = memo(({ demande, onUpdate }) => {
               >
                 Plus de détails
               </Link>
+            </div>
+          </div>
+        )}
+
+        {demande.statut === "terminee" && (
+          <div className="flex flex-col">
+            <div className="flex justify-between mt-4">
+              <Link
+                to={`/admin/demandes/${demande._id}`}
+                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
+              >
+                Détail
+              </Link>
+              <button
+                className="bg-gray-500 text-white px-4 py-1.5 rounded hover:bg-gray-600"
+                onClick={() => GenerateFacture(demande._id)}
+              >
+                Facture
+              </button>
             </div>
           </div>
         )}

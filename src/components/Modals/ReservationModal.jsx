@@ -28,32 +28,18 @@ export default function ReservationModal({ setShowModal, selectedService }) {
   });
   //console.log(formData.tarif);
 
-  const calculateTarif = (duree, uniteDuree, tarifBase) => {
-    const dureeNum = Number(duree) || 0;
-    const tarifNum = Number(tarifBase) || 0;
-
-    // Conversion en heures pour calcul standard
-    let heuresEquivalentes = dureeNum;
-
-    if (uniteDuree === "minutes") {
-      heuresEquivalentes = dureeNum / 60;
-    } else if (uniteDuree === "jours") {
-      heuresEquivalentes = dureeNum * 24;
-    }
-
-    // Calcul du tarif total avec arrondi
-    const tarifTotal = Math.ceil(heuresEquivalentes * tarifNum);
-
-    // Minimum d'1 heure de facturation
-    return tarifTotal < tarifNum ? tarifNum : tarifTotal;
+  const calculateTarif = (duree, tarifBase) => {
+    let tarifTotal = 0;
+    tarifBase = Number(tarifBase) || 0; // S'assurer que tarifBase est un nombre
+    tarifTotal = tarifBase * duree;
+    return tarifTotal;
   };
 
   // Dans votre useEffect de calcul
   useEffect(() => {
-    if (formData.duree && formData.uniteDuree && formData.tarif) {
+    if (formData.duree && formData.tarif) {
       const newTarif = calculateTarif(
         formData.duree,
-        formData.uniteDuree,
         selectedService?.tarif || formData.tarif
       );
 
@@ -62,12 +48,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
         tarif: newTarif,
       }));
     }
-  }, [
-    formData.duree,
-    formData.uniteDuree,
-    selectedService?.tarif,
-    formData.tarif,
-  ]);
+  }, [formData.duree, selectedService?.tarif, formData.tarif]);
 
   const [error, setError] = useState("");
 
@@ -257,12 +238,13 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 id="duree"
                 name="duree"
                 type="number"
-                min="1"
+                min={selectedService?.duree || 0}
+                max={100}
                 step="1"
                 value={formData.duree}
                 onChange={handleInputChange}
                 required
-                className="block w-full rounded-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                className="block w-full rounded px-3 py-1.5 text-base text-gray-900 border border-gray-400"
               />
             </div>
 
@@ -274,9 +256,8 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 name="uniteDuree"
                 id="uniteDuree"
                 value={formData.uniteDuree}
-                onChange={handleInputChange}
-                required
-                className="py-2 block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                disabled
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               >
                 <option value="minutes">Minutes</option>
                 <option value="heures">Heures</option>
@@ -297,18 +278,10 @@ export default function ReservationModal({ setShowModal, selectedService }) {
                 className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
               />
               <p className="text-xs text-gray-500 mt-1">
-                {formData.uniteDuree === "heures" &&
-                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
-                    formData.duree
-                  } heure(s))`}
-                {formData.uniteDuree === "jours" &&
-                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
-                    formData.duree
-                  } jour(s) = ${formData.duree * 24} heures)`}
-                {formData.uniteDuree === "minutes" &&
-                  `Tarif: ${formData.tarif.toLocaleString()} FCFA (${
-                    formData.duree
-                  } minute(s) = ${(formData.duree / 60).toFixed(2)} heures)`}
+                {selectedService?.uniteDuree &&
+                  `Tarif: ${selectedService?.tarif.toLocaleString()} FCFA / ${
+                    selectedService?.uniteDuree
+                  }`}
               </p>
             </div>
           </div>

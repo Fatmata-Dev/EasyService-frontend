@@ -61,15 +61,16 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
     setIsSubmitting(true);
 
     try {
+      const jsonData = {
+        nom: formData.nom,
+        prenom: formData.prenom,
+        email: formData.email,
+        password: formData.password,
+        role: "client",
+      };
       const response = await axios.post(
         "https://easyservice-backend-iv29.onrender.com/api/auth/register",
-        {
-          nom: formData.nom,
-          prenom: formData.prenom,
-          email: formData.email,
-          password: formData.password,
-          role: "client",
-        },
+        JSON.stringify(jsonData),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,

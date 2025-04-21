@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-scroll";
+import { useState, useEffect } from "react";
 
 // Configuration d'animation réutilisable
 const fadeInUp = {
@@ -11,46 +12,74 @@ const fadeInUp = {
   }
 };
 
-const slideInRight = {
-  hidden: { opacity: 0, x: 100 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: { duration: 0.8, ease: "anticipate" }
-  }
-};
+// const slideInRight = {
+//   hidden: { opacity: 0, x: 100 },
+//   visible: { 
+//     opacity: 1, 
+//     x: 0,
+//     transition: { duration: 0.8, ease: "anticipate" }
+//   }
+// };
 
 // Configuration d'hover pour les images
-const imageHover = {
-  hover: { 
-    scale: 1.05,
-    transition: { duration: 0.6, ease: "easeOut" } 
-  }
-};
+// const imageHover = {
+//   hover: { 
+//     scale: 1.05,
+//     transition: { duration: 0.6, ease: "easeOut" } 
+//   }
+// };
+
+
+
 
 export default function HeroSection() {
+  const backgroundImages = [
+  "/image1.jpeg",
+  "/image2.jpeg",
+  "/image3.jpeg",
+  "/image4.jpeg",
+  "/image5.jpeg",
+  "/image6.jpeg"
+];
+
+const [currentIndex, setCurrentIndex] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+  }, 5000); // change every 2s
+
+  return () => clearInterval(interval);
+}, [backgroundImages.length]);
+
+const backgroundStyle = {
+  backgroundImage: `url(${backgroundImages[currentIndex]})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+};
   return (
     <section id="home" className="bg-gray-50 p-4">
-      <div className="md:px-12 flex flex-col items-center lg:flex-row">
-        <motion.div 
+      <div
+        className="md:px-12 flex flex-col items-center lg:flex-row h-dvh -m-4 mb-2 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-1000"
+        style={backgroundStyle}
+      >
+        <motion.div
           initial="hidden"
           animate="visible"
           variants={{
-            visible: { transition: { staggerChildren: 0.3 } }
+            visible: { transition: { staggerChildren: 0.3 } },
           }}
-          className="mx-auto px-4 text-center"
+          className="text-center absolute bottom-0 right-[50%] translate-x-[50%] w-full mb-1"
         >
-          <motion.h1 
+          <motion.h1
             variants={fadeInUp}
-            className="text-4xl font-bold mb-6 text-gray-800"
+            className="text-4xl font-bold text-white"
           >
             Bienvenue sur <span className="text-orange-500">EasyService</span>
           </motion.h1>
-          
-          <motion.p 
-            variants={fadeInUp}
-            className="text-xl mb-8 text-gray-600"
-          >
+
+          <motion.p variants={fadeInUp} className="text-xl mb-8 text-white">
             La plateforme idéale pour vos besoins en services techniques
           </motion.p>
 
@@ -65,9 +94,11 @@ export default function HeroSection() {
             </Link>
           </motion.div>
         </motion.div>
+      </div>
+
 
         {/* Section images avec animations */}
-        <motion.div 
+        {/* <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -102,8 +133,7 @@ export default function HeroSection() {
               variants={imageHover}
             />
           </div>
-        </motion.div>
-      </div>
+        </motion.div> */}
 
       {/* Section Femme */}
       <div className="flex flex-col items-center sm:flex-row md:px-12 md:mx-12">

@@ -36,19 +36,23 @@ const ServicesSection = () => {
     fetchServices();
   }, []);
 
-  if (loading)
-    return (
-      <div id="services">
-        <h2 className="bg-[#2C3E50] text-3xl md:text-4xl font-bold text-center p-2 text-gray-100 uppercase">
-          Nos Services
-        </h2>
+  return (
+    <div id="services">
+      <h2 className="bg-[#2C3E50] text-3xl md:text-4xl font-bold text-center p-2 text-gray-100 uppercase">
+        Nos Services
+      </h2>
 
-        <section className="lg:px-8 bg-white">
-          <div className="mx-4">
-            <h4 className="text-center pb-8 pt-4 text-lg">
-              Découvrez nos services les plus demandés et connectez-vous pour en
-              découvrir davantage
-            </h4>
+      <section className="lg:px-8 bg-white">
+        <div className="mx-4">
+          <h4 className="text-center pb-8 pt-4 text-lg">
+            Découvrez nos services les plus demandés et connectez-vous pour en
+            découvrir davantage
+          </h4>
+          {error && (
+            <div className="text-red-500 text-center py-8">{error}</div>
+          )}
+
+          {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {[...Array(8)].map((_, i) => (
                 <motion.div
@@ -78,31 +82,13 @@ const ServicesSection = () => {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-      </div>
-    );
-  if (error)
-    return <div className="text-red-500 text-center py-8">{error}</div>;
-
-  return (
-    <div id="services">
-      <h2 className="bg-[#2C3E50] text-3xl md:text-4xl font-bold text-center p-2 text-gray-100 uppercase">
-        Nos Services
-      </h2>
-
-      <section className="lg:px-8 bg-white">
-        <div className="mx-4">
-          <h4 className="text-center pb-8 pt-4 text-lg">
-            Découvrez nos services les plus demandés et connectez-vous pour en
-            découvrir davantage
-          </h4>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {services.map((service) => (
-              <ServiceCardHome key={service._id} service={service} />
-            ))}
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {services.map((service) => (
+                <ServiceCardHome key={service._id} service={service} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
