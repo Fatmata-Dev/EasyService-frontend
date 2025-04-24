@@ -8,12 +8,17 @@ export default function Intervention() {
   const [user, setUser] = useState(null);
   const [allInterventions, setAllInterventions] = useState([]);
   const [displayedInterventions, setDisplayedInterventions] = useState([]);
+  const [interventionsParStatut, setInterventionsParStatut] = useState([
+    { statut: "En attente", nombre: 0 },
+    { statut: "En cours", nombre: 0 },
+    { statut: "Terminé", nombre: 0 },
+    { statut: "Annulé", nombre: 0 },
+  ]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const [activeTab, setActiveTab] = useState("en_cours");
 
-  // Récupérer les infos du technicien connecté
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
     setUser(userData);
@@ -41,15 +46,13 @@ export default function Intervention() {
           prenom: "Client",
           nom: "inconnu",
         };
-        // console.log("Intervention:", intervention);
-        // console.log("Demande:", demandeObj);
 
         return {
           _id: intervention._id,
           dateIntervention: intervention.dateIntervention || "Non définie",
           heureDebut: intervention.heureDebut || "À définir",
           heureFin: intervention.heureFin || "À définir",
-          statut: intervention.statut || "en_attente",
+          etatExecution: intervention.etatExecution || "non_commencee", // Correction ici
           service: serviceObj.nom,
           client: `${clientObj.prenom} ${clientObj.nom}`,
           adresse: demandeObj.adresse || "Adresse non spécifiée",
@@ -59,9 +62,31 @@ export default function Intervention() {
         };
       });
 
+      // Compter les interventions par statut
+      const counts = {
+        "En attente": 0,
+        "En cours": 0,
+        Terminé: 0,
+        Annulé: 0,
+      };
+
+      interventionsAvecDetails.forEach((intervention) => {
+        const statutNormalise = normalizeStatut(intervention.etatExecution);
+
+        if (statutNormalise === "non_commencee") counts["En attente"]++;
+        else if (statutNormalise === "en_cours") counts["En cours"]++;
+        else if (statutNormalise === "terminee") counts["Terminé"]++;
+        else if (statutNormalise === "annulee") counts["Annulé"]++;
+      });
+
       setAllInterventions(interventionsAvecDetails);
+      setInterventionsParStatut(
+        Object.entries(counts).map(([statut, nombre]) => ({
+          statut, // Changé de etatExecution à statut pour correspondre à l'état initial
+          nombre,
+        }))
+      );
     } catch (err) {
-      //   console.error("Erreur:", err);
       toast.error(err.response?.data?.message || "Erreur lors du chargement");
     } finally {
       setLoading(false);
@@ -74,59 +99,34 @@ export default function Intervention() {
     }
   }, [fetchInterventions, user]);
 
-  // Normalisation des statuts
   const normalizeStatut = (statut) => {
     if (!statut) return "";
     const s = statut.toLowerCase().trim();
 
-    if (s.includes("attente")) return "en_attente";
+    if (s.includes("commencee")) return "non_commencee";
     if (s.includes("cours")) return "en_cours";
     if (s.includes("term")) return "terminee";
     if (s.includes("annul")) return "annulee";
     return s;
   };
 
-  // Filtrage et pagination
   useEffect(() => {
     const filtered = allInterventions.filter(
-      (i) => normalizeStatut(i.statut) === activeTab
+      (i) => normalizeStatut(i.etatExecution) === activeTab // Changé de statut à etatExecution
     );
-
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-
     setDisplayedInterventions(paginated);
   }, [allInterventions, activeTab, currentPage]);
 
   const totalFilteredInterventions = allInterventions.filter(
-    (i) => normalizeStatut(i.statut) === activeTab
+    (i) => normalizeStatut(i.etatExecution) === activeTab // Changé de statut à etatExecution
   ).length;
   const totalPages = Math.ceil(totalFilteredInterventions / itemsPerPage);
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleStatutChange = async (interventionId, newStatut) => {
-    try {
-      await axios.put(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/${interventionId}`,
-        { statut: newStatut },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
-
-      toast.success("Statut mis à jour avec succès");
-      fetchInterventions(); // Recharger les données
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Erreur lors de la mise à jour"
-      );
-    }
   };
 
   if (loading) {
@@ -136,26 +136,26 @@ export default function Intervention() {
           Mes Interventions
         </h1>
 
-        {/* Onglets de chargement */}
         <div className="flex flex-wrap justify-center mb-6">
-          {["en_attente", "en_cours", "terminee", "annulee"].map((statut) => (
-            <div
-              key={statut}
-              className={`py-2 px-4 mx-1 mb-2 rounded ${
-                activeTab === statut ? "bg-gray-300" : "bg-gray-200"
-              }`}
-            >
-              <div className="invisible">
-                {statut === "en_attente" && "En attente"}
-                {statut === "en_cours" && "En cours"}
-                {statut === "terminee" && "Terminées"}
-                {statut === "annulee" && "Annulées"}
+          {["non_commencee", "en_cours", "terminee", "annulee"].map(
+            (statut) => (
+              <div
+                key={statut}
+                className={`py-2 px-4 mx-1 mb-2 rounded ${
+                  activeTab === statut ? "bg-gray-300" : "bg-gray-200"
+                }`}
+              >
+                <div className="invisible">
+                  {statut === "non_commencee" && "En attente"}
+                  {statut === "en_cours" && "En cours"}
+                  {statut === "terminee" && "Terminées"}
+                  {statut === "annulee" && "Annulées"}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
 
-        {/* Cartes de chargement */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <motion.div
@@ -165,10 +165,7 @@ export default function Intervention() {
               transition={{ delay: i * 0.1 }}
               className="border border-blue-300 p-4 rounded-lg shadow-md w-full bg-blue-50 animate-pulse"
             >
-              {/* Titre */}
               <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4" />
-
-              {/* Lignes de texte */}
               <div className="space-y-3">
                 <div className="flex">
                   <div className="h-4 bg-gray-200 rounded w-1/4" />
@@ -187,8 +184,6 @@ export default function Intervention() {
                   <div className="h-4 bg-orange-200 rounded w-3/4 ml-2" />
                 </div>
               </div>
-
-              {/* Boutons */}
               <div className="mt-4 flex justify-between">
                 <div className="h-8 bg-gray-300 rounded w-24" />
                 <div className="h-8 bg-orange-300 rounded w-24" />
@@ -206,37 +201,51 @@ export default function Intervention() {
         Mes Interventions
       </h1>
 
-      {/* Onglets */}
+      {/* Onglets avec compteurs */}
       <div className="flex flex-wrap justify-center mb-6">
-        {["en_attente", "en_cours", "terminee", "annulee"].map((statut) => (
-          <button
-            key={statut}
-            onClick={() => {
-              setActiveTab(statut);
-              setCurrentPage(1);
-            }}
-            className={`py-2 px-4 mx-1 mb-2 rounded ${
-              activeTab === statut
-                ? "bg-orange-500 text-white font-bold"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {statut === "en_attente" && "En attente"}
-            {statut === "en_cours" && "En cours"}
-            {statut === "terminee" && "Terminées"}
-            {statut === "annulee" && "Annulées"}
-          </button>
-        ))}
+        {[
+          { id: "non_commencee", label: "En attente", statutKey: "En attente" },
+          { id: "en_cours", label: "En cours", statutKey: "En cours" },
+          { id: "terminee", label: "Terminées", statutKey: "Terminé" },
+          { id: "annulee", label: "Annulées", statutKey: "Annulé" },
+        ].map((tab) => {
+          const statutData = interventionsParStatut.find(
+            (item) => item.statut === tab.statutKey
+          );
+          const count = statutData ? statutData.nombre : 0;
+
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setCurrentPage(1);
+              }}
+              className={`py-2 px-4 mx-1 mb-2 rounded flex items-center ${
+                activeTab === tab.id
+                  ? "bg-orange-500 text-white font-bold"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {tab.label}
+              <span
+                className={`ml-2 font-bold text-md ${
+                  activeTab === tab.id ? "text-white" : "text-orange-500"
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Liste des interventions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedInterventions.length > 0 ? (
           displayedInterventions.map((intervention) => (
             <InterventionCard
               key={intervention._id}
               intervention={intervention}
-              onStatutChange={handleStatutChange}
             />
           ))
         ) : (
@@ -247,7 +256,6 @@ export default function Intervention() {
         )}
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8">
           <nav className="inline-flex rounded-md shadow">

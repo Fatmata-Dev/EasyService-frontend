@@ -1,109 +1,271 @@
 import { Link } from "react-router-dom";
- import { FaLongArrowAltRight } from "react-icons/fa";
- 
- const data = [
-     {
-       id: 1,
-       name: "Maintenance Informatique",
-       categorie: "Informatique",
-       tarif: "12.000 FCFA",
-       date_soumission: "20/03/2025",
-       date_intervention: "21/03/2025",
-       status: "En cours",
-     },
-     {
-       id: 2,
-       name: "Tresses",
-       categorie: "Coiffure",
-       tarif: "2.000 FCFA",
-       date_soumission: "20/03/2025",
-       date_intervention: "23/03/2025",
-       status: "En attente",
-     },
-   ];
- 
- export default function DashboardTechniciens () {
-     return (
-         <div className="flex flex-col gap-5">
-           <div className="bg-gray-100 rounded-lg">
-             <h3 className="uppercase text-center font-bold text-lg mt-2">
-               Interventions
-             </h3>
-     
-     
-             {/* Tableau */}
-             <div className="container mx-auto p-4">
-               <div className="overflow-x-auto">
-                 <table className="min-w-full border border-gray-300 bg-white rounded-lg shadow-md">
-                   <thead className="bg-orange-500 text-white">
-                     <tr>
-                       <th className="px-6 py-3 text-left">Nom</th>
-                       <th className="px-6 py-3 text-left">Categorie</th>
-                       <th className="px-6 py-3 text-left">Tarif</th>
-                       <th className="px-6 py-3 text-left">Date de soumission</th>
-                       <th className="px-6 py-3 text-left">Date intervention</th>
-                       <th className="px-6 py-3 text-left">Status</th>
-                     </tr>
-                   </thead>
-                   <tbody>
-                     {data.map((user, index) => (
-                       <tr
-                         key={user.id}
-                         className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-                       >
-                         <td className="px-6 py-3 border-b">{user.name}</td>
-                         <td className="px-6 py-3 border-b">{user.categorie}</td>
-                         <td className="px-6 py-3 border-b">{user.tarif}</td>
-                         <td className="px-6 py-3 border-b">
-                           {user.date_soumission}
-                         </td>
-                         <td className="px-6 py-3 border-b">
-                           {user.date_intervention}
-                         </td>
-                         <td className="px-6 py-3 border-b">{user.status}</td>
-                       </tr>
-                     ))}
-                   </tbody>
-                 </table>
-               </div>
-               <div className="flex justify-end items-center mt-1">
-                 <Link
-                   to="home"
-                   className="text-orange-500 cursor-pointer font-bold flex items-center gap-2"
-                 >
-                   Voir toutes les demandes{" "}
-                   <FaLongArrowAltRight className="text-xl" />
-                 </Link>
-               </div>
-             </div>
-           </div>
-     
-           {/* Messages */}
-           <div className="bg-gray-100 rounded-lg py-3">
-             <h3 className="uppercase text-center font-bold text-lg mb-3">
-               Messages
-             </h3>
-             <div className="flex bg-gray-300 mx-5 rounded-lg">
-               <h4 className="text-4xl px-4 py-2 bg-orange-400 rounded-full m-2 flex justify-center items-center">
-                 A
-               </h4>
-               <div className="flex flex-col gap-1 justify-center">
-                 <p className="font-bold">Admin Fadiaba</p>
-                 <p className="text-gray-600">
-                   Bonjour Mouhamed, votre demande a était acceptée
-                 </p>
-               </div>
-             </div>
-             <div className="flex justify-end items-center mr-5 mt-1">
-               <Link
-                 to="home"
-                 className="text-orange-500 cursor-pointer font-bold flex items-center gap-2"
-               >
-                 Voir toutes les demandes <FaLongArrowAltRight className="text-xl" />
-               </Link>
-             </div>
-           </div>
-     
-         </div>
-       );
- }
+import { FaLongArrowAltRight, FaBell, FaEnvelope } from "react-icons/fa";
+import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import { format, parseISO } from "date-fns";
+import { fr } from "date-fns/locale";
+import { toast } from "react-hot-toast";
+import InterventionCard from "../../components/cards/InterventionCard";
+
+const DashboardTechniciens = () => {
+  const [user, setUser] = useState(null);
+  const formatDate = (dateString) => {
+    if (!dateString) return "Non définie";
+    try {
+      return format(parseISO(dateString), "dd/MM/yyyy", { locale: fr });
+    } catch {
+      return dateString; // Retourne la date originale si le parsing échoue
+    }
+  };
+
+  const [loading, setLoading] = useState(true);
+  const [interventions, setInterventions] = useState([]);
+  // const [messages, setMessages] = useState([]);
+  const [stats, setStats] = useState({
+    enCours: 0,
+    terminees: 0,
+    enAttente: 0,
+  });
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("user"));
+    setUser(userData);
+  }, []);
+
+  const fetchInterventions = useCallback(async () => {
+    try {
+      if (!user || user.role !== "technicien") return;
+      const response = await axios.get(
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/technicien/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          timeout: 5000, // 5 secondes timeout
+        }
+      );
+
+      // Calcul des statistiques
+      const counts = {
+        enCours: 0,
+        terminees: 0,
+        enAttente: 0,
+      };
+
+      console.log(response.data);
+
+      response.data.forEach((interv) => {
+        if (interv.etatExecution === "en_cours") counts.enCours++;
+        else if (interv.etatExecution === "terminee") counts.terminees++;
+        else if (interv.etatExecution === "non_commencee") counts.enAttente++;
+      });
+
+      setStats(counts);
+      setInterventions(response.data.slice(0, 5)); // On ne garde que les 5 premières
+    } catch (error) {
+      toast.error("Erreur lors du chargement des interventions");
+      console.error(error);
+    }
+  }, [user]);
+
+  // const fetchMessages = useCallback(async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  //         },
+  //       }
+  //     );
+  //     setMessages(response.data.slice(0, 3)); // 3 derniers messages
+  //   } catch (error) {
+  //     console.error("Erreur messages:", error);
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchInterventions()]);
+      } catch (error) {
+        console.error("Erreur chargement données:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [fetchInterventions]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4 space-y-6">
+      {/* Header avec stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="En cours"
+          value={stats.enCours}
+          color="bg-blue-100 text-blue-800"
+          icon={<FaBell className="text-blue-500" />}
+        />
+        <StatCard
+          title="Terminées"
+          value={stats.terminees}
+          color="bg-green-100 text-green-800"
+          icon={<FaBell className="text-green-500" />}
+        />
+        <StatCard
+          title="En attente"
+          value={stats.enAttente}
+          color="bg-yellow-100 text-yellow-800"
+          icon={<FaBell className="text-yellow-500" />}
+        />
+      </div>
+
+      {/* Dernières interventions */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">
+            Dernières interventions
+          </h2>
+          <Link
+            to="/technicien/interventions"
+            className="text-orange-500 hover:underline flex items-center"
+          >
+            Voir tout <FaLongArrowAltRight className="ml-2" />
+          </Link>
+        </div>
+
+        {interventions.length > 0 ? (
+          <div className="space-y-4">
+            {interventions.map((intervention) => (
+              <InterventionCard
+                key={intervention._id}
+                intervention={{
+                  ...intervention,
+                  client: `${intervention.client?.prenom || ""} ${
+                    intervention.client?.nom || ""
+                  }`,
+                  service: intervention.service?.nom || "Service inconnu",
+                }}
+                compact
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-4">
+            Aucune intervention récente
+          </p>
+        )}
+      </div>
+
+      {/* Messages et calendrier */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Messages */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">
+              Messages récents
+            </h2>
+            <Link
+              to="/technicien/messages"
+              className="text-orange-500 hover:underline flex items-center"
+            >
+              Voir tout <FaLongArrowAltRight className="ml-2" />
+            </Link>
+          </div>
+
+          {/* {messages.length > 0 ? (
+            <div className="space-y-3">
+              {messages.map(msg => (
+                <div key={msg._id} className="border-b pb-3 last:border-0">
+                  <div className="flex items-start">
+                    <div className="bg-orange-100 p-2 rounded-full mr-3">
+                      <FaEnvelope className="text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{msg.expediteur?.prenom || 'Admin'} {msg.expediteur?.nom || ''}</p>
+                      <p className="text-gray-600 text-sm">{msg.contenu}</p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        {formatDate(msg.dateEnvoi)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-4">Aucun message récent</p>
+          )} */}
+        </div>
+
+        {/* Calendrier/Prochaines interventions */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            Prochaines interventions
+          </h2>
+          {interventions.filter(
+            (i) => i.statut === "En attente" || i.statut === "En cours"
+          ).length > 0 ? (
+            <div className="space-y-3">
+              {interventions
+                .filter(
+                  (i) => i.statut === "En attente" || i.statut === "En cours"
+                )
+                .slice(0, 3)
+                .map((intervention) => (
+                  <div
+                    key={intervention._id}
+                    className="border-b pb-3 last:border-0"
+                  >
+                    <p className="font-semibold">
+                      {intervention.service?.nom || "Service"}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      {formatDate(intervention.dateIntervention)} -{" "}
+                      {intervention.heureDebut || ""}
+                    </p>
+                    <span
+                      className={`inline-block mt-1 px-2 py-1 rounded-full text-xs ${
+                        intervention.statut === "En cours"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {intervention.statut}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 py-4">
+              Aucune intervention programmée
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Composant pour les cartes de statistiques
+const StatCard = ({ title, value, color, icon }) => (
+  <div className="bg-white rounded-lg shadow-md p-4 flex items-center">
+    <div className={`p-3 rounded-full mr-4 ${color}`}>{icon}</div>
+    <div>
+      <p className="text-gray-500 text-sm">{title}</p>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
+  </div>
+);
+
+export default DashboardTechniciens;

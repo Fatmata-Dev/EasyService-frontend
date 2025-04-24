@@ -5,17 +5,17 @@ import { useState, useEffect } from "react";
 // Configuration d'animation réutilisable
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" }
-  }
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
 };
 
 // const slideInRight = {
 //   hidden: { opacity: 0, x: 100 },
-//   visible: { 
-//     opacity: 1, 
+//   visible: {
+//     opacity: 1,
 //     x: 0,
 //     transition: { duration: 0.8, ease: "anticipate" }
 //   }
@@ -23,45 +23,45 @@ const fadeInUp = {
 
 // Configuration d'hover pour les images
 // const imageHover = {
-//   hover: { 
+//   hover: {
 //     scale: 1.05,
-//     transition: { duration: 0.6, ease: "easeOut" } 
+//     transition: { duration: 0.6, ease: "easeOut" }
 //   }
 // };
 
-
-
-
 export default function HeroSection() {
   const backgroundImages = [
-  "/image1.jpeg",
-  "/image2.jpeg",
-  "/image3.jpeg",
-  "/image4.jpeg",
-  "/image5.jpeg",
-  "/image6.jpeg"
-];
+    "/image1.jpeg",
+    "/image2.jpeg",
+    "/image3.jpeg",
+    "/image4.jpeg",
+    "/image5.jpeg",
+    "/image6.jpeg",
+    "/image7.jpeg",
+    "/image8.jpeg",
+    "/image9.jpeg",
+  ];
 
-const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-  }, 5000); // change every 2s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 5000); // change every 2s
 
-  return () => clearInterval(interval);
-}, [backgroundImages.length]);
+    return () => clearInterval(interval);
+  }, [backgroundImages.length]);
 
-const backgroundStyle = {
-  backgroundImage: `url(${backgroundImages[currentIndex]})`,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-};
+  const backgroundStyle = {
+    backgroundImage: `url(${backgroundImages[currentIndex]})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  };
   return (
     <section id="home" className="bg-gray-50 p-4">
       <div
-        className="md:px-12 flex flex-col items-center lg:flex-row h-dvh -m-4 mb-2 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-1000"
+        className="md:px-12 flex flex-col items-center lg:flex-row h-dvh -m-4 mb-2 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity"
         style={backgroundStyle}
       >
         <motion.div
@@ -96,9 +96,8 @@ const backgroundStyle = {
         </motion.div>
       </div>
 
-
-        {/* Section images avec animations */}
-        {/* <motion.div 
+      {/* Section images avec animations */}
+      {/* <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
@@ -137,7 +136,7 @@ const backgroundStyle = {
 
       {/* Section Femme */}
       <div className="flex flex-col items-center sm:flex-row md:px-12 md:mx-12">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "0px 0px -100px 0px" }}
@@ -146,8 +145,8 @@ const backgroundStyle = {
         >
           <img src="/femme.png" alt="Client recherchant un service" />
         </motion.div>
-        
-        <motion.p 
+
+        <motion.p
           initial={{ opacity: 0, x: 100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "0px 0px -100px 0px" }}
@@ -160,7 +159,7 @@ const backgroundStyle = {
 
       {/* Section Technicien */}
       <div className="flex flex-col-reverse items-center sm:flex-row md:px-12 md:mx-12">
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, x: -100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "0px 0px -100px 0px" }}
@@ -169,8 +168,8 @@ const backgroundStyle = {
         >
           Vous êtes un technicien à la recherche de clients
         </motion.p>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, x: 100 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "0px 0px -100px 0px" }}
@@ -182,25 +181,23 @@ const backgroundStyle = {
       </div>
 
       {/* Section Conclusion */}
-      <motion.p 
+      <motion.p
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.9 }}
         className="text-xl font-bold sm:text-2xl md:text-3xl sm:mx-0 text-center mt-12 md:px-12 md:mx-12 mb-4"
       >
-        <motion.span className="text-orange-500">Easy Service</motion.span> est la
-        plateforme qu’il vous faut, alors n’hésitez pas car chez nous{" "}
-        <motion.span className="text-orange-500">la satisfaction est garantie</motion.span>.
+        <motion.span className="text-orange-500">Easy Service</motion.span> est
+        la plateforme qu’il vous faut, alors n’hésitez pas car chez nous{" "}
+        <motion.span className="text-orange-500">
+          la satisfaction est garantie
+        </motion.span>
+        .
       </motion.p>
     </section>
   );
 }
-
-
-
-
-
 
 // import React from "react";
 // import { Link } from "react-scroll";

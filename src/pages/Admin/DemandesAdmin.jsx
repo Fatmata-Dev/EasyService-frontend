@@ -6,6 +6,13 @@ import toast from "react-hot-toast";
 export default function DemandesAdmin() {
   const [allDemandes, setAllDemandes] = useState([]); // Toutes les demandes chargées
   const [displayedDemandes, setDisplayedDemandes] = useState([]); // Demandes à afficher
+  const [demandesParStatut, setDemandesParStatut] = useState([
+    { statut: "En attente", nombre: 0 },
+    { statut: "Acceptée", nombre: 0 },
+    { statut: "En cours", nombre: 0 },
+    { statut: "Terminé", nombre: 0 },
+    { statut: "Refusé", nombre: 0 },
+  ]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Nombre d'éléments par page
@@ -25,7 +32,6 @@ export default function DemandesAdmin() {
       );
 
       // 2. Construire directement les données finales
-      console.log(response.data.length);
       const demandesAvecDetails = response.data.map((demande) => {
         // Vérifier si le service est un objet complet ou juste un ID
         const serviceObj =
@@ -55,6 +61,7 @@ export default function DemandesAdmin() {
           clientPrenom: clientObj?.prenom || "Client non spécifié",
           clientNom: clientObj?.nom || "",
           statut: demande.statut,
+          etatExecution: demande.etatExecution,
           categorie: demande.categorieService,
           description: demande.description,
           technicienPrenom: TechnicienObj?.prenom || "À définir",
@@ -62,7 +69,45 @@ export default function DemandesAdmin() {
         };
       });
 
+      // Initialiser le compteur avec tous les statuts possibles
+      const counts = {
+        "En attente": 0,
+        Accepté: 0,
+        "En cours": 0,
+        Terminé: 0,
+        Refusé: 0,
+        Autre: 0, // Pour les statuts non reconnus
+      };
+
+      // Compter les demandes par statut normalisé
+      demandesAvecDetails.forEach((demande) => {
+        const statutNormalise = normalizeStatut(demande.statut);
+
+        // Mapper les statuts normalisés aux statuts affichés
+        let statutAffiche;
+        if (statutNormalise === "en_attente") statutAffiche = "En attente";
+        else if (statutNormalise === "acceptee") statutAffiche = "Accepté";
+        else if (statutNormalise === "en_cours") statutAffiche = "En cours";
+        else if (statutNormalise === "terminee") statutAffiche = "Terminé";
+        else if (statutNormalise === "refusee") statutAffiche = "Refusé";
+        else if (statutNormalise === "annulee") statutAffiche = "Annulé";
+        else statutAffiche = "Autre";
+
+        if (counts[statutAffiche] !== undefined) {
+          counts[statutAffiche]++;
+        }
+      });
+
+      // Mettre à jour les états
       setAllDemandes(demandesAvecDetails);
+      setDemandesParStatut(
+        Object.entries(counts)
+          .filter(([statut]) => statut !== "Autre")
+          .map(([statut, nombre]) => ({
+            statut,
+            nombre,
+          }))
+      );
     } catch (err) {
       console.error("Erreur:", err);
       toast.error(err.response?.data?.message || "Erreur lors du chargement");
@@ -83,6 +128,7 @@ export default function DemandesAdmin() {
     const s = statut.toLowerCase().trim();
 
     if (s.includes("attente")) return "en_attente";
+    if (s.includes("accept")) return "acceptee";
     if (s.includes("cours")) return "en_cours";
     if (s.includes("annul")) return "annulee";
     if (s.includes("refus")) return "refusee";
@@ -110,10 +156,10 @@ export default function DemandesAdmin() {
   ).length;
   const totalPages = Math.ceil(totalFilteredDemandes / itemsPerPage);
 
-  const handleTabChange = (statut) => {
-    setActiveTab(statut);
-    setCurrentPage(1); // Reset à la première page quand on change de statut
-  };
+  // const handleTabChange = (statut) => {
+  //   setActiveTab(statut);
+  //   setCurrentPage(1); // Reset à la première page quand on change de statut
+  // };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
@@ -129,24 +175,30 @@ export default function DemandesAdmin() {
 
         {/* Onglets de chargement */}
         <div className="flex flex-wrap justify-center mb-6">
-          {["en_attente", "en_cours", "annulee", "refusee", "terminee"].map(
-            (statut) => (
-              <div
-                key={statut}
-                className={`py-2 px-4 mx-1 mb-2 rounded ${
-                  activeTab === statut ? "bg-gray-300" : "bg-gray-200"
-                }`}
-              >
-                <div className="invisible">
-                  {statut === "en_attente" && "En attente"}
-                  {statut === "en_cours" && "En cours"}
-                  {statut === "annulee" && "Annulées"}
-                  {statut === "refusee" && "Refusées"}
-                  {statut === "terminee" && "Terminées"}
-                </div>
+          {[
+            "en_attente",
+            "acceptee",
+            "en_cours",
+            "annulee",
+            "refusee",
+            "terminee",
+          ].map((statut) => (
+            <div
+              key={statut}
+              className={`py-2 px-4 mx-1 mb-2 rounded ${
+                activeTab === statut ? "bg-gray-300" : "bg-gray-200"
+              }`}
+            >
+              <div className="invisible">
+                {statut === "en_attente" && "En attente"}
+                {statut === "acceptee" && "Acceptées"}
+                {statut === "en_cours" && "En cours"}
+                {statut === "annulee" && "Annulées"}
+                {statut === "refusee" && "Refusées"}
+                {statut === "terminee" && "Terminées"}
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
 
         {/* Cartes de chargement */}
@@ -204,32 +256,48 @@ export default function DemandesAdmin() {
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto">
       <h1 className="text-2xl font-bold uppercase text-center pb-6">
         Demandes
       </h1>
 
       {/* Onglets */}
       <div className="flex flex-wrap justify-center mb-6">
-        {["en_attente", "en_cours", "annulee", "refusee", "terminee"].map(
-          (statut) => (
+        {[
+          { id: "en_attente", label: "En attente", statutKey: "En attente" },
+          { id: "acceptee", label: "Acceptées", statutKey: "Accepté" },
+          { id: "en_cours", label: "En cours", statutKey: "En cours" },
+          { id: "annulee", label: "Annulées", statutKey: "Annulé" },
+          { id: "refusee", label: "Refusées", statutKey: "Refusé" },
+          { id: "terminee", label: "Terminées", statutKey: "Terminé" },
+        ].map((tab) => {
+          // Trouver le nombre correspondant au statut
+          const statutData = demandesParStatut.find(
+            (item) => item.statut === tab.statutKey
+          );
+          const count = statutData ? statutData.nombre : 0;
+
+          return (
             <button
-              key={statut}
-              className={`py-2 px-4 mx-1 mb-2 rounded ${
-                activeTab === statut
+              key={tab.id}
+              className={`py-2 px-4 mx-1 mb-2 rounded flex items-center ${
+                activeTab === tab.id
                   ? "bg-orange-500 text-white font-bold"
                   : "bg-gray-200 hover:bg-gray-300"
               }`}
-              onClick={() => setActiveTab(statut)}
+              onClick={() => setActiveTab(tab.id)}
             >
-              {statut === "en_attente" && "En attente"}
-              {statut === "en_cours" && "En cours"}
-              {statut === "annulee" && "Annulées"}
-              {statut === "refusee" && "Refusées"}
-              {statut === "terminee" && "Terminées"}
+              {tab.label}
+              <span
+                className={`ml-2 font-bold text-md ${
+                  activeTab === tab.id ? "text-white" : "text-orange-500"
+                }`}
+              >
+                {count}
+              </span>
             </button>
-          )
-        )}
+          );
+        })}
       </div>
 
       {/* Liste des demandes */}

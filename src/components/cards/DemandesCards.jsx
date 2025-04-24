@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import ReservationModal from "../Modals/ReservationModal";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import AssignTechnicienModal from "../Modals/AssignerTechnicienModal";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -14,262 +12,185 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
   const navigate = useNavigate();
 
   const formatDate = (dateString) => {
-    return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
-  };
-
-  const getStatutColor = (statut) => {
-    switch (statut) {
-      case "en_attente":
-        return "bg-yellow-500";
-      case "en_cours":
-        return "bg-blue-500";
-      case "terminee":
-        return "bg-green-500";
-      case "annulee":
-        return "bg-red-500";
-      case "refusee":
-        return "bg-gray-500";
-      default:
-        return "bg-gray-500";
+    if (!dateString) return "Non définie";
+    try {
+      return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
+    } catch {
+      return dateString;
     }
   };
 
-  // const handleDelete = async (id) => {
-  //   if (window.confirm("Êtes-vous sûr de vouloir supprimer cette demande ?")) {
-  //     try {
-  //       await axios.delete(`https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`, {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //         },
-  //       });
-  //       toast.success("Demande supprimé avec succès");
-  //       navigate("/admin/demandes");
-  //     } catch (err) {
-  //       toast.error(
-  //         err.response?.data?.message || "Erreur lors de la suppression"
-  //       );
-  //     }
-  //   }
-  // };
-
-  const handleReject = async (id) => {
-    if (window.confirm("Voulez-vous rejeter cette demande ?")) {
-      try {
-        await axios.put(
-          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-          { statut: "refusee" },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        toast.success("Demande rejetée avec succès");
-        navigate("/admin/demandes");
-      } catch (err) {
-        toast.error(
-          err.response?.data?.message || "Erreur lors du rejet de la demande"
-        );
-      }
-    }
+  const statusConfig = {
+    en_attente: { label: "En attente", color: "bg-yellow-500" },
+    acceptee: { label: "Acceptée", color: "bg-indigo-500" },
+    en_cours: { label: "En cours", color: "bg-blue-500" },
+    terminee: { label: "Terminée", color: "bg-green-500" },
+    annulee: { label: "Annulée", color: "bg-red-500" },
+    refusee: { label: "Refusée", color: "bg-gray-500" },
   };
 
-  const handleCancel = async (id) => {
-    if (window.confirm("Voulez-vous annuler cette demande ?")) {
-      try {
-        await axios.put(
-          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-          { statut: "annulee" },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        toast.success("Demande annulée avec succès");
-        navigate("/admin/demandes");
-      } catch (err) {
-        toast.error(
-          err.response?.data?.message ||
-            "Erreur lors de l'annulation de la demande"
-        );
-      }
-    }
+  const executionStateConfig = {
+    non_commencee: { label: "Non commencée", color: "bg-yellow-500" },
+    en_cours: { label: "En cours", color: "bg-blue-500" },
+    terminee: { label: "Terminée", color: "bg-green-500" },
   };
 
-  const handleFinish = async (id) => {
-    if (window.confirm("Voulez-vous annuler cette demande ?")) {
-      try {
-        await axios.put(
-          `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-          { statut: "terminee" },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        toast.success("Demande marquée comme terminée");
-        navigate("/admin/demandes");
-      } catch (err) {
-        toast.error(
-          err.response?.data?.message ||
-            "Erreur lors de l'annulation de la demande"
-        );
-      }
+  const handleStatusChange = async (id, newStatus) => {
+    const confirmMessages = {
+      refusee: "Voulez-vous rejeter cette demande ?",
+      annulee: "Voulez-vous annuler cette demande ?",
+      terminee: "Voulez-vous marquer cette demande comme terminée ?",
+    };
+
+    if (
+      !window.confirm(
+        confirmMessages[newStatus] || "Confirmez-vous cette action ?"
+      )
+    )
+      return;
+
+    try {
+      await axios.put(
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
+        { statut: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      toast.success(
+        `Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`
+      );
+      onUpdate?.(); // Rafraîchir la liste si une callback est fournie
+      navigate("/admin/demandes");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message ||
+          `Erreur lors de la modification du statut`
+      );
     }
   };
 
   const handleAssignSuccess = () => {
-    onUpdate && onUpdate(); // Rafraîchir la liste des demandes
+    setShowAssignModal(false);
+    onUpdate?.(); // Rafraîchir la liste des demandes
+  };
+
+  const currentStatus = statusConfig[demande.statut] || statusConfig.refusee;
+  const currentExecutionState = executionStateConfig[demande.etatExecution] || {
+    label: "Inconnu",
+    color: "bg-gray-500",
   };
 
   return (
-    <div
-      key={demande._id}
-      className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col justify-between items-between"
-    >
-      <div className="flex flex-col flex-wrap">
-        <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
-          Informations demande
-        </h2>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">N&deg; DEMANDE :</strong>{" "}
-          <span>{demande.numeroDemande}</span>
+    <div className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col">
+      <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
+        Informations demande
+      </h2>
+
+      <div className="space-y-2 mb-4">
+        <p>
+          <strong className="font-bold pe-2">N° DEMANDE :</strong>
+          {demande.numeroDemande}
         </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">NOM SERVICE :</strong>{" "}
+        <p>
+          <strong className="font-bold pe-2">SERVICE :</strong>
           <span className="text-orange-600">{demande.service}</span>
         </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">DATE DEMANDE :</strong>{" "}
-          <span>{formatDate(demande.date)}</span>
+        <p>
+          <strong className="font-bold pe-2">DATE :</strong>
+          {formatDate(demande.date)}
         </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">CLIENT :</strong>{" "}
+        <p>
+          <strong className="font-bold pe-2">CLIENT :</strong>
           <span className="text-orange-600">
             {demande.clientPrenom} {demande.clientNom}
           </span>
         </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">TECHNICIEN :</strong>{" "}
-          <span>
-            {demande.technicienPrenom} {demande.technicienNom}
+        <p>
+          <strong className="font-bold pe-2">TECHNICIEN :</strong>
+          {demande.technicienPrenom} {demande.technicienNom || "Non assigné"}
+        </p>
+        <p>
+          <strong className="font-bold pe-2">INTERVENTION :</strong>
+          {formatDate(demande.dateIntervention)}
+        </p>
+        <p className="flex items-center">
+          <strong className="font-bold pe-2">STATUT :</strong>
+          <span
+            className={`${currentStatus.color} text-white px-2 py-1 rounded-full text-sm`}
+          >
+            {currentStatus.label}
           </span>
         </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">DATE INTERVENTION :</strong>{" "}
-          <span>{formatDate(demande.dateIntervention)}</span>
-        </p>
-        <p className="flex flex-wrap">
-          <strong className="font-bold pe-2">STATUT :</strong>{" "}
+        <p className="flex items-center">
+          <strong className="font-bold pe-2">EXÉCUTION :</strong>
           <span
-            className={`${getStatutColor(
-              demande.statut
-            )} text-white px-2 py-1 rounded-full text-sm`}
+            className={`${currentExecutionState.color} text-white px-2 py-1 rounded-full text-sm`}
           >
-            {/* {demande.statut} */}
-            {demande.statut === "en_attente" && "En attente"}
-            {demande.statut === "en_cours" && "En cours"}
-            {demande.statut === "annulee" && "Annulée"}
-            {demande.statut === "refusee" && "Refusée"}
-            {demande.statut === "terminee" && "Terminée"}
+            {currentExecutionState.label}
           </span>
         </p>
       </div>
 
-      {/* Boutons */}
-      <div className="">
+      {/* Actions */}
+      <div className="mt-auto">
         {demande.statut === "en_attente" && (
-          <div className="flex flex-col">
-            <div className="flex justify-between mt-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between gap-2">
               <button
-                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
-                onClick={() => handleReject(demande._id)}
+                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 flex-1"
+                onClick={() => handleStatusChange(demande._id, "refusee")}
               >
                 Refuser
               </button>
               <button
-                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
+                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600 flex-1"
                 onClick={() => setShowAssignModal(true)}
               >
                 Accepter
               </button>
             </div>
-            <div className="flex justify-center">
-              <Link
-                to={`/admin/demandes/${demande._id}`}
-                className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
-              >
-                Plus de détails
-              </Link>
-            </div>
+            <Link
+              to={`/admin/demandes/${demande._id}`}
+              className="text-center text-blue-500 hover:underline"
+            >
+              Plus de détails
+            </Link>
           </div>
         )}
 
-        {demande.statut === "en_cours" && (
-          <div className="flex flex-col">
-            <div className="flex justify-between mt-4">
+        {["acceptee", "en_cours"].includes(demande.statut) && (
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between gap-2">
               <button
-                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
-                onClick={() => handleCancel(demande._id)}
-              >
-                Refuser
-              </button>
-              <button
-                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
-                onClick={() => handleFinish(demande._id)}
-              >
-                Terminée
-              </button>
-            </div>
-            <div className="flex justify-center">
-              <Link
-                to={`/admin/demandes/${demande._id}`}
-                className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
-              >
-                Plus de détails
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* {demande.statut === "en_cours" && (
-          <div className="flex flex-col">
-            <div className="flex justify-between mt-4">
-              <button
-                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600"
-                onClick={() => handleCancel(demande._id)}
+                className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 flex-1"
+                onClick={() => handleStatusChange(demande._id, "annulee")}
               >
                 Annuler
               </button>
               <Link
                 to={`/admin/demandes/${demande._id}`}
-                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600"
+                className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600 flex-1 text-center"
               >
-                Détail
-              </Link>
-            </div>
-          </div>
-        )} */}
-
-        {(demande.statut === "annulee" ||
-          demande.statut === "refusee" ||
-          demande.statut === "terminee") && (
-          <div className="flex flex-col">
-            <div className="flex justify-center">
-              <Link
-                to={`/admin/demandes/${demande._id}`}
-                className="text-center mt-2 text-blue-500 cursor-pointer w-fit hover:underline"
-              >
-                Plus de détails
+                Détails
               </Link>
             </div>
           </div>
         )}
+
+        {["annulee", "refusee", "terminee"].includes(demande.statut) && (
+          <Link
+            to={`/admin/demandes/${demande._id}`}
+            className="block text-center text-blue-500 hover:underline"
+          >
+            Plus de détails
+          </Link>
+        )}
       </div>
 
-      {/* Modal */}
       {/* Modal d'assignation */}
       {showAssignModal && (
         <AssignTechnicienModal

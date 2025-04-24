@@ -1,104 +1,127 @@
 import { Link } from "react-router-dom";
-import { FaLongArrowAltRight } from "react-icons/fa";
+import {
+  FaLongArrowAltRight,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import React from "react";
+import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const formatDate = (dateString) => {
     return format(parseISO(dateString), "dd/MM/yyyy", { locale: fr });
   };
+
   const [loading, setLoading] = useState(true);
+  const [services, setServices] = useState([]);
   const [demandes, setDemandes] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [error, setError] = useState(null);
+
   const userData = JSON.parse(localStorage.getItem("user"));
   const clientId = userData?.id;
 
-  const fetchDemandes = useCallback(async () => {
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.5 } },
+  };
+
+  const slideIn = {
+    hidden: { x: 50, opacity: 0 },
+    visible: { x: 0, opacity: 1, transition: { duration: 0.5 } },
+  };
+
+  // Fetch latest data
+  const fetchLatestData = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/client/${clientId}`,
+      setLoading(true);
+
+      // Fetch latest 2 demandes
+      const demandesRes = await axios.get(
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/client/${clientId}?limit=2`,
+        { withCredentials: true }
+      );
+
+      // Fetch 5 services
+      const servicesRes = await axios.get(
+        "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service?limit=5",
         {
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
           },
-          withCredentials: true,
         }
       );
-      return response.data;
-    } catch (error) {
-      console.error("Erreur lors de la récupération des demandes :", error);
-      setError("Erreur lors du chargement des demandes");
-      return null;
+
+      // Fetch 2 messages (ajuster selon votre API)
+      const messagesRes = await axios.get(
+        `https://easyservice-backend-iv29.onrender.com/api/messages/recus?limit=2`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      // Process demandes with categories
+      const demandesWithCategories = await Promise.all(
+        demandesRes.data.map(async (demande) => {
+          if (demande?.service?.categorie) {
+            const categoryRes = await axios.get(
+              `https://easyservice-backend-iv29.onrender.com/api/categories/${demande.service.categorie}`,
+              { withCredentials: true }
+            );
+            return {
+              ...demande,
+              service: {
+                ...demande.service,
+                categorie: categoryRes.data.nom || "Inconnu",
+              },
+            };
+          }
+          return demande;
+        })
+      );
+
+      setDemandes(demandesWithCategories);
+      setServices(servicesRes.data);
+      setMessages(messagesRes.data || []);
+    } catch (err) {
+      console.error("Erreur lors du chargement des données:", err);
+      setError("Erreur lors du chargement des données");
+      toast.error("Erreur lors du chargement des données");
+    } finally {
+      setLoading(false);
     }
   }, [clientId]);
 
-  const fetchCategoryName = async (categoryId) => {
-    try {
-      const response = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/categories/${categoryId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      return response.data.nom;
-    } catch (error) {
-      console.error("Erreur lors de la récupération de la catégorie :", error);
-      return "Inconnu";
-    }
+  useEffect(() => {
+    fetchLatestData();
+
+    // Auto-slide for services
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchLatestData, services.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3));
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!clientId) {
-        setError("Client ID non trouvé");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const demandesData = await fetchDemandes();
-
-        if (demandesData) {
-          // Inverse l'ordre des demandes (les plus récentes en premier)
-          const reversedDemandes = [...demandesData].reverse();
-
-          // Met à jour les catégories en parallèle
-          const demandesWithCategories = await Promise.all(
-            reversedDemandes.map(async (demande) => {
-              if (demande?.service?.categorie) {
-                const categoryName = await fetchCategoryName(
-                  demande.service.categorie
-                );
-                return {
-                  ...demande,
-                  service: {
-                    ...demande.service,
-                    categorie: categoryName,
-                  },
-                };
-              }
-              return demande;
-            })
-          );
-
-          setDemandes(demandesWithCategories);
-        }
-      } catch (err) {
-        console.error("Erreur lors du chargement des données:", err);
-        setError("Erreur lors du chargement des données");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [fetchDemandes, clientId]);
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) =>
+        (prev - 1 + Math.ceil(services.length / 3)) %
+        Math.ceil(services.length / 3)
+    );
+  };
 
   if (loading) {
     return (
@@ -117,112 +140,207 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 p-4">
-      <div className="bg-gray-100 rounded-lg p-4">
-        <h3 className="uppercase text-center font-bold text-lg mb-4">
-          Demandes
-        </h3>
-
-        {demandes.length === 0 ? (
-          <p className="text-center text-gray-500">Aucune demande trouvée</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-300 bg-white rounded-lg shadow-md">
-              <thead className="bg-orange-500 text-white">
-                <tr>
-                  <th className="px-6 py-3 text-left">Nom</th>
-                  <th className="px-6 py-3 text-left">Catégorie</th>
-                  <th className="px-6 py-3 text-left">Tarif</th>
-                  <th className="px-6 py-3 text-left">Date de soumission</th>
-                  <th className="px-6 py-3 text-left">Date intervention</th>
-                  <th className="px-6 py-3 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {demandes.map((demande, index) => (
-                  <tr
-                    key={demande._id}
-                    className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                  >
-                    <td className="px-6 py-4 border-b">
-                      {demande?.service?.nom || "-"}
-                    </td>
-                    <td className="px-6 py-4 border-b">
-                      {demande?.service?.categorie || "-"}
-                    </td>
-                    <td className="px-6 py-4 border-b">
-                      {demande.tarif || "-"}
-                    </td>
-                    <td className="px-6 py-4 border-b">
-                      {formatDate(demande.dateDemande) || "-"}
-                    </td>
-                    <td className="px-6 py-4 border-b">
-                      {formatDate(demande.dateIntervention) || "-"}
-                    </td>
-                    <td className="px-6 py-4 border-b">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          demande.statut === "En cours"
-                            ? "bg-blue-100 text-blue-800"
-                            : demande.statut === "En attente"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {demande.statut || "-"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <div className="flex justify-end mt-4">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={fadeIn}
+      className="flex flex-col gap-3 w-full mx-auto"
+    >
+      {/* Section Demandes */}
+      <motion.div
+        variants={slideIn}
+        className="bg-white rounded-xl shadow-md p-4"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-gray-800">
+            Vos dernières demandes
+          </h3>
           <Link
             to="/client/demandes"
-            className="text-orange-500 font-bold flex items-center gap-2 hover:underline"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
           >
-            Voir toutes les demandes <FaLongArrowAltRight />
+            Voir toutes <FaLongArrowAltRight />
           </Link>
         </div>
-      </div>
 
-      {/* Messages */}
-      <div className="bg-gray-100 rounded-lg p-4">
-        <h3 className="uppercase text-center font-bold text-lg mb-4">
-          Messages
-        </h3>
-        <div className="flex items-center bg-gray-200 p-3 rounded-lg mb-3">
-          <div className="bg-orange-400 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3">
-            <span>A</span>
+        {demandes.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">
+            Aucune demande récente
+          </p>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {[...demandes]
+              .reverse()
+              .slice(0, 2)
+              .map((demande) => (
+                <div
+                  key={demande._id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between">
+                    <h4 className="font-semibold text-gray-800">
+                      {demande?.service?.nom || "Service"}
+                    </h4>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        demande.statut === "En cours"
+                          ? "bg-blue-100 text-blue-800"
+                          : demande.statut === "En attente"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {demande.statut || "-"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {demande?.service?.categorie || "-"}
+                  </p>
+                  <div className="flex justify-between mt-3 text-sm">
+                    <span className="text-gray-500">
+                      Soumis: {formatDate(demande.dateDemande)}
+                    </span>
+                    <span className="font-medium text-orange-500">
+                      {demande.tarif || "-"} FCFA
+                    </span>
+                  </div>
+                </div>
+              ))}
           </div>
-          <div>
-            <p className="font-bold">Admin Fadiaba</p>
-            <p className="text-gray-600">
-              Bonjour {userData?.prenom || ""}, votre demande a été acceptée
-            </p>
-          </div>
+        )}
+      </motion.div>
+
+      {/* Section Services */}
+      <motion.div
+        variants={slideIn}
+        className="bg-white rounded-xl shadow-md p-4"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-gray-800">Services récents</h3>
+          <Link
+            to="/client/services"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+          >
+            Voir tous <FaLongArrowAltRight />
+          </Link>
         </div>
-        <div className="flex justify-end">
+
+        {services.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">
+            Aucun service disponible
+          </p>
+        ) : (
+          <div className="relative overflow-hidden">
+            <div
+              className="flex transition-transform duration-500"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {[...services].reverse().map((service) => (
+                <div
+                  key={service._id}
+                  className="flex-shrink-0 w-full md:w-1/3 px-2"
+                >
+                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all">
+                    <div className="h-40 bg-gray-100 rounded-md mb-3 overflow-hidden">
+                      {service.image ? (
+                        <img
+                          src={service.image}
+                          alt={service.nom}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          Pas d'image
+                        </div>
+                      )}
+                    </div>
+                    <h4 className="font-semibold text-gray-800">
+                      {service.nom}
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-1 truncate">
+                      {service.description}
+                    </p>
+                    <div className="flex justify-between items-center mt-3">
+                      <span className="font-medium text-orange-500">
+                        {service.tarif} FCFA
+                      </span>
+                      <Link
+                        to={`/client/services/${service._id}`}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        Voir détails
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {services.length > 3 && (
+              <div className="flex justify-center mt-4 space-x-2">
+                <button
+                  onClick={prevSlide}
+                  className="p-2 rounded-full hover:bg-gray-100"
+                >
+                  <FaChevronLeft className="text-gray-600" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="p-2 rounded-full hover:bg-gray-100"
+                >
+                  <FaChevronRight className="text-gray-600" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Section Messages */}
+      <motion.div
+        variants={slideIn}
+        className="bg-white rounded-xl shadow-md p-4"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-gray-800">Derniers messages</h3>
           <Link
             to="/client/messages"
-            className="text-orange-500 font-bold flex items-center gap-2 hover:underline"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
           >
-            Voir tous les messages <FaLongArrowAltRight />
+            Voir tous <FaLongArrowAltRight />
           </Link>
         </div>
-      </div>
 
-      {/* Services */}
-      <div className="bg-gray-100 rounded-lg p-4">
-        <h3 className="uppercase text-center font-bold text-lg mb-4">
-          Services
-        </h3>
-        <p className="text-center text-gray-500">Section services à venir</p>
-      </div>
-    </div>
+        {messages.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">Aucun message récent</p>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message._id}
+                className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 flex-shrink-0">
+                  {message.expediteur.prenom?.charAt(0) || "A"}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-semibold text-gray-800">
+                      {message.expediteur.prenom || "Expéditeur"}{" "}
+                      {message.expediteur.nom || ""}
+                    </h4>
+                    <span className="text-xs text-gray-500">
+                      {formatDate(message.dateEnvoi)}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 mt-1">{message.contenu}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
   );
 };
 

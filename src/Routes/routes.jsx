@@ -38,6 +38,7 @@ import { useState, useEffect } from "react";
 import LoginModal from "../components/Modals/LoginModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
 import SignupModal from "../components/Modals/SignupModal";
+import MessagesClient from "../pages/client/Messages";
 
 export default function AppRoutes() {
   const [searchParams] = useSearchParams();
@@ -70,7 +71,7 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="demandes" element={<Demands />} />
           <Route path="demandes/:id" element={<DetailsDemandeClient />} />
-          <Route path="messages" element={<Messages />} />
+          <Route path="messages" element={<MessagesClient />} />
           <Route path="messages/:id" element={<DetailsMessageClient />} />
           <Route path="services" element={<Services />} />
           <Route path="services/:id" element={<ServiceDetailsClient />} />

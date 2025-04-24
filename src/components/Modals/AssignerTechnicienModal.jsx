@@ -32,11 +32,19 @@ export default function AssignTechnicienModal({
         );
 
         if (Array.isArray(response.data.techniciens)) {
-          const validTechniciens = response.data.techniciens.filter(
-            (tech) => tech._id && tech.prenom && tech.nom
-          );
-          setTechniciens(validTechniciens);
-          console.log(response.data.techniciens);
+          response.data.techniciens.map((technicien) => {
+            // Vérifier si le technicien a un ID valide
+            if (!technicien._id) {
+              console.error("Technicien sans ID:", technicien);
+            }
+            // Filtrer les techniciens valides
+            const validTechniciens = response.data.techniciens.filter(
+              (tech) => tech._id && tech.prenom && tech.nom && tech.disponible
+            );
+
+            setTechniciens(validTechniciens);
+            console.log(technicien);
+          });
         } else {
           //console.log(response.data.techniciens);
           setError("Format de données inattendu");
