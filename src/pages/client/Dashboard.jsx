@@ -44,13 +44,13 @@ const Dashboard = () => {
 
       // Fetch latest 2 demandes
       const demandesRes = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/client/${clientId}?limit=2`,
+        `https://easyservice-backend-iv29.onrender.com/api/demandes/client/${clientId}`,
         { withCredentials: true }
       );
 
       // Fetch 5 services
       const servicesRes = await axios.get(
-        "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service?limit=5",
+        "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -60,7 +60,7 @@ const Dashboard = () => {
 
       // Fetch 2 messages (ajuster selon votre API)
       const messagesRes = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/messages/recus?limit=2`,
+        `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
