@@ -33,7 +33,7 @@ const MessagesTechniciens = () => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `https://easyservice-backend-iv29.onrender.com/api/messages/technicien/${userData.id}`,
+          `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -43,7 +43,7 @@ const MessagesTechniciens = () => {
         );
 
         // Trier les messages par date décroissante
-        const sortedMessages = response.data.sort(
+        const sortedMessages = response.data.data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
         );
 
@@ -76,7 +76,7 @@ const MessagesTechniciens = () => {
   const markAsRead = async (messageId) => {
     try {
       await axios.patch(
-        `https://easyservice-backend-iv29.onrender.com/api/messages/${messageId}/read`,
+        `https://easyservice-backend-iv29.onrender.com/api/messages/${messageId}/lu`,
         {},
         {
           headers: {

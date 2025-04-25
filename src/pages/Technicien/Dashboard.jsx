@@ -20,7 +20,7 @@ const DashboardTechniciens = () => {
 
   const [loading, setLoading] = useState(true);
   const [interventions, setInterventions] = useState([]);
-  // const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [stats, setStats] = useState({
     enCours: 0,
     terminees: 0,
@@ -68,27 +68,27 @@ const DashboardTechniciens = () => {
     }
   }, [user]);
 
-  // const fetchMessages = useCallback(async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //         },
-  //       }
-  //     );
-  //     setMessages(response.data.slice(0, 3)); // 3 derniers messages
-  //   } catch (error) {
-  //     console.error("Erreur messages:", error);
-  //   }
-  // }, []);
+  const fetchMessages = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      setMessages(response.data.data.slice(0, 3)); // 3 derniers messages
+    } catch (error) {
+      console.error("Erreur messages:", error);
+    }
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        await Promise.all([fetchInterventions()]);
+        await Promise.all([fetchInterventions(), fetchMessages()]);
       } catch (error) {
         console.error("Erreur chargement données:", error);
       } finally {
@@ -97,7 +97,7 @@ const DashboardTechniciens = () => {
     };
 
     loadData();
-  }, [fetchInterventions]);
+  }, [fetchInterventions, fetchMessages]);
 
   if (loading) {
     return (
@@ -147,7 +147,7 @@ const DashboardTechniciens = () => {
 
         {interventions.length > 0 ? (
           <div className="space-y-4">
-            {interventions.map((intervention) => (
+            {[...interventions].slice(0, 1).map((intervention) => (
               <InterventionCard
                 key={intervention._id}
                 intervention={{
