@@ -64,7 +64,7 @@ export default function DemandesAdmin() {
           etatExecution: demande.etatExecution,
           categorie: demande.categorieService,
           description: demande.description,
-          technicienPrenom: TechnicienObj?.prenom || "À définir",
+          technicienPrenom: TechnicienObj?.prenom,
           technicienNom: TechnicienObj?.nom || "",
         };
       });

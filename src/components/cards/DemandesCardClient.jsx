@@ -139,13 +139,13 @@ const DemandesCardClient = memo(({ demande }) => {
   return (
     <div className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col">
       <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
-        Informations demande
+        DEMANDE
+          #{demande.numeroDemande}
       </h2>
 
       <div className="space-y-2 mb-4">
         <p>
-          <strong className="font-semibold pe-2">N° DEMANDE :</strong>
-          {demande.numeroDemande}
+          
         </p>
         <p>
           <strong className="font-semibold pe-2">SERVICE :</strong>
@@ -159,7 +159,7 @@ const DemandesCardClient = memo(({ demande }) => {
           <strong className="font-semibold pe-2">TECHNICIEN :</strong>
           {`${demande.technicienPrenom} ${demande.technicienNom}`}
         </p>
-        <p>
+        <p className="flex items-center flex-wrap">
           <strong className="font-semibold pe-2">INTERVENTION :</strong>
           {formatDate(demande.dateIntervention)}
         </p>
@@ -176,19 +176,21 @@ const DemandesCardClient = memo(({ demande }) => {
       {/* Actions */}
       <div className="mt-auto">
         {["en_attente", "en_cours", "acceptee"].includes(demande.statut) && (
-          <div className="flex justify-between gap-2">
+          
+          <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
+            <Link
+            to={`/client/demandes/${demande._id}`}
+            className="block text-center text-blue-500 hover:underline"
+          >
+            Plus de détails
+          </Link>
             <button
-              className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 flex-1"
+              className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
               onClick={() => handleCancel(demande._id)}
             >
               Annuler
             </button>
-            <Link
-              to={`/client/demandes/${demande._id}`}
-              className="bg-orange-500 text-white px-4 py-1.5 rounded hover:bg-orange-600 flex-1 text-center"
-            >
-              Détails
-            </Link>
+            
           </div>
         )}
 

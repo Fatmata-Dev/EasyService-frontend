@@ -6,20 +6,26 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const formatDate = (dateString) => {
-    return format(parseISO(dateString), "dd/MM/yyyy", { locale: fr });
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return format(isNaN(date) ? new Date() : date, "dd MMM yyyy 'à' HH:mm", { locale: fr });
+    } catch {
+      return "-";
+    }
   };
 
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState([]);
   const [demandes, setDemandes] = useState([]);
-  //const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [error, setError] = useState(null);
 
@@ -59,14 +65,14 @@ const Dashboard = () => {
       );
 
       // Fetch 2 messages (ajuster selon votre API)
-      // const messagesRes = await axios.get(
-      //   `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      //     },
-      //   }
-      // );
+      const messagesRes = await axios.get(
+        `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
 
       // Process demandes with categories
       const demandesWithCategories = await Promise.all(
@@ -90,7 +96,7 @@ const Dashboard = () => {
 
       setDemandes(demandesWithCategories);
       setServices(servicesRes.data);
-      setMessages(messagesRes.data || []);
+      setMessages(messagesRes.data.data || []);
     } catch (err) {
       console.error("Erreur lors du chargement des données:", err);
       setError("Erreur lors du chargement des données");
@@ -210,6 +216,51 @@ const Dashboard = () => {
         )}
       </motion.div>
 
+      {/* Section Messages */}
+     <motion.div
+        variants={slideIn}
+        className="bg-white rounded-xl shadow-md p-4"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-gray-800">Derniers messages</h3>
+          <Link
+            to="/client/messages"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+          >
+            Voir tous <FaLongArrowAltRight />
+          </Link>
+        </div>
+
+        {messages.length === 0 ? (
+          <p className="text-center text-gray-500 py-4">Aucun message récent</p>
+        ) : (
+          <div className="space-y-4">
+            {[...messages].slice(0, 2).map((message) => (
+              <div
+                key={message._id}
+                className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 flex-shrink-0">
+                  {message.expediteur.prenom?.charAt(0) || "A"}
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-semibold text-gray-800">
+                      {message.expediteur.prenom || "Expéditeur"}{" "}
+                      {message.expediteur.nom || ""}
+                    </h4>
+                    <span className="text-xs text-gray-500">
+                      {formatDate(message.dateEnvoi)}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 mt-1">{message.contenu}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
       {/* Section Services */}
       <motion.div
         variants={slideIn}
@@ -296,50 +347,7 @@ const Dashboard = () => {
         )}
       </motion.div>
 
-      {/* Section Messages */}
-   {/*   <motion.div
-        variants={slideIn}
-        className="bg-white rounded-xl shadow-md p-4"
-      >
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-gray-800">Derniers messages</h3>
-          <Link
-            to="/client/messages"
-            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
-          >
-            Voir tous <FaLongArrowAltRight />
-          </Link>
-        </div>
-
-        {messages.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">Aucun message récent</p>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message._id}
-                className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
-              >
-                <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 flex-shrink-0">
-                  {message.expediteur.prenom?.charAt(0) || "A"}
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-gray-800">
-                      {message.expediteur.prenom || "Expéditeur"}{" "}
-                      {message.expediteur.nom || ""}
-                    </h4>
-                    <span className="text-xs text-gray-500">
-                      {formatDate(message.dateEnvoi)}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mt-1">{message.contenu}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </motion.div>*/}
+      
     </motion.div>
   );
 };
