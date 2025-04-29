@@ -1,110 +1,62 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useGetTechniciensQuery } from "../../API/authApi";
+import { useAssignerDemandeMutation } from "../../API/demandesApi";
+import { useSelector } from "react-redux";
 
 export default function AssignTechnicienModal({
   setShowModal,
   demande,
-  onAssignSuccess,
 }) {
-  const [techniciens, setTechniciens] = useState([]);
   const [selectedTechnicien, setSelectedTechnicien] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const adminId = useSelector(state => state?.auth?.user?.id) || JSON.parse(localStorage.getItem("user"))?.id;
+  
+
+  // Récupération des techniciens via RTK Query
+  const { 
+    data: techniciensData, 
+    isLoading: isLoadingTechniciens, 
+    error: techniciensError 
+  } = useGetTechniciensQuery();
+
+  console.log(techniciensData);
+
+  // Mutation pour l'assignation
+  const [assignerDemande, { isLoading: isAssigning }] = useAssignerDemandeMutation();
 
   const formatDate = (dateString) => {
     return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
   };
 
-  // Charger la liste des techniciens disponibles
-  useEffect(() => {
-    const fetchTechniciens = async () => {
-      try {
-        const response = await axios.get(
-          "https://easyservice-backend-iv29.onrender.com/api/auth/all/techniciens",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-
-        if (Array.isArray(response.data.techniciens)) {
-          response.data.techniciens.map((technicien) => {
-            // Vérifier si le technicien a un ID valide
-            if (!technicien._id) {
-              console.error("Technicien sans ID:", technicien);
-            }
-            // Filtrer les techniciens valides
-            const validTechniciens = response.data.techniciens.filter(
-              (tech) => tech._id && tech.prenom && tech.nom && tech.disponible
-            );
-
-            setTechniciens(validTechniciens);
-            console.log(technicien);
-          });
-        } else {
-          //console.log(response.data.techniciens);
-          setError("Format de données inattendu");
-          toast.error("Erreur: les techniciens n'ont pas pu être chargés");
-        }
-      } catch (err) {
-        setError(err.message);
-        toast.error("Erreur lors du chargement des techniciens");
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTechniciens();
-  }, []);
+  // Filtrage des techniciens disponibles
+  const techniciensDisponibles = techniciensData?.filter(tech => 
+    tech._id && tech.prenom && tech.nom && tech.disponible
+  ) || [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    console.log("Données à envoyer:", {
-      demandeId: demande._id,
-      technicienId: selectedTechnicien,
-    });
-
+    
     if (!selectedTechnicien) {
       toast.error("Veuillez sélectionner un technicien");
-      setIsLoading(false);
       return;
     }
 
-    //const demandeId = demande._id;
-
     try {
-      const response = await axios.post(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/assigner`,
-        {
-          demandeId: demande._id,
-          technicienId: selectedTechnicien,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
-
-      console.log(response);
+      await assignerDemande({
+        demandeId: demande._id,
+        technicienId: selectedTechnicien,
+        adminId: adminId
+      }).unwrap();
 
       toast.success("Technicien assigné avec succès");
-      onAssignSuccess(); // Rafraîchir la liste des demandes
       setShowModal(false);
     } catch (err) {
       toast.error(
-        err.response?.data?.message ||
-          "Erreur lors de l'assignation du technicien"
+        err.data?.message || "Erreur lors de l'assignation du technicien"
       );
-    } finally {
-      setIsLoading(false);
+      console.log(err);
     }
   };
 
@@ -122,7 +74,7 @@ export default function AssignTechnicienModal({
         </h3>
 
         <form onSubmit={handleSubmit}>
-          {/* Section informations de la demande (lecture seule) */}
+          {/* Section informations de la demande */}
           <div className="mb-6">
             <h4 className="font-bold text-gray-700 mb-2">
               Informations de la demande
@@ -142,7 +94,7 @@ export default function AssignTechnicienModal({
                   Service
                 </label>
                 <div className="mt-1 p-2 bg-gray-100 rounded">
-                  {demande.service}
+                  {demande.service.nom}
                 </div>
               </div>
             </div>
@@ -153,7 +105,7 @@ export default function AssignTechnicienModal({
                   Client
                 </label>
                 <div className="mt-1 p-2 bg-gray-100 rounded">
-                  {demande.clientPrenom} {demande.clientNom}
+                  {demande.client.prenom} {demande.client.nom}
                 </div>
               </div>
               <div>
@@ -176,7 +128,7 @@ export default function AssignTechnicienModal({
             </div>
           </div>
 
-          {/* Section assignation technicien (modifiable) */}
+          {/* Section assignation technicien */}
           <div className="mb-6">
             <h4 className="font-bold text-gray-700 mb-2">Assignation</h4>
 
@@ -185,21 +137,23 @@ export default function AssignTechnicienModal({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Technicien *
                 </label>
-                {isLoading ? (
+                {isLoadingTechniciens ? (
                   <div>Chargement des techniciens...</div>
-                ) : error ? (
-                  <div className="text-red-500">{error}</div>
+                ) : techniciensError ? (
+                  <div className="text-red-500">
+                    Erreur lors du chargement des techniciens
+                  </div>
                 ) : (
                   <select
                     className="w-full p-2 border border-gray-300 rounded"
                     value={selectedTechnicien}
                     onChange={(e) => setSelectedTechnicien(e.target.value)}
                     required
-                    disabled={isLoading || error}
+                    disabled={isLoadingTechniciens || techniciensError}
                   >
                     <option value="">Sélectionnez un technicien</option>
-                    {techniciens.length > 0 ? (
-                      techniciens.map((tech) => (
+                    {techniciensDisponibles.length > 0 ? (
+                      techniciensDisponibles.map((tech) => (
                         <option key={tech._id} value={tech._id}>
                           {tech.prenom} {tech.nom} - {tech.metier}
                         </option>
@@ -236,9 +190,9 @@ export default function AssignTechnicienModal({
             <button
               type="submit"
               className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-              disabled={isLoading}
+              disabled={isLoadingTechniciens || isAssigning}
             >
-              {isLoading ? "Enregistrement..." : "Assigner"}
+              {isAssigning ? "Enregistrement..." : "Assigner"}
             </button>
           </div>
         </form>

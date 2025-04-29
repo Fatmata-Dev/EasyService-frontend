@@ -2,10 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ServicesModal from "../../components/Modals/ServicesModal";
-import {
-  useGetServiceByIdQuery,
-  useDeleteServiceMutation,
-} from "../../services/servicesApi";
+import { useGetServiceByIdQuery, useDeleteServiceMutation, useGetAvisByIdQuery } from "../../API/servicesApi";
 
 const ServiceDetailAdmin = () => {
   const { id } = useParams();
@@ -13,6 +10,9 @@ const ServiceDetailAdmin = () => {
   const [deleteService] = useDeleteServiceMutation();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  const { data : feedbacks, isLoading : isLoadingFeedbacks, error : errorFeedbacks } = useGetAvisByIdQuery(id);
+  console.log(feedbacks)
 
   // État pour les commentaires
   const [comments, setComments] = useState([

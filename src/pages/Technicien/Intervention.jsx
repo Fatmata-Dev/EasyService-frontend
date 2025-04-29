@@ -40,6 +40,7 @@ export default function Intervention() {
       );
 
       const interventionsAvecDetails = response.data.map((intervention) => {
+        console.log(intervention)
         const demandeObj = intervention || {};
         const serviceObj = demandeObj.service || { nom: "Service inconnu" };
         const clientObj = demandeObj.client || {
@@ -59,6 +60,12 @@ export default function Intervention() {
           description: demandeObj.description || "Aucune description",
           note: intervention.note || null,
           commentaire: intervention.commentaire || "",
+          clientId: intervention.client._id,
+          demandeId: intervention._id,
+          technicienId: intervention.technicien._id,
+          serviceId: intervention.service._id,
+          adminId: intervention?.admin?._id,
+          tarif: intervention.tarif
         };
       });
 

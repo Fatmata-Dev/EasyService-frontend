@@ -12,6 +12,10 @@ import {
 const SidebarTechnicien = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const userData = JSON.parse(localStorage.getItem("user"));
+  if (!userData) {
+    window.location.href = "/";
+    return null;
+  }
   const prenom = userData.prenom;
   const nom = userData.nom;
   const links = [

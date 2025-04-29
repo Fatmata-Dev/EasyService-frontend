@@ -6,7 +6,7 @@ import {
   useUpdateServiceMutation,
   useGetCategoriesQuery,
   useCreateCategoryMutation,
-} from "../../services/servicesApi";
+} from "../../API/servicesApi";
 
 const ServicesModal = ({
   setShowModal,

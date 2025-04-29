@@ -6,7 +6,7 @@ import NotFound from "../pages/NotFound";
 import ClientHome from "../pages/client/Client";
 import Dashboard from "../pages/client/Dashboard";
 import Demands from "../pages/client/Demands";
-import Messages from "../pages/client/Messages";
+import MessagesClient from "../pages/client/Messages";
 import Services from "../pages/client/Services";
 import AvisClient from "../pages/client/AvisClient";
 import Contact from "../pages/client/Contact";
@@ -16,7 +16,7 @@ import DashboardAdmin from "../pages/Admin/Dashboard";
 import ServicesAdmin from "../pages/Admin/ServicesAdmin";
 import ServiceDetailAdmin from "../pages/Admin/ServiceDetailAdmin";
 import DemandesAdmin from "../pages/Admin/DemandesAdmin";
-import MessagesAdmin from "../pages/Admin/MessagesAdmin";
+import MessagesList from "../pages/Admin/MessageList";
 import PermissionsAdmin from "../pages/Admin/Permsissions";
 import AvisAdmin from "../pages/Admin/AvisAdmin";
 import DashboardTechniciens from "../pages/Technicien/Dashboard";
@@ -38,7 +38,6 @@ import { useState, useEffect } from "react";
 import LoginModal from "../components/Modals/LoginModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
 import SignupModal from "../components/Modals/SignupModal";
-import MessagesClient from "../pages/client/Messages";
 
 export default function AppRoutes() {
   const [searchParams] = useSearchParams();
@@ -89,7 +88,7 @@ export default function AppRoutes() {
           <Route path="services/:id" element={<ServiceDetailAdmin />} />
           <Route path="demandes" element={<DemandesAdmin />} />
           <Route path="demandes/:id" element={<DetailsDemandeAdmin />} />
-          <Route path="messages" element={<MessagesAdmin />} />
+          <Route path="messages" element={<MessagesList />} />
           <Route path="messages/:id" element={<DetailsMessageAdmin />} />
           <Route path="permissions" element={<PermissionsAdmin />} />
           <Route path="avis" element={<AvisAdmin />} />

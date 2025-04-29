@@ -17,6 +17,85 @@ export default function InterventionCard({ intervention }) {
     }
   }, []);
 
+  console.log(intervention)
+  console.log("montant:" ,intervention.tarif,
+    "service: "+intervention?.serviceId,
+    "technicien: "+intervention?.technicienId,
+    "client:"+ intervention?.clientId,
+    "admin: 67da88347e9d8aefcaa19120",
+    "refDemande:"+ intervention._id )
+
+  const generateFacture = async (id) => {
+    if (!window.confirm("Voulez-vous générer la facture ?")) return;
+
+    try {
+
+      // const formData = new FormData();
+      // formData.append("montant", demande.tarif);
+      // formData.append("service", demande?.service?._id);
+      // formData.append("technicien", demande?.technicien?._id);
+      // formData.append("client", demande?.clientId);
+      // formData.append("admin", "67da88347e9d8aefcaa19120");
+      // formData.append("refDemande", id);
+
+      // console.log(intervention)
+
+      
+      
+      // console.log(intervention.tarif, intervention.serviceId, intervention.technicienId, intervention.clientId, "67da88347e9d8aefcaa19120", id);
+
+      const { data } = await axios.post(
+        `https://easyservice-backend-iv29.onrender.com/api/factures/creer/facture`,
+        {
+          montant: intervention.tarif,
+            service: intervention?.serviceId,
+            technicien: intervention?.technicienId,
+            client: intervention?.clientId,
+            admin: "67da88347e9d8aefcaa19120",
+            refDemande: id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      
+      console.log(data);
+
+    //   data.map(async (facture) => {
+
+    //     if (facture.refDemande == id) {
+    //         const { response } = await axios.get(
+    //       `https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    //         },
+    //       });
+    //       console.log(facture.odooInvoiceId);
+    //       return response;
+      
+    //     }
+
+        
+    // }
+
+    //   // console.log(odooInvoiceId);
+
+    //   );
+
+      toast.success("Facture générée avec succès");
+      // navigate("/demandes");
+    } catch (err) {
+      console.error(err);
+      toast.error(
+        err.response?.data?.message ||
+          "Erreur lors de la génération de la facture"
+      );
+    }
+  };
+
   const handleStatusChange = useCallback(async (action, id) => {
     if (!window.confirm(`Voulez-vous ${action} cette intervention ?`)) return;
 
@@ -153,7 +232,7 @@ export default function InterventionCard({ intervention }) {
               <>
                 <button
                   onClick={() =>
-                    handleStatusChange("terminer", intervention._id)
+                    handleStatusChange("terminer", intervention._id) && generateFacture(intervention._id)
                   }
                   disabled={isProcessing}
                   className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm disabled:opacity-50"
