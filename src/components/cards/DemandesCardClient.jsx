@@ -5,7 +5,7 @@ import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { memo } from "react";
 import { useUpdateDemandeMutation, useDeleteDemandeMutation, useGetFacturesQuery  } from "../../API/demandesApi";
-import { useDownloadFactureMutationMutation } from "../../API/demandesApi";
+// import { useDownloadFactureMutation } from "../../API/demandesApi";
 import { useCreateAvisMutation } from "../../API/servicesApi";
 
 const DemandesCardClient = memo(({ demande }) => {
@@ -21,7 +21,7 @@ const DemandesCardClient = memo(({ demande }) => {
   const [deleteDemande] = useDeleteDemandeMutation();
   const [createAvis] = useCreateAvisMutation();
   const { data: factures = [] } = useGetFacturesQuery();
-  const [downloadFacture] = useDownloadFactureMutationMutation();
+  // const [downloadFacture] = useDownloadFactureMutation();
 
   const formatDate = (dateString) => {
     if (!dateString) return "Non définie";
@@ -41,42 +41,51 @@ const DemandesCardClient = memo(({ demande }) => {
     refusee: { label: "Refusée", color: "bg-gray-500" },
   };
 
-  const generateFacture = async (id) => {
-    try {
-      const facture = factures.find(f => f.refDemande === id);
-      if (facture) {
-        const result = await downloadFacture(facture.odooInvoiceId).unwrap();
-        
-        // Créer un objet URL pour le blob
-        const url = window.URL.createObjectURL(result.data);
-        const a = document.createElement('a');
-        a.href = url;
-        
-        // Extraire le nom de fichier depuis les headers
-        const contentDisposition = result.meta?.responseHeaders?.['content-disposition'];
-        let filename = 'facture.pdf';
-        if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-          if (filenameMatch && filenameMatch[1]) {
-            filename = filenameMatch[1];
-          }
-        }
-        
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
-        toast.success("Facture téléchargée avec succès");
-      } else {
-        toast.error("Aucune facture trouvée pour cette demande");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.data?.message || "Erreur lors du téléchargement de la facture");
+const generateFacture = async (id) => {
+  try {
+    const facture = factures.find(f => f.refDemande === id);
+    if (!facture) {
+      toast.error("Aucune facture trouvée pour cette demande");
+      return;
     }
-  };
+
+    // Appel API direct sans passer par Redux
+    const response = await fetch(`https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+
+    if (!response.ok) throw new Error("Erreur de téléchargement");
+
+    const blob = await response.blob();
+    const contentDisposition = response.headers.get('content-disposition');
+    
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    let filename = 'facture.pdf';
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      if (filenameMatch?.[1]) filename = filenameMatch[1];
+    }
+    
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    }, 100);
+    
+    toast.success("Facture téléchargée avec succès");
+  } catch (err) {
+    console.error("Erreur de téléchargement:", err);
+    toast.error(err.message || "Erreur lors du téléchargement");
+  }
+};
 
   const handleCancel = async (id) => {
     if (!window.confirm("Voulez-vous annuler cette demande ?")) return;

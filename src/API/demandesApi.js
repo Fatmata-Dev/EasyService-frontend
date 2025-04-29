@@ -134,31 +134,39 @@ export const demandesApi = createApi({
       invalidatesTags: ["Facture"],
     }),
 
-    downloadFacture: builder.query({
-      query: (id) => ({
-        url: `/factures/${id}/download`,
-        responseHandler: async (response) => {
-          const blob = await response.blob();
-          return {
-            data: blob,
-            meta: {
-              responseHeaders: {
-                'content-disposition': response.headers.get('content-disposition'),
-                'content-type': response.headers.get('content-type')
-              }
-            }
-          };
-        }
-      }),
-      providesTags: (result, error, id) => [{ type: "Facture", id }],
-    }),
+    // downloadFacture: builder.query({
+    //   query: (id) => ({
+    //     url: `/factures/${id}/download`,
+    //     responseHandler: async (response) => {
+    //       const blob = await response.blob();
+    //       return {
+    //         data: blob,
+    //         meta: {
+    //           responseHeaders: {
+    //             'content-disposition': response.headers.get('content-disposition'),
+    //             'content-type': response.headers.get('content-type')
+    //           }
+    //         }
+    //       };
+    //     }
+    //   }),
+    //   providesTags: (result, error, id) => [{ type: "Facture", id }],
+    // }),
 
     // Ajoutez cette mutation pour le téléchargement
-    downloadFactureMutation: builder.mutation({
+    downloadFacture: builder.mutation({
       query: (id) => ({
         url: `/factures/${id}/download`,
         method: 'GET',
-        responseHandler: (response) => response.blob(),
+        responseHandler: async (response) => {
+          // Retourner seulement les métadonnées nécessaires
+          return {
+            headers: {
+              'content-disposition': response.headers.get('content-disposition'),
+              'content-type': response.headers.get('content-type')
+            }
+          };
+        },
         cache: 'no-cache'
       }),
     }),
@@ -182,5 +190,5 @@ export const {
   useUpdateFactureMutation,
   useDeleteFactureMutation,
   useDownloadFactureQuery,
-  useDownloadFactureMutationMutation
+  useDownloadFactureMutation
 } = demandesApi;

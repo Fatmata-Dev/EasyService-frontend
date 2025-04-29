@@ -17,16 +17,10 @@ export default function InterventionCard({ intervention }) {
     }
   }, []);
 
-  console.log(intervention)
-  console.log("montant:" ,intervention.tarif,
-    "service: "+intervention?.serviceId,
-    "technicien: "+intervention?.technicienId,
-    "client:"+ intervention?.clientId,
-    "admin: 67da88347e9d8aefcaa19120",
-    "refDemande:"+ intervention._id )
+  // console.log(intervention)
 
   const generateFacture = async (id) => {
-    if (!window.confirm("Voulez-vous générer la facture ?")) return;
+    // if (!window.confirm("Voulez-vous générer la facture ?")) return;
 
     try {
 
@@ -51,7 +45,7 @@ export default function InterventionCard({ intervention }) {
             service: intervention?.serviceId,
             technicien: intervention?.technicienId,
             client: intervention?.clientId,
-            admin: "67da88347e9d8aefcaa19120",
+            admin: intervention?.adminId,
             refDemande: id
         },
         {
@@ -62,28 +56,6 @@ export default function InterventionCard({ intervention }) {
       );
       
       console.log(data);
-
-    //   data.map(async (facture) => {
-
-    //     if (facture.refDemande == id) {
-    //         const { response } = await axios.get(
-    //       `https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`,
-    //       {
-    //         headers: {
-    //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-    //         },
-    //       });
-    //       console.log(facture.odooInvoiceId);
-    //       return response;
-      
-    //     }
-
-        
-    // }
-
-    //   // console.log(odooInvoiceId);
-
-    //   );
 
       toast.success("Facture générée avec succès");
       // navigate("/demandes");

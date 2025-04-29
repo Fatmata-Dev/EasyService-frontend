@@ -80,8 +80,8 @@ export default function AssignTechnicienModal({
               Informations de la demande
             </h4>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="flex flex-col sm:flex-row mb-4 gap-5">
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-500">
                   N° Demande
                 </label>
@@ -89,7 +89,7 @@ export default function AssignTechnicienModal({
                   {demande.numeroDemande}
                 </div>
               </div>
-              <div>
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-500">
                   Service
                 </label>
@@ -99,8 +99,8 @@ export default function AssignTechnicienModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
+            <div className="flex flex-col sm:flex-row mb-4 gap-5">
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-500">
                   Client
                 </label>
@@ -108,7 +108,7 @@ export default function AssignTechnicienModal({
                   {demande.client.prenom} {demande.client.nom}
                 </div>
               </div>
-              <div>
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-500">
                   Statut
                 </label>
@@ -132,8 +132,8 @@ export default function AssignTechnicienModal({
           <div className="mb-6">
             <h4 className="font-bold text-gray-700 mb-2">Assignation</h4>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="flex flex-col sm:flex-row mb-4 gap-5">
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Technicien *
                 </label>
@@ -167,7 +167,7 @@ export default function AssignTechnicienModal({
                 )}
               </div>
 
-              <div>
+              <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date d'intervention
                 </label>

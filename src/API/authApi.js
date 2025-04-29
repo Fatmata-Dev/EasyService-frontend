@@ -61,7 +61,7 @@ export const authApi = createApi({
     }),
 
     createTechnicien: builder.mutation({
-      query: ({ body }) => ({
+      query: ( body ) => ({
         url: `/auth/creer/technicien`,
         method: "POST",
         body,
@@ -76,6 +76,15 @@ export const authApi = createApi({
         response.techniciens.map((user) => ({
           ...user || console.log(user),
         })),
+    }),
+
+    updateToTechnicien: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/auth/techniciens/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["User", "Technicien"],
     }),
 
     // Endpoints pour les changements de mot de passe
@@ -97,6 +106,22 @@ export const authApi = createApi({
       invalidatesTags: ["User"],
     }),
 
+    blockUser: builder.mutation({
+      query: (id) => ({
+        url: `/auth/users/${id}/block`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['User']
+    }),
+    
+    unblockUser: builder.mutation({
+      query: (id) => ({
+        url: `/auth/users/${id}/unblock`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['User']
+    }),
+
   }),
 });
 
@@ -108,6 +133,9 @@ export const {
   useUpdateUserMutation,
   useCreateTechnicienMutation,
   useGetTechniciensQuery,
+  useUpdateToTechnicienMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useBlockUserMutation,
+  useUnblockUserMutation
 } = authApi;

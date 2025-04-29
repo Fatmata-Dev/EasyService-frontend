@@ -9,11 +9,13 @@ import {
   IoMdTrash,
   IoMdBuild 
 } from "react-icons/io";
-import { useGetUsersQuery, useUpdateUserMutation } from "../../API/authApi";
+import { useGetUsersQuery, useUpdateUserMutation, useBlockUserMutation, useUnblockUserMutation } from "../../API/authApi";
 import toast from "react-hot-toast";
 import TechnicienInfoModal from "../../components/Modals/TechnicienInfoModal";
 
 export default function PermissionsAdmin() {
+  const [blockUser] = useBlockUserMutation();
+  const [unblockUser] = useUnblockUserMutation();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTechModal, setShowTechModal] = useState(false);
   const [users, setUsers] = useState([]);
@@ -92,38 +94,20 @@ export default function PermissionsAdmin() {
     }
   };
 
+  
   const toggleUserStatus = async (userId, isBlocked) => {
     try {
-      await updateUser({
-        id: userId,
-        body: { bloque: !isBlocked }
-      }).unwrap();
-      
-      toast.success(`Utilisateur ${!isBlocked ? 'bloqué' : 'débloqué'} avec succès`);
-      refetch();
+      if (isBlocked) {
+        await unblockUser(userId).unwrap();
+        toast.success('Utilisateur débloqué avec succès');
+      } else {
+        await blockUser(userId).unwrap();
+        toast.success('Utilisateur bloqué avec succès');
+      }
+      refetch(); // Recharger la liste des utilisateurs
     } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la modification");
-    }
-  };
-
-  const handleTechInfoSubmit = (techInfo) => {
-    if (selectedUser && tempRole) {
-      setUsers(prevUsers => 
-        prevUsers.map(user => {
-          if (user._id === selectedUser._id) {
-            return { 
-              ...user, 
-              role: tempRole,
-              ...techInfo,
-              firstConnexion: true,
-              disponible: true
-            };
-          }
-          return user;
-        })
-      );
-      setEditingUser(selectedUser._id);
-      setShowTechModal(false);
+      toast.error(err.data?.message || 'Erreur lors de la modification');
+      console.log(err)
     }
   };
 
@@ -259,7 +243,7 @@ export default function PermissionsAdmin() {
         <TechnicienInfoModal
           setShowModal={setShowTechModal}
           user={selectedUser}
-          onSubmit={handleTechInfoSubmit}
+          // onSubmit={handleTechInfoSubmit}
           isNew={tempRole === 'technicien' && selectedUser.role !== 'technicien'}
         />
       )}

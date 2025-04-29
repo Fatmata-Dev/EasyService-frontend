@@ -4,7 +4,7 @@ export const servicesApi = createApi({
   reducerPath: "servicesApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://easyservice-backend-iv29.onrender.com/api",
-    prepareHeaders: (headers, { getState, endpoint }) => {
+    prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("authToken");
       if (token) headers.set("Authorization", `Bearer ${token}`);
 
