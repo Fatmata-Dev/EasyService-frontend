@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import ServiceCard from "../../components/cards/ServiceCard";
 import ServicesModal from "../../components/Modals/ServicesModal";
 import { useNavigate } from "react-router-dom";
-import { useGetServicesQuery } from "../../services/servicesApi";
+import { useGetServicesQuery } from "../../API/servicesApi";
 import { motion } from "framer-motion";
 
 export default function ServicesAdmin() {

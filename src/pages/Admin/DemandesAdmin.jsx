@@ -1,11 +1,25 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import DemandesCard from "../../components/cards/DemandesCards";
-import axios from "axios";
 import toast from "react-hot-toast";
+import {
+  useGetDemandesQuery,
+  useCommencerDemandeMutation,
+  useTerminerDemandeMutation,
+} from "../../API/demandesApi";
 
 export default function DemandesAdmin() {
-  const [allDemandes, setAllDemandes] = useState([]); // Toutes les demandes chargées
-  const [displayedDemandes, setDisplayedDemandes] = useState([]); // Demandes à afficher
+  // Utilisation des hooks RTK Query
+  const {
+    data: allDemandes = [],
+    isLoading,
+    isError,
+    error,
+  } = useGetDemandesQuery();
+
+  const [commencerDemande] = useCommencerDemandeMutation();
+  const [terminerDemande] = useTerminerDemandeMutation();
+
+  const [displayedDemandes, setDisplayedDemandes] = useState([]);
   const [demandesParStatut, setDemandesParStatut] = useState([
     { statut: "En attente", nombre: 0 },
     { statut: "Acceptée", nombre: 0 },
@@ -13,51 +27,34 @@ export default function DemandesAdmin() {
     { statut: "Terminé", nombre: 0 },
     { statut: "Refusé", nombre: 0 },
   ]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Nombre d'éléments par page
+  const itemsPerPage = 6;
 
-  const fetchServices = useCallback(async () => {
-    try {
-      setLoading(true);
+  const [activeTab, setActiveTab] = useState("en_attente");
 
-      // 1. Récupérer toutes les demandes avec les services et clients inclus
-      const response = await axios.get(
-        "https://easyservice-backend-iv29.onrender.com/api/demandes",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+  // Transformation des données
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      const demandesAvecDetails = allDemandes.map((demande) => {
+        const serviceObj = typeof demande.service === "object"
+          ? demande.service
+          : { _id: demande.service, nom: "Service inconnu" };
 
-      // 2. Construire directement les données finales
-      const demandesAvecDetails = response.data.map((demande) => {
-        // Vérifier si le service est un objet complet ou juste un ID
-        const serviceObj =
-          typeof demande.service === "object"
-            ? demande.service
-            : { _id: demande.service, nom: "Service inconnu" };
+        const clientObj = typeof demande.client === "object"
+          ? demande.client
+          : { _id: demande.client, prenom: "Client", nom: "inconnu" };
 
-        // Vérifier si le client est un objet complet ou juste un ID
-        const clientObj =
-          typeof demande.client === "object"
-            ? demande.client
-            : { _id: demande.client, prenom: "Client", nom: "inconnu" };
-
-        // Vérifier si le client est un objet complet ou juste un ID
-        const TechnicienObj =
-          typeof demande.technicien === "object"
-            ? demande.technicien
-            : { _id: demande.technicien, prenom: "Technicien", nom: "inconnu" };
+        const TechnicienObj = typeof demande.technicien === "object"
+          ? demande.technicien
+          : { _id: demande.technicien, prenom: "Technicien", nom: "inconnu" };
 
         return {
+          ...demande,
           _id: demande._id,
           numeroDemande: demande.numeroDemande,
           service: serviceObj?.nom || "Service non spécifié",
           date: demande.dateDemande || new Date().toLocaleDateString(),
-          dateIntervention:
-            demande.dateIntervention || new Date().toLocaleDateString(),
+          dateIntervention: demande.dateIntervention || new Date().toLocaleDateString(),
           clientPrenom: clientObj?.prenom || "Client non spécifié",
           clientNom: clientObj?.nom || "",
           statut: demande.statut,
@@ -69,22 +66,19 @@ export default function DemandesAdmin() {
         };
       });
 
-      // Initialiser le compteur avec tous les statuts possibles
       const counts = {
         "En attente": 0,
         Accepté: 0,
         "En cours": 0,
         Terminé: 0,
         Refusé: 0,
-        Autre: 0, // Pour les statuts non reconnus
+        Annulé: 0,
       };
 
-      // Compter les demandes par statut normalisé
       demandesAvecDetails.forEach((demande) => {
         const statutNormalise = normalizeStatut(demande.statut);
-
-        // Mapper les statuts normalisés aux statuts affichés
         let statutAffiche;
+        
         if (statutNormalise === "en_attente") statutAffiche = "En attente";
         else if (statutNormalise === "acceptee") statutAffiche = "Accepté";
         else if (statutNormalise === "en_cours") statutAffiche = "En cours";
@@ -98,35 +92,33 @@ export default function DemandesAdmin() {
         }
       });
 
-      // Mettre à jour les états
-      setAllDemandes(demandesAvecDetails);
       setDemandesParStatut(
         Object.entries(counts)
           .filter(([statut]) => statut !== "Autre")
-          .map(([statut, nombre]) => ({
-            statut,
-            nombre,
-          }))
+          .map(([statut, nombre]) => ({ statut, nombre }))
       );
-    } catch (err) {
-      console.error("Erreur:", err);
-      toast.error(err.response?.data?.message || "Erreur lors du chargement");
-    } finally {
-      setLoading(false);
     }
-  }, []);
 
+    if (isError) {
+      toast.error(error?.data?.message || "Erreur lors du chargement");
+    }
+  }, [allDemandes, isLoading, isError, error]);
+
+  // Pagination et filtrage
   useEffect(() => {
-    fetchServices();
-  }, [fetchServices]);
+    if (!isLoading) {
+      const filtered = allDemandes.filter(
+        (d) => normalizeStatut(d.statut) === activeTab
+      );
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+      setDisplayedDemandes(paginated);
+    }
+  }, [allDemandes, activeTab, currentPage, isLoading]);
 
-  const [activeTab, setActiveTab] = useState("en_attente");
-
-  // Ajoutez cette fonction utilitaire
   const normalizeStatut = (statut) => {
     if (!statut) return "";
     const s = statut.toLowerCase().trim();
-
     if (s.includes("attente")) return "en_attente";
     if (s.includes("accept")) return "acceptee";
     if (s.includes("cours")) return "en_cours";
@@ -136,37 +128,36 @@ export default function DemandesAdmin() {
     return s;
   };
 
-  // Calcul de la pagination
-  useEffect(() => {
-    // Filtrer avec normalizeStatut
-    const filtered = allDemandes.filter(
-      (d) => normalizeStatut(d.statut) === activeTab
-    );
-
-    // Puis paginer les résultats
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
-
-    setDisplayedDemandes(paginated);
-  }, [allDemandes, activeTab, currentPage]);
-
-  // Calcul du total doit aussi utiliser normalizeStatut
   const totalFilteredDemandes = allDemandes.filter(
     (d) => normalizeStatut(d.statut) === activeTab
   ).length;
   const totalPages = Math.ceil(totalFilteredDemandes / itemsPerPage);
-
-  // const handleTabChange = (statut) => {
-  //   setActiveTab(statut);
-  //   setCurrentPage(1); // Reset à la première page quand on change de statut
-  // };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
+  // Gestion des actions sur les demandes
+  const handleCommencerDemande = async (id) => {
+    try {
+      await commencerDemande(id).unwrap();
+      toast.success("Demande marquée comme 'en cours'");
+    } catch (err) {
+      toast.error(err.data?.message || "Erreur lors de la mise à jour");
+    }
+  };
+
+  const handleTerminerDemande = async (id) => {
+    try {
+      await terminerDemande(id).unwrap();
+      toast.success("Demande marquée comme 'terminée'");
+    } catch (err) {
+      toast.error(err.data?.message || "Erreur lors de la mise à jour");
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4">
         <h1 className="text-2xl font-bold uppercase text-center pb-6">
@@ -304,13 +295,16 @@ export default function DemandesAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedDemandes.length > 0 ? (
           displayedDemandes.map((demande) => (
-            <DemandesCard key={demande._id} demande={demande} />
+            <DemandesCard 
+              key={demande._id} 
+              demande={demande}
+              // onCommencer={handleCommencerDemande}
+              // onTerminer={handleTerminerDemande}
+            />
           ))
         ) : (
           <div className="col-span-full text-center py-10 text-gray-500">
-            {loading
-              ? "Chargement..."
-              : "Aucune demande trouvée pour ce statut"}
+            Aucune demande trouvée pour ce statut
           </div>
         )}
       </div>

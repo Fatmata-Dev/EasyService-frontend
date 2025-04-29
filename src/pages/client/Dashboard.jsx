@@ -74,7 +74,23 @@ const Dashboard = () => {
         }
       );
 
-      // Process demandes with categories
+      const messagesWithUserInfos = await Promise.all(
+        messagesRes.data.data.map(async (message) => {
+          if (message?.expediteur?.userId) {
+            const messageRes = await axios.get(
+              `https://easyservice-backend-iv29.onrender.com/api/auth/users/${message.expediteur.userId}`,
+              { withCredentials: true }
+            );
+            return {
+              ...message,
+              expediteur : {prenom : messageRes.data.prenom, nom : messageRes.data.nom},
+            };
+          }
+          return message;
+        })
+      );
+
+      // Catégories de services
       const demandesWithCategories = await Promise.all(
         demandesRes.data.map(async (demande) => {
           if (demande?.service?.categorie) {
@@ -96,7 +112,8 @@ const Dashboard = () => {
 
       setDemandes(demandesWithCategories);
       setServices(servicesRes.data);
-      setMessages(messagesRes.data.data || []);
+      setMessages((messagesRes.data.data && messagesWithUserInfos) || []);
+      console.log(messagesRes.data.data);
     } catch (err) {
       console.error("Erreur lors du chargement des données:", err);
       setError("Erreur lors du chargement des données");
@@ -241,16 +258,16 @@ const Dashboard = () => {
                 className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
               >
                 <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 flex-shrink-0">
-                  {message.expediteur.prenom?.charAt(0) || "A"}
+                  {message.expediteur.prenom?.charAt(0).toUpperCase() || "A"}
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-gray-800">
+                    <h4 className="font-semibold text-gray-800 capitalize">
                       {message.expediteur.prenom || "Expéditeur"}{" "}
                       {message.expediteur.nom || ""}
                     </h4>
                     <span className="text-xs text-gray-500">
-                      {formatDate(message.dateEnvoi)}
+                      {formatDate(message.date)}
                     </span>
                   </div>
                   <p className="text-gray-600 mt-1">{message.contenu}</p>

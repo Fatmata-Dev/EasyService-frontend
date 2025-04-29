@@ -12,6 +12,7 @@ const Header = ({ user }) => {
 
   const handleLogout = () => {
     
+    window.location.reload();
     localStorage.removeItem("authToken"); // Supprime le token d'authentification
     localStorage.removeItem("user"); // Supprime le token d'authentification
     navigate("/"); // Redirige vers la racine

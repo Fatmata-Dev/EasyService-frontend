@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import toast from "react-hot-toast";
 import AssignTechnicienModal from "../Modals/AssignerTechnicienModal";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { memo } from "react";
+import { 
+  useUpdateDemandeMutation
+} from "../../API/demandesApi"; // Ajustez le chemin selon votre structure
 
-const DemandesCard = memo(({ demande, onUpdate }) => {
+const DemandesCard = memo(({ demande }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const navigate = useNavigate();
+  const [updateDemande] = useUpdateDemandeMutation();
 
   const formatDate = (dateString) => {
     if (!dateString) return "Non définie";
@@ -45,35 +48,36 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
     if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
     
     try {
-      await axios.put(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-        { statut: newStatus },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
-      );
+      await updateDemande({ 
+        id, 
+        body: { 
+          statut: newStatus, 
+          etatExecution: 
+          newStatus === "refusee" ? "annulee" : demande.etatExecution ||
+          newStatus === "annulee" ? "annulee" : demande.etatExecution
+         } 
+      }).unwrap();
+      
       toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
-      onUpdate?.();
       navigate("/admin/demandes");
     } catch (err) {
-      toast.error(err.response?.data?.message || `Erreur lors de la modification du statut`);
+      toast.error(err.data?.message || `Erreur lors de la modification du statut`);
     }
   };
 
-  const handleAssignSuccess = () => {
-    setShowAssignModal(false);
-    onUpdate?.();
-  };
+  
 
   const currentStatus = statusConfig[demande.statut] || statusConfig.refusee;
   const currentExecutionState = executionStateConfig[demande.etatExecution] || {
-    label: "Inconnu",
+    label: "Annulee",
     color: "bg-gray-500",
   };
 
   return (
     <div className="border border-orange-300 rounded-lg shadow-md bg-orange-50 overflow-hidden flex flex-col">
       {/* En-tête de la carte */}
-      <div className="bg-orange-500 p-2">
-        <h2 className="text-white font-bold text-lg uppercase text-center">
+      <div className="pt-2">
+        <h2 className="text-orange-500 font-bold text-lg uppercase text-center">
           Demande #{demande.numeroDemande}
         </h2>
       </div>
@@ -85,12 +89,12 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
             <div>
               <p className="text-sm text-gray-600">Client</p>
               <p className="font-semibold text-orange-600 capitalize line-clamp-1">
-                {demande.clientPrenom} {demande.clientNom}
+                {demande.client.prenom} {demande.client.nom}
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Service</p>
-              <p className="font-semibold text-orange-600">{demande.service}</p>
+              <p className="font-semibold text-orange-600">{demande.service.nom}</p>
             </div>
         </div>
 
@@ -98,7 +102,7 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
         <div className="grid grid-cols-2 gap-4 mb-2">
           <div>
             <p className="text-sm text-gray-600">Réservation</p>
-            <p className="font-medium">{formatDate(demande.date)}</p>
+            <p className="font-medium">{formatDate(demande.dateDemande)}</p>
           </div>
           <div>
             <p className="text-sm text-gray-600">Intervention</p>
@@ -110,7 +114,7 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
         <div className="mb-2">
           <p className="text-sm text-gray-600">Technicien</p>
           <p className="font-medium capitalize">
-            {demande.technicienPrenom} {demande.technicienNom || "Non assigné"}
+            {demande.technicien?.prenom} {demande.technicien?.nom || "Non assigné"}
           </p>
         </div>
 
@@ -196,7 +200,6 @@ const DemandesCard = memo(({ demande, onUpdate }) => {
         <AssignTechnicienModal
           setShowModal={setShowAssignModal}
           demande={demande}
-          onAssignSuccess={handleAssignSuccess}
         />
       )}
     </div>

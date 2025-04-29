@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const MessagesClient = () => {
   const [messages, setMessages] = useState([]);
@@ -19,7 +20,7 @@ const MessagesClient = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replying, setReplying] = useState(false);
-  // const [replyContent, setReplyContent] = useState("");
+  const [replyContent, setReplyContent] = useState("");
   const userData = JSON.parse(localStorage.getItem("user"));
 
   const formatDate = (dateString) => {
@@ -41,10 +42,22 @@ const MessagesClient = () => {
           }
         );
 
+        const envoyes = await axios.get(
+          `https://easyservice-backend-iv29.onrender.com/api/messages/envoyes`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+            withCredentials: true,
+          }
+        );
+
         // Trier les messages par date décroissante
         const sortedMessages = response.data.data.sort(
           (a, b) => new Date(b.date) - new Date(a.date)
         );
+
+        sortedMessages.push(...envoyes.data.data);
 
         setMessages(sortedMessages);
 
@@ -68,60 +81,62 @@ const MessagesClient = () => {
       message.contenu.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // const markAsRead = async (messageId) => {
-  //   try {
-  //     const response = await axios.patch(
-  //       `https://easyservice-backend-iv29.onrender.com/api/messages/${messageId}/lu`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //         },
-  //       }
-  //     );
+  const markAsRead = async (messageId) => {
+    try {
+      const response = await axios.put(
+        `https://easyservice-backend-iv29.onrender.com/api/messages/${messageId}/lu`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
   
-  //     if (response.data.success) {
-  //       toast.success("Message marqué comme lu");
-  //       // Mettre à jour l'état local si nécessaire
-  //     }
-  //   } catch (error) {
-  //     console.error("Erreur:", error.response?.data);
-  //     toast.error(error.response?.data?.error || "Erreur lors du marquage comme lu");
-  //   }
-  // };
+      if (response.data.success) {
+        toast.success("Message marqué comme lu");
+        // Mettre à jour l'état local si nécessaire
+      }
+    } catch (error) {
+      console.error("Erreur:", error.response?.data);
+      toast.error(error.response?.data?.error || "Erreur lors du marquage comme lu");
+    }
+  };
 
-  // const handleReply = async () => {
-  //   if (!replyContent.trim()) {
-  //     toast.error("Le message ne peut pas être vide");
-  //     return;
-  //   }
+  const handleReply = async () => {
+    if (!replyContent.trim()) {
+      toast.error("Le message ne peut pas être vide");
+      return;
+    }
 
-  //   try {
-  //     await axios.post(
-  //       `https://easyservice-backend-iv29.onrender.com/api/messages`,
-  //       {
-  //         titre: `RE: ${selectedMessage.titre}`,
-  //         objet: selectedMessage.objet,
-  //         contenu: replyContent,
-  //         destinataire: selectedMessage.expediteur._id,
-  //         demande: selectedMessage.demande?._id,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //         },
-  //         withCredentials: true,
-  //       }
-  //     );
+    const destinataires = new Array(selectedMessage.expediteur.userId);
 
-  //     toast.success("Réponse envoyée avec succès");
-  //     setReplying(false);
-  //     setReplyContent("");
-  //   } catch (error) {
-  //     console.error("Erreur lors de l'envoi:", error);
-  //     toast.error("Erreur lors de l'envoi de la réponse");
-  //   }
-  // };
+    try {
+      await axios.post(
+        `https://easyservice-backend-iv29.onrender.com/api/messages`,
+        {
+          titre: `RE: ${selectedMessage.titre}`,
+          objet: selectedMessage.objet,
+          contenu: replyContent,
+          destinataire: destinataires,
+          demande: selectedMessage.demande?._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast.success("Réponse envoyée avec succès");
+      setReplying(false);
+      setReplyContent("");
+    } catch (error) {
+      console.error("Erreur lors de l'envoi:", error);
+      toast.error(error.response?.data?.error || "Erreur lors de l'envoi de la réponse");
+    }
+  };
 
   if (loading) {
     return (
@@ -182,7 +197,7 @@ const MessagesClient = () => {
                     onClick={() => {
                       setSelectedMessage(message);
                       setReplying(false);
-                      // if (!message.lu) markAsRead(message._id);
+                      if (!message.lu) markAsRead(message._id);
                     }}
                   >
                     <div className="flex justify-between items-start">
@@ -301,7 +316,7 @@ const MessagesClient = () => {
                     )}
                   </div>
 
-                  {/* <AnimatePresence>
+                  <AnimatePresence>
                     {replying && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -332,7 +347,7 @@ const MessagesClient = () => {
                         </div>
                       </motion.div>
                     )}
-                  </AnimatePresence> */}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             ) : (

@@ -1,49 +1,56 @@
 import { useState, useEffect } from "react";
 import ServiceCardClient from "../../components/cards/ServiceCardClient";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useGetServicesQuery } from "../../API/servicesApi";
 
 export default function Services() {
-  const [services, setServices] = useState([]);
+  const { data: services = [], isLoading, error } = useGetServicesQuery();
   const [allServices, setAllServices] = useState([]);
   const [displayedServices, setDisplayedServices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const totalPages = Math.ceil(allServices.length / itemsPerPage);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const { data } = await axios.get(
-          "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-
-        const formattedServices = data.map((service) => ({
-          ...service,
-          categorie: service.categorie || {},
-        }));
-
-        setServices(formattedServices);
-        setAllServices(formattedServices);
-      } catch (err) {
-        toast.error("Erreur lors du chargement des services");
-        console.error(err);
-      } finally {
-        setLoading(false);
+      if (services && services.length > 0) {
+        setAllServices(services);
+        // Réinitialiser à la première page quand les données changent
+        setCurrentPage(1);
       }
-    };
+    }, [services]);
 
-    fetchServices();
-  }, []);
+  // useEffect(() => {
+  //   const fetchServices = async () => {
+  //     try {
+  //       const { data } = await axios.get(
+  //         "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  //           },
+  //         }
+  //       );
+
+  //       const formattedServices = data.map((service) => ({
+  //         ...service,
+  //         categorie: service.categorie || {},
+  //       }));
+
+  //       setServices(formattedServices);
+  //       setAllServices(formattedServices);
+  //     } catch (err) {
+  //       toast.error("Erreur lors du chargement des services");
+  //       console.error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchServices();
+  // }, []);
 
   useEffect(() => {
     if (allServices && allServices.length > 0) {
@@ -55,13 +62,15 @@ export default function Services() {
     }
   }, [allServices, currentPage, itemsPerPage]);
 
+  if (error) toast.error("Erreur lors du chargement des services");
+
   return (
     <div className="container mx-auto xl:px-4">
       <h1 className="font-bold text-2xl text-center uppercase my-3">
         Services
       </h1>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-5">
           {[...Array(8)].map((_, i) => (
             <motion.div
@@ -94,7 +103,6 @@ export default function Services() {
               <ServiceCardClient
                 key={service._id}
                 service={service}
-                onClick={() => navigate(`/client/services/${service._id}`)}
               />
             ))}
           </div>

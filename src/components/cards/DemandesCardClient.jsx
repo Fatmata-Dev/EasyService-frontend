@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
-import { de, fr } from "date-fns/locale";
+import { fr } from "date-fns/locale";
 import { memo } from "react";
+import { useUpdateDemandeMutation, useDeleteDemandeMutation, useGetFacturesQuery  } from "../../API/demandesApi";
+import { useDownloadFactureMutationMutation } from "../../API/demandesApi";
+import { useCreateAvisMutation } from "../../API/servicesApi";
 
 const DemandesCardClient = memo(({ demande }) => {
   const navigate = useNavigate();
@@ -13,6 +15,13 @@ const DemandesCardClient = memo(({ demande }) => {
     note: demande.note || "",
     commentaire: demande.commentaire || "",
   });
+
+  // Utilisation des hooks RTK Query
+  const [updateDemande] = useUpdateDemandeMutation();
+  const [deleteDemande] = useDeleteDemandeMutation();
+  const [createAvis] = useCreateAvisMutation();
+  const { data: factures = [] } = useGetFacturesQuery();
+  const [downloadFacture] = useDownloadFactureMutationMutation();
 
   const formatDate = (dateString) => {
     if (!dateString) return "Non définie";
@@ -33,44 +42,39 @@ const DemandesCardClient = memo(({ demande }) => {
   };
 
   const generateFacture = async (id) => {
-    if (!window.confirm("Voulez-vous générer la facture ?")) return;
-
     try {
-      const { data } = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/factures/afficher/facture/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
+      const facture = factures.find(f => f.refDemande === id);
+      if (facture) {
+        const result = await downloadFacture(facture.odooInvoiceId).unwrap();
+        
+        // Créer un objet URL pour le blob
+        const url = window.URL.createObjectURL(result.data);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        // Extraire le nom de fichier depuis les headers
+        const contentDisposition = result.meta?.responseHeaders?.['content-disposition'];
+        let filename = 'facture.pdf';
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+          if (filenameMatch && filenameMatch[1]) {
+            filename = filenameMatch[1];
+          }
         }
-      );
-
-      const formData = new FormData();
-      formData.append("montant", data.tarif);
-      formData.append("service", data?.service?._id);
-      formData.append("technicien", data?.technicien?._id);
-      formData.append("client", data?.client?._id);
-      formData.append("admin", "67da88347e9d8aefcaa19120");
-      formData.append("refDemande", data._id);
-
-      await axios.post(
-        `https://easyservice-backend-iv29.onrender.com/api/factures/creer/facture`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
-
-      toast.success("Facture générée avec succès");
-      navigate("/demandes");
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast.success("Facture téléchargée avec succès");
+      } else {
+        toast.error("Aucune facture trouvée pour cette demande");
+      }
     } catch (err) {
       console.error(err);
-      toast.error(
-        err.response?.data?.message ||
-          "Erreur lors de la génération de la facture"
-      );
+      toast.error(err.data?.message || "Erreur lors du téléchargement de la facture");
     }
   };
 
@@ -78,54 +82,45 @@ const DemandesCardClient = memo(({ demande }) => {
     if (!window.confirm("Voulez-vous annuler cette demande ?")) return;
 
     try {
-      await axios.put(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/${id}`,
-        { statut: "annulee" },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+      await updateDemande({
+        id,
+        body: { statut: "annulee", etatExecution: "annulee" }
+      }).unwrap();
       toast.success("Demande annulée avec succès");
       navigate("/client/demandes");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-          "Erreur lors de l'annulation de la demande"
-      );
+      toast.error(err.data?.message || "Erreur lors de l'annulation de la demande");
     }
   };
 
-  // console.log(demande);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Voulez-vous supprimer cette demande ?")) return;
+
+    try {
+      await deleteDemande(id).unwrap();
+      toast.success("Demande supprimée avec succès");
+      navigate("/client/demandes");
+    } catch (err) {
+      toast.error(err.data?.message || "Erreur lors de la suppression de la demande");
+    }
+  };
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await axios.post(
-        `https://easyservice-backend-iv29.onrender.com/api/avis/ajouter`,
-        {
-          ...feedback,
-          client: demande.clientId,
-          technicien: demande.technicienId,
-          service: demande.serviceId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+      await createAvis({
+        ...feedback,
+        client: demande.clientId,
+        technicien: demande.technicienId,
+        service: demande.serviceId,
+      }).unwrap();
 
       toast.success("Évaluation soumise avec succès");
       setFeedback({ note: "", commentaire: "" });
       setShowFeedbackForm(false);
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-          "Erreur lors de la soumission de l'évaluation"
-      );
+      toast.error(err.data?.message || "Erreur lors de la soumission de l'évaluation");
     }
   };
 
@@ -139,14 +134,10 @@ const DemandesCardClient = memo(({ demande }) => {
   return (
     <div className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col">
       <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
-        DEMANDE
-          #{demande.numeroDemande}
+        DEMANDE #{demande.numeroDemande}
       </h2>
 
       <div className="space-y-2 mb-4">
-        <p>
-          
-        </p>
         <p>
           <strong className="font-semibold pe-2">SERVICE :</strong>
           <span className="text-orange-600">{demande.service}</span>
@@ -176,31 +167,37 @@ const DemandesCardClient = memo(({ demande }) => {
       {/* Actions */}
       <div className="mt-auto">
         {["en_attente", "en_cours", "acceptee"].includes(demande.statut) && (
-          
           <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
             <Link
-            to={`/client/demandes/${demande._id}`}
-            className="block text-center text-blue-500 hover:underline"
-          >
-            Plus de détails
-          </Link>
+              to={`/client/demandes/${demande._id}`}
+              className="block text-center text-blue-500 hover:underline"
+            >
+              Plus de détails
+            </Link>
             <button
               className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
               onClick={() => handleCancel(demande._id)}
             >
               Annuler
             </button>
-            
           </div>
         )}
 
         {["annulee", "refusee"].includes(demande.statut) && (
-          <Link
-            to={`/client/demandes/${demande._id}`}
-            className="block text-center text-blue-500 hover:underline"
-          >
-            Plus de détails
-          </Link>
+          <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
+            <Link
+              to={`/client/demandes/${demande._id}`}
+              className="block text-center text-blue-500 hover:underline"
+            >
+              Plus de détails
+            </Link>
+            <button
+              className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
+              onClick={() => handleDelete(demande._id)}
+            >
+              Supprimer
+            </button>
+          </div>
         )}
 
         {demande.statut === "terminee" && (

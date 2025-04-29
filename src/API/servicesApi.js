@@ -16,7 +16,7 @@ export const servicesApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Service", "Category"],
+  tagTypes: ["Service", "Category", "Avis"],
   endpoints: (builder) => ({
     // Endpoints pour les services
     getServices: builder.query({
@@ -75,6 +75,57 @@ export const servicesApi = createApi({
       }),
       invalidatesTags: ["Category"],
     }),
+
+    getCategorieById: builder.query({
+      query: (id) => `/categories/${id}`,
+      providesTags: (result, error, id) => [{ type: "Category", id }],
+    }),
+
+    updateCategorie: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/categories/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    DeleteCategorie: builder.mutation({
+      query: ({ id }) => ({
+        url: `/categories/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Category"],
+    }),
+
+    // Endpoints pour les avis
+    getAvis: builder.query({
+      query: () => "/avis",
+      providesTags: ["Avis"],
+      transformResponse: (response) => response,
+    }),
+
+    createAvis: builder.mutation({
+      query: (newAvis) => ({
+        url: "/avis/ajouter",
+        method: "POST",
+        body: newAvis,
+      }),
+      invalidatesTags: ["Avis"],
+    }),
+
+    getAvisById: builder.query({
+      query: (id) => `/avis/${id}`,
+      providesTags: (result, error, id) => [{ type: "Avis", id }],
+    }),
+
+    DeleteAvis: builder.mutation({
+      query: ({ id }) => ({
+        url: `/avis/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Avis"],
+    }),
   }),
 });
 
@@ -86,4 +137,11 @@ export const {
   useDeleteServiceMutation,
   useGetCategoriesQuery,
   useCreateCategoryMutation,
+  useGetCategorieByIdQuery,
+  useUpdateCategorieMutation,
+  useDeleteCategorieMutation,
+  useGetAvisQuery,
+  useCreateAvisMutation,
+  useGetAvisByIdQuery,
+  useDeleteAvisMutation,
 } = servicesApi;

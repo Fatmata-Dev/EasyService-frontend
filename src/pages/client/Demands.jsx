@@ -62,11 +62,15 @@ export default function Demands() {
             ? demande.technicien
             : { _id: demande.technicien, prenom: "Technicien", nom: "inconnu" };
 
+        console.log(demande);
+
         return {
           _id: demande._id,
           numeroDemande: demande.numeroDemande,
           service: serviceObj?.nom || "Service non spécifié",
           serviceId: serviceObj?._id || demande.service,
+          tarif: demande.tarif,
+          admin: demande.admin,
           clientId: clientObj?._id || demande.client,
           technicienId: TechnicienObj?._id || demande.technicien,
           date: demande.dateDemande || new Date().toLocaleDateString(),

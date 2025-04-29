@@ -184,7 +184,7 @@ const DashboardTechniciens = () => {
             </Link>
           </div>
 
-          {/* {messages.length > 0 ? (
+           {messages.length > 0 ? (
             <div className="space-y-3">
               {messages.map(msg => (
                 <div key={msg._id} className="border-b pb-3 last:border-0">
@@ -205,7 +205,7 @@ const DashboardTechniciens = () => {
             </div>
           ) : (
             <p className="text-center text-gray-500 py-4">Aucun message récent</p>
-          )} */}
+          )} 
         </div>
 
         {/* Calendrier/Prochaines interventions */}

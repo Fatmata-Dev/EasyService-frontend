@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ProfileSignature from "../../assets/ProfileSignature.png";
 import {
@@ -13,6 +13,10 @@ import {
 const Sidebar = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const userData = JSON.parse(localStorage.getItem("user"));
+  if (!userData) {
+    window.location.href = "/";
+    return null;
+  }
   const prenom = userData.prenom;
   const nom = userData.nom;
   const links = [
