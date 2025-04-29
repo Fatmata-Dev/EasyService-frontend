@@ -87,14 +87,14 @@ const DemandesCard = memo(({ demande }) => {
         {/* Section Client et Service */}
         <div className="grid grid-cols-2 gap-4 mb-2">
             <div>
-              <p className="text-sm text-gray-600">Client</p>
+              <p className="text-sm text-gray-600">Client(e)</p>
               <p className="font-semibold text-orange-600 capitalize line-clamp-1">
                 {demande.client.prenom} {demande.client.nom}
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Service</p>
-              <p className="font-semibold text-orange-600">{demande.service.nom}</p>
+              <p className="font-semibold text-orange-600 line-clamp-1">{demande.service.nom}</p>
             </div>
         </div>
 
@@ -112,7 +112,7 @@ const DemandesCard = memo(({ demande }) => {
 
         {/* Section Technicien */}
         <div className="mb-2">
-          <p className="text-sm text-gray-600">Technicien</p>
+          <p className="text-sm text-gray-600">Technicien(ne)</p>
           <p className="font-medium capitalize">
             {demande.technicien?.prenom} {demande.technicien?.nom || "Non assigné"}
           </p>

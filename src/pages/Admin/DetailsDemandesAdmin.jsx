@@ -262,16 +262,16 @@ export default function DemandeDetails() {
 
       <div className="p-3 border-t border-orange-200">
               {demande.statut === "en_attente" && (
-                <div className="flex flex-col gap-2">
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="">
+                  <div className="flex flex-col-reverse justify-end items-end sm:flex-row gap-2 fixed bottom-5 sm:right-8 right-5">
                     <button
-                      className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
+                      className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
                       onClick={() => handleStatusChange(demande._id, "refusee")}
                     >
                       Refuser
                     </button>
                     <button
-                      className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm font-medium w-fit"
+                      className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-medium w-fit"
                       onClick={() => setShowAssignModal(true)}
                     >
                       Accepter
@@ -281,10 +281,10 @@ export default function DemandeDetails() {
               )}
       
               {["acceptee", "en_cours"].includes(demande.statut) && (
-                <div className="flex flex-col gap-2">
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-end">
+                  <div className="w-full">
                     <button
-                      className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 text-sm font-medium"
+                      className="fixed bottom-5 right-5 bg-red-500 text-white px-16 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
                       onClick={() => handleStatusChange(demande._id, "annulee")}
                     >
                       Annuler
@@ -292,15 +292,6 @@ export default function DemandeDetails() {
                     </div>
                 </div>
               )}
-      
-              {/* {["annulee", "refusee", "terminee"].includes(demande.statut) && (
-                <Link
-                  to={`/admin/demandes/${demande._id}`}
-                  className="block text-center text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  Plus de détails
-                </Link>
-              )} */}
             </div>
       
             {/* Modal d'assignation */}

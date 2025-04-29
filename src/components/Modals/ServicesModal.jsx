@@ -12,12 +12,11 @@ const ServicesModal = ({
   setShowModal,
   selectedService,
   isEditing,
-  onSuccess,
 }) => {
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
   const { data: categories = [] } = useGetCategoriesQuery();
-  console.log("Catégories:", categories);
+  // console.log("Catégories:", categories);
 
   const [createCategory] = useCreateCategoryMutation();
 
@@ -34,7 +33,6 @@ const ServicesModal = ({
 
   const userData = JSON.parse(localStorage.getItem("user"));
   const userId = userData?.id;
-  const selectedCategory = watch("categorie");
 
   useEffect(() => {
     if (selectedService) {
@@ -50,7 +48,7 @@ const ServicesModal = ({
       fields.forEach((field) => {
         const value = selectedService[field];
         if (value) setValue(field, field === "categorie" ? value._id : value);
-        console.log("selectedService", selectedService);
+        // console.log("selectedService", selectedService);
       });
       setImagePreview(selectedService.image);
     }
@@ -152,18 +150,25 @@ const ServicesModal = ({
           {isEditing ? "Modifier le service" : "Ajouter un service"}
         </h3>
 
+        {/* {errors && (
+          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+            {errors}
+          </div>
+        )} */}
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             {/* Nom du Service */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
-                Nom du Service *
+                Nom du Service 
               </label>
               <input
                 {...register("nom", {
                   required: "Ce champ est obligatoire",
                   maxLength: { value: 50, message: "Maximum 50 caractères" },
                 })}
+                placeholder="Nom du service"
                 className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
               {errors.nom && (
@@ -176,7 +181,7 @@ const ServicesModal = ({
             {/* Catégorie */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
-                Catégorie *
+                Catégorie 
               </label>
               {categories.length === 0 ? (
                 <p>Chargement des catégories...</p>
@@ -235,6 +240,7 @@ const ServicesModal = ({
               <input
                 type="number"
                 {...register("duree", { min: 0 })}
+                placeholder="Ajoutez la durée minimale"
                 className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
             </div>
@@ -267,6 +273,7 @@ const ServicesModal = ({
                     message: "Le tarif ne peut pas être négatif",
                   },
                 })}
+                placeholder="Ajoutez le tarif de base"
                 className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               />
               {errors.tarif && (
@@ -284,6 +291,7 @@ const ServicesModal = ({
               {...register("description", { maxLength: 500 })}
               className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
               rows="3"
+              placeholder="Ajoutez une description pour le service"
             />
             <p className="text-right text-sm text-gray-500 mt-1">
               {watch("description")?.length || 0}/500
