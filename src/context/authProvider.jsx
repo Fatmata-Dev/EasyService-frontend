@@ -1,148 +1,84 @@
-// import { createContext, useContext, useState, useEffect, useCallback } from "react";
-// import PropTypes from "prop-types";
-// import { useNavigate, useLocation } from "react-router-dom";
-// import axios from "axios";
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
+import { AuthContext } from "./authContext";
 
-// export const AuthContext = createContext(null);
 
-// const AuthProvider = ({ children }) => {
-//   const [user, setUser] = useState(null);
-//   const [token, setToken] = useState(localStorage.getItem("authToken") || "");
-//   const [loading, setLoading] = useState(true);
-//   const navigate = useNavigate();
-//   const location = useLocation();
+const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem("authToken") || "");
+  const [loginMutation] = useUserLoginMutation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-//   // Mémoïzation de la fonction checkAuth
-//   const checkAuth = useCallback(async () => {
-//     try {
-//       const storedToken = localStorage.getItem("authToken");
-//       if (!storedToken) return null;
+  // Utilise RTK Query pour récupérer le user connecté
+  const { data: user, isLoading, isError, refetch } = useGetUserConnetedQuery(undefined, {
+    skip: !token, // Ne pas fetch si pas de token
+  });
 
-//       const userData = JSON.parse(localStorage.getItem("user"));
-//       if (!userData?._id) return null;
+  // Redirection basée sur le rôle
+  useEffect(() => {
+    if (!isLoading && user) {
+      const rolePath = {
+        client: "/client/dashboard",
+        admin: "/admin/dashboard",
+        technicien: "/technicien/dashboard",
+      };
 
-//       const response = await axios.get(
-//         `https://easyservice-backend-iv29.onrender.com/api/users/${userData._id}`,
-//         { headers: { Authorization: `Bearer ${storedToken}` }}
-//       );
+      if (location.pathname === "/") {
+        navigate(rolePath[user.role] || "/");
+      }
+    }
+    if (!isLoading && !user && !location.pathname.includes("/")) {
+      navigate("/");
+    }
+  }, [user, isLoading, location.pathname, navigate]);
 
-//       return response.data;
-//     } catch (error) {
-//       console.error("Auth verification error:", error);
-//       return null;
-//     }
-//   }, []);
+  if (isError) {
+    console.error("Error fetching user:", isError);
+  }
 
-//   // Initialisation de l'authentification
-//   useEffect(() => {
-//     const initializeAuth = async () => {
-//       try {
-//         const userData = await checkAuth();
+  const login = async (credentials) => {
+    try {
+      const response = await loginMutation(credentials).unwrap();
+      const { token: newToken } = response;
 
-//         if (userData) {
-//           setUser(userData);
-//           setToken(localStorage.getItem("authToken"));
+      localStorage.setItem("authToken", newToken);
+      setToken(newToken);
+      refetch(); // force une actualisation du user connecté
 
-//           // Redirection uniquement si sur la page d'accueil
-//           if (location.pathname === "/") {
-//             const rolePath = {
-//               client: '/client/dashboard',
-//               admin: '/admin/dashboard',
-//               technicien: '/technicien/dashboard'
-//             };
-//             navigate(rolePath[userData.role] || '/');
-//           }
-//         } else {
-//           // Si non authentifié et pas déjà sur la page de login
-//           if (!location.pathname.includes('/')) {
-//             navigate('/');
-//           }
-//         }
-//       } catch (err) {
-//         console.error("Auth init error:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+    } catch (err) {
+      console.error("Login error:", err);
+      throw err;
+    }
+  };
 
-//     initializeAuth();
-//   }, [checkAuth, navigate, location.pathname]);
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    setToken("");
+    navigate("/");
+  };
 
-//   const login = async (credentials) => {
-//     try {
-//       setLoading(true);
-//       const response = await axios.post(
-//         "https://easyservice-backend-iv29.onrender.com/api/auth/login",
-//         credentials
-//       );
+  if (isLoading) return <div>Chargement...</div>;
 
-//       const { user: userData, token } = response.data;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        refetchUser: refetch,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-//       const normalizedUser = {
-//         prenom: userData.prenom || '',
-//         nom: userData.nom || '',
-//         email: userData.email || '',
-//         role: userData.role || 'user',
-//         _id: userData._id,
-//         ...userData
-//       };
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
-//       setUser(normalizedUser);
-//       setToken(token);
-//       localStorage.setItem("authToken", token);
-//       localStorage.setItem("user", JSON.stringify(normalizedUser));
 
-//       const rolePath = {
-//         client: '/client/dashboard',
-//         admin: '/admin/dashboard',
-//         technicien: '/technicien/dashboard'
-//       };
-
-//       navigate(rolePath[normalizedUser.role] || '/');
-//     } catch (err) {
-//       console.error("Login error:", err);
-//       throw err;
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const logout = () => {
-//     localStorage.removeItem("authToken");
-//     localStorage.removeItem("user");
-//     setUser(null);
-//     setToken("");
-//     navigate("/");
-//   };
-
-//   if (loading) {
-//     return <div className="loading-spinner">Chargement...</div>;
-//   }
-
-//   return (
-//     <AuthContext.Provider value={{
-//       user,
-//       token,
-//       loading,
-//       login,
-//       logout,
-//       checkAuth
-//     }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// export default AuthProvider;
-
-// export const useAuth = () => {
-//   const context = useContext(AuthContext);
-//   if (!context) {
-//     throw new Error("useAuth must be used within AuthProvider");
-//   }
-//   return context;
-// };
-
-// AuthProvider.propTypes = {
-//   children: PropTypes.node.isRequired,
-// };
+export default AuthProvider;

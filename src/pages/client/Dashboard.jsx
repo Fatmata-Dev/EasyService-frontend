@@ -4,33 +4,34 @@ import {
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
-import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
+import { useGetDemandeForClientIdQuery } from "../../API/demandesApi";
+import { useGetCategoriesQuery, useGetServicesQuery } from "../../API/servicesApi";
+import { useGetReceivedMessagesQuery } from "../../API/messagesApi";
+// import { useGetUserByIdQuery } from "../../API/authApi";
+import { useAuth } from "../../context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     try {
       const date = new Date(dateString);
-      return format(isNaN(date) ? new Date() : date, "dd MMM yyyy 'à' HH:mm", { locale: fr });
+      return format(isNaN(date) ? new Date() : date, "dd MMM yyyy", { locale: fr });
     } catch {
       return "-";
     }
   };
+  const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [services, setServices] = useState([]);
-  const [demandes, setDemandes] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [error, setError] = useState(null);
-
-  const userData = JSON.parse(localStorage.getItem("user"));
-  const clientId = userData?.id;
+  const { user } = useAuth();
+  const clientId = user?._id;
+  // console.log(clientId);
 
   // Animation variants
   const fadeIn = {
@@ -43,96 +44,82 @@ const Dashboard = () => {
     visible: { x: 0, opacity: 1, transition: { duration: 0.5 } },
   };
 
-  // Fetch latest data
-  const fetchLatestData = useCallback(async () => {
-    try {
-      setLoading(true);
+  // Fetch data using RTK Query
+  const {
+    data: demandes = [],
+    isLoading: isLoadingDemandes,
+    isError: isErrorDemandes,
+    error: demandesError
+  } = useGetDemandeForClientIdQuery(clientId, { skip: !clientId });
 
-      // Fetch latest 2 demandes
-      const demandesRes = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/client/${clientId}`,
-        { withCredentials: true }
-      );
+  const {
+    data: services = [],
+    isLoading: isLoadingServices,
+    isError: isErrorServices,
+    error: servicesError
+  } = useGetServicesQuery();
 
-      // Fetch 5 services
-      const servicesRes = await axios.get(
-        "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+  const {
+    data: messagesData,
+    isLoading: isLoadingMessages,
+    isError: isErrorMessages,
+    error: messagesError
+  } = useGetReceivedMessagesQuery();
 
-      // Fetch 2 messages (ajuster selon votre API)
-      const messagesRes = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/messages/recus`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
+  const { data: categories = [] } = useGetCategoriesQuery();
 
-      const messagesWithUserInfos = await Promise.all(
-        messagesRes.data.data.map(async (message) => {
-          if (message?.expediteur?.userId) {
-            const messageRes = await axios.get(
-              `https://easyservice-backend-iv29.onrender.com/api/auth/users/${message.expediteur.userId}`,
-              { withCredentials: true }
-            );
-            return {
-              ...message,
-              expediteur : {prenom : messageRes.data.prenom, nom : messageRes.data.nom},
-            };
-          }
-          return message;
-        })
-      );
+  // console.log(categories)
 
-      // Catégories de services
-      const demandesWithCategories = await Promise.all(
-        demandesRes.data.map(async (demande) => {
-          if (demande?.service?.categorie) {
-            const categoryRes = await axios.get(
-              `https://easyservice-backend-iv29.onrender.com/api/categories/${demande.service.categorie}`,
-              { withCredentials: true }
-            );
-            return {
-              ...demande,
-              service: {
-                ...demande.service,
-                categorie: categoryRes.data.nom || "Inconnu",
-              },
-            };
-          }
-          return demande;
-        })
-      );
+  const getCategorieNom = (categorieId) => {
+    return categories.find(cat => cat._id === categorieId)?.nom || "-";
+  };
+  
+  // Fetch sender info for each message
+  const messages = messagesData?.data || [];
+  // const messageSenders = messages.map(message => message.expediteur?.userId).filter(Boolean);
+  
+  // Fetch all senders data at once
+  // const { data: sendersData } = useGetUserByIdQuery(messageSenders, {
+  //   skip: messageSenders.length === 0,
+  //   selectFromResult: ({ data }) => ({
+  //     data: data?.reduce((acc, user) => {
+  //       acc[user._id] = user;
+  //       return acc;
+  //     }, {})
+  //   })
+  // });
 
-      setDemandes(demandesWithCategories);
-      setServices(servicesRes.data);
-      setMessages((messagesRes.data.data && messagesWithUserInfos) || []);
-      console.log(messagesRes.data.data);
-    } catch (err) {
-      console.error("Erreur lors du chargement des données:", err);
-      setError("Erreur lors du chargement des données");
-      toast.error("Erreur lors du chargement des données");
-    } finally {
-      setLoading(false);
-    }
-  }, [clientId]);
+  // Process messages with sender info
+  const processedMessages = messages.map(message => {
+    // const senderId = message.expediteur?.userId;
+    // const sender = senderId ? sendersData?.[senderId] : null;
+    // console.log(message);
+    const isUnread = message.destinataires?.some(
+      destinataire => destinataire?.email === user.email && !destinataire?.lu
+    );
 
+    // console.log(isUnread);
+    
+    return {
+      ...message,
+      unreaded: isUnread,
+      // expediteur: {
+      //   prenom: sender?.prenom || "Expéditeur",
+      //   nom: sender?.nom || ""
+      // }
+    };
+  });
+  // console.log(processedMessages);
+
+  // Auto-slide for services
   useEffect(() => {
-    fetchLatestData();
-
-    // Auto-slide for services
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [fetchLatestData, services.length]);
+    if (services.length > 3) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3));
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [services.length]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % Math.ceil(services.length / 3));
@@ -146,7 +133,13 @@ const Dashboard = () => {
     );
   };
 
-  if (loading) {
+  // Handle loading and error states
+  const isLoading = isLoadingDemandes || isLoadingServices || isLoadingMessages;
+  const error = isErrorDemandes ? demandesError : 
+                isErrorServices ? servicesError : 
+                isErrorMessages ? messagesError : null;
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
@@ -155,26 +148,29 @@ const Dashboard = () => {
   }
 
   if (error) {
+    toast.error("Erreur lors du chargement des données");
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">Erreur lors du chargement des données</p>
       </div>
     );
   }
 
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
+      // initial="hidden"
+      // animate="visible"
       variants={fadeIn}
       className="flex flex-col gap-3 w-full mx-auto"
     >
+      
+      <h1 className="text-2xl font-bold">Tableau de Bord</h1>
       {/* Section Demandes */}
       <motion.div
         variants={slideIn}
         className="bg-white rounded-xl shadow-md p-4"
       >
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-1">
           <h3 className="text-xl font-bold text-gray-800">
             Vos dernières demandes
           </h3>
@@ -198,30 +194,44 @@ const Dashboard = () => {
               .map((demande) => (
                 <div
                   key={demande._id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className={`border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow p-2 sm:p-4 hover:bg-gray-100 cursor-pointer`}
+                  onClick={() => navigate(`/client/demandes/${demande._id}`)}
                 >
                   <div className="flex justify-between">
                     <h4 className="font-semibold text-gray-800">
                       {demande?.service?.nom || "Service"}
                     </h4>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        demande.statut === "En cours"
-                          ? "bg-blue-100 text-blue-800"
-                          : demande.statut === "En attente"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-gray-100 text-gray-800"
+                      className={`px-2 py-1 rounded-full font-semibold text-xs ${
+                        demande.statut === "en_attente"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : demande.statut === "acceptee"
+                      ? "bg-indigo-100 text-indigo-800"
+                      : demande.statut === "en_cours"
+                      ? "bg-blue-100 text-blue-800"
+                      : demande.statut === "terminee"
+                      ? "bg-green-100 text-green-800"
+                      : demande.statut === "annulee"
+                      ? "bg-red-100 text-red-800"
+                      : demande.statut === "refusee"
+                      ? "bg-gray-100 text-gray-800"
+                      : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      {demande.statut || "-"}
+                      {demande.statut === "en_attente" ? "En attente" : "" }
+                      {demande.statut === "acceptee" ? "Acceptée" : ""}
+                      {demande.statut === "en_cours" ? "En cours" : ""}
+                      {demande.statut === "terminee" ? "Terminée" : ""}
+                      {demande.statut === "annulee" ? "Annulee" : ""}
+                      {demande.statut === "refusee" ? "Refusée" : ""}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mt-1">
-                    {demande?.service?.categorie || "-"}
+                    {getCategorieNom(demande?.service?.categorie) || "-"}
                   </p>
-                  <div className="flex justify-between mt-3 text-sm">
+                  <div className="flex justify-between mt-3 text-sm flex-wrap gap-1">
                     <span className="text-gray-500">
-                      Soumis: {formatDate(demande.dateDemande)}
+                      Soumis : {formatDate(demande.dateDemande)}
                     </span>
                     <span className="font-medium text-orange-500">
                       {demande.tarif || "-"} FCFA
@@ -234,11 +244,11 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Section Messages */}
-     <motion.div
+      <motion.div
         variants={slideIn}
         className="bg-white rounded-xl shadow-md p-4"
       >
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-2">
           <h3 className="text-xl font-bold text-gray-800">Derniers messages</h3>
           <Link
             to="/client/messages"
@@ -248,30 +258,33 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {messages.length === 0 ? (
+        {processedMessages.length === 0 ? (
           <p className="text-center text-gray-500 py-4">Aucun message récent</p>
         ) : (
           <div className="space-y-4">
-            {[...messages].slice(0, 2).map((message) => (
-              <div
-                key={message._id}
-                className="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
-              >
+            {[...processedMessages].slice(0, 2).map((message) => (
+              <div 
+                key={message._id} className={`flex gap-2 border border-gray-200 rounded-lg p-2 sm:p-4 hover:bg-gray-100 cursor-pointer ${
+                message.unreaded ? "border-l-4 border-blue-500 bg-blue-50" : ""
+                }`} onClick={() => navigate(`/client/messages/${message._id}`)}
+                >
                 <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center mr-3 flex-shrink-0">
-                  {message.expediteur.prenom?.charAt(0).toUpperCase() || "A"}
+                  {message.expediteur.email?.charAt(0).toUpperCase() || "A"}
                 </div>
                 <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h4 className="font-semibold text-gray-800 capitalize">
-                      {message.expediteur.prenom || "Expéditeur"}{" "}
-                      {message.expediteur.nom || ""}
+                  <div className="flex justify-between items-start flex-wrap gap-1">
+                    <h4 className="font-semibold text-gray-800">
+                      {message.expediteur.email || "Expéditeur"}
                     </h4>
                     <span className="text-xs text-gray-500">
-                      {formatDate(message.date)}
+                      {formatDate(message.createdAt)}
                     </span>
                   </div>
-                  <p className="text-gray-600 mt-1">{message.contenu}</p>
+                  <p className="text-gray-600 mt-1 line-clamp-2">{message.contenu}</p>
                 </div>
+                {message.unreaded && (
+                  <span className="bg-orange-500 w-2 h-2 rounded-full ml-2 mt-1"></span>
+                )}
               </div>
             ))}
           </div>
@@ -283,7 +296,7 @@ const Dashboard = () => {
         variants={slideIn}
         className="bg-white rounded-xl shadow-md p-4"
       >
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-1">
           <h3 className="text-xl font-bold text-gray-800">Services récents</h3>
           <Link
             to="/client/services"
@@ -308,8 +321,8 @@ const Dashboard = () => {
                   key={service._id}
                   className="flex-shrink-0 w-full md:w-1/3 px-2"
                 >
-                  <div className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all">
-                    <div className="h-40 bg-gray-100 rounded-md mb-3 overflow-hidden">
+                  <div className="border border-gray-200 rounded-lg hover:shadow-lg transition-all">
+                    <div className="h-40 bg-gray-100 rounded-t-md mb-3 overflow-hidden">
                       {service.image ? (
                         <img
                           src={service.image}
@@ -322,23 +335,25 @@ const Dashboard = () => {
                         </div>
                       )}
                     </div>
-                    <h4 className="font-semibold text-gray-800">
-                      {service.nom}
-                    </h4>
-                    <p className="text-sm text-gray-600 mt-1 truncate">
-                      {service.description}
-                    </p>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="font-medium text-orange-500">
-                        {service.tarif} FCFA
-                      </span>
-                      <Link
-                        to={`/client/services/${service._id}`}
-                        className="text-sm text-blue-500 hover:underline"
-                      >
-                        Voir détails
-                      </Link>
-                    </div>
+                    <div className="p-4">
+                      <h4 className="font-semibold text-gray-800">
+                        {service.nom}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1 truncate">
+                        {service.description}
+                      </p>
+                      <div className="flex justify-between items-center mt-3">
+                        <span className="font-medium text-orange-500">
+                          {service.tarif} FCFA
+                        </span>
+                        <Link
+                          to={`/client/services/${service._id}`}
+                          className="text-sm text-blue-500 hover:underline"
+                        >
+                          Voir détails
+                        </Link>
+                      </div>
+                      </div>
                   </div>
                 </div>
               ))}
@@ -363,8 +378,6 @@ const Dashboard = () => {
           </div>
         )}
       </motion.div>
-
-      
     </motion.div>
   );
 };

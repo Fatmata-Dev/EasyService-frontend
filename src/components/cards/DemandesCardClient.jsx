@@ -8,7 +8,7 @@ import { useUpdateDemandeMutation, useDeleteDemandeMutation, useGetFacturesQuery
 // import { useDownloadFactureMutation } from "../../API/demandesApi";
 import { useCreateAvisMutation } from "../../API/servicesApi";
 
-const DemandesCardClient = memo(({ demande }) => {
+const DemandesCardClient = memo(({ demande, onRefresh }) => {
   const navigate = useNavigate();
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [feedback, setFeedback] = useState({
@@ -97,6 +97,7 @@ const generateFacture = async (id) => {
       }).unwrap();
       toast.success("Demande annulée avec succès");
       navigate("/client/demandes");
+      onRefresh?.(); // appeler le refetch du parent
     } catch (err) {
       toast.error(err.data?.message || "Erreur lors de l'annulation de la demande");
     }
@@ -109,6 +110,7 @@ const generateFacture = async (id) => {
       await deleteDemande(id).unwrap();
       toast.success("Demande supprimée avec succès");
       navigate("/client/demandes");
+      onRefresh?.(); // appeler le refetch du parent
     } catch (err) {
       toast.error(err.data?.message || "Erreur lors de la suppression de la demande");
     }
@@ -120,14 +122,16 @@ const generateFacture = async (id) => {
     try {
       await createAvis({
         ...feedback,
-        client: demande.clientId,
-        technicien: demande.technicienId,
-        service: demande.serviceId,
+        client: demande?.clientId,
+        technicien: demande?.technicienId,
+        service: demande?.serviceId,
+        demande: demande?._id
       }).unwrap();
 
       toast.success("Évaluation soumise avec succès");
       setFeedback({ note: "", commentaire: "" });
       setShowFeedbackForm(false);
+      onRefresh?.(); // appeler le refetch du parent
     } catch (err) {
       toast.error(err.data?.message || "Erreur lors de la soumission de l'évaluation");
     }
@@ -138,30 +142,30 @@ const generateFacture = async (id) => {
     setFeedback((prev) => ({ ...prev, [name]: value }));
   };
 
-  const currentStatut = statutConfig[demande.statut] || statutConfig.refusee;
+  const currentStatut = statutConfig[demande?.statut] || statutConfig.refusee;
 
   return (
     <div className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col">
       <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
-        DEMANDE #{demande.numeroDemande}
+        DEMANDE #{demande?.numeroDemande}
       </h2>
 
       <div className="space-y-2 mb-4">
         <p>
           <strong className="font-semibold pe-2">SERVICE :</strong>
-          <span className="text-orange-600">{demande.service}</span>
+          <span className="text-orange-600">{demande?.service}</span>
         </p>
         <p>
           <strong className="font-semibold pe-2">DATE :</strong>
-          {formatDate(demande.date)}
+          {formatDate(demande?.dateDemande)}
         </p>
         <p>
           <strong className="font-semibold pe-2">TECHNICIEN :</strong>
-          {`${demande.technicienPrenom} ${demande.technicienNom}`}
+          {`${demande?.technicienPrenom} ${demande?.technicienNom}`}
         </p>
         <p className="flex items-center flex-wrap">
           <strong className="font-semibold pe-2">INTERVENTION :</strong>
-          {formatDate(demande.dateIntervention)}
+          {formatDate(demande?.dateIntervention)}
         </p>
         <p className="flex items-center">
           <strong className="font-semibold pe-2">STATUT :</strong>
@@ -175,46 +179,46 @@ const generateFacture = async (id) => {
 
       {/* Actions */}
       <div className="mt-auto">
-        {["en_attente", "en_cours", "acceptee"].includes(demande.statut) && (
+        {["en_attente", "en_cours", "acceptee"].includes(demande?.statut) && (
           <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
             <Link
-              to={`/client/demandes/${demande._id}`}
+              to={`/client/demandes/${demande?._id}`}
               className="block text-center text-blue-500 hover:underline"
             >
               Plus de détails
             </Link>
             <button
               className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
-              onClick={() => handleCancel(demande._id)}
+              onClick={() => handleCancel(demande?._id)}
             >
               Annuler
             </button>
           </div>
         )}
 
-        {["annulee", "refusee"].includes(demande.statut) && (
+        {["annulee", "refusee"].includes(demande?.statut) && (
           <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
             <Link
-              to={`/client/demandes/${demande._id}`}
+              to={`/client/demandes/${demande?._id}`}
               className="block text-center text-blue-500 hover:underline"
             >
               Plus de détails
             </Link>
             <button
               className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
-              onClick={() => handleDelete(demande._id)}
+              onClick={() => handleDelete(demande?._id)}
             >
               Supprimer
             </button>
           </div>
         )}
 
-        {demande.statut === "terminee" && (
+        {demande?.statut === "terminee" && (
           <>
             <div className="flex justify-between gap-2 mb-2">
               <button
                 className="bg-gray-500 text-white px-4 py-1.5 rounded hover:bg-gray-600 flex-1"
-                onClick={() => generateFacture(demande._id)}
+                onClick={() => generateFacture(demande?._id)}
               >
                 Facture
               </button>
@@ -267,7 +271,7 @@ const generateFacture = async (id) => {
             )}
 
             <Link
-              to={`/client/demandes/${demande._id}`}
+              to={`/client/demandes/${demande?._id}`}
               className="block text-center mt-2 text-blue-500 hover:underline"
             >
               Plus de détails

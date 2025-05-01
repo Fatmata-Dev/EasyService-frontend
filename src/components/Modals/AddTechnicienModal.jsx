@@ -56,11 +56,12 @@ export default function AddTechnicienModal({ setShowModal }) {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Erreur lors de l'enregistrement"
+        err.response?.data?.error || "Erreur lors de l'enregistrement"
       );
       toast.error(
-        err.response?.data?.message || "Erreur lors de l'enregistrement"
+        err.response?.data?.error || "Erreur lors de l'enregistrement"
       );
+      console.error("Erreur lors de l'enregistrement", err);
     } finally {
       setIsLoading(false);
     }

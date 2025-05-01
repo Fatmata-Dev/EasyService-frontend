@@ -103,11 +103,11 @@ const ServiceDetailAdmin = () => {
         <div className="lg:w-1/2 flex justify-center">
           <div className="relative w-full max-w-md h-64 lg:h-80 rounded-lg overflow-hidden shadow-lg">
             <img
-              src={service.image || "/placeholder-service.jpg"}
+              src={service.image || "/mecano.jpg"}
               alt={service.nom}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = "/placeholder-service.jpg";
+                e.target.src = "/mecano.jpg";
               }}
             />
           </div>

@@ -1,175 +1,263 @@
-import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useGetAvisQuery, useGetServicesQuery, useGetCategoriesQuery } from '../../API/servicesApi';
+import { useGetDemandeForClientIdQuery } from '../../API/demandesApi';
 import AvisCard from "../../components/cards/AvisCard";
+import { FaStar, FaRegStar, FaUserCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { useGetTechniciensQuery, useGetUsersQuery } from '../../API/authApi';
+import { Link } from 'react-router-dom';
 
 const AvisClient = () => {
   const { user } = useOutletContext();
-  const [reviews, setReviews] = useState([]);
-  const [ratings, setRatings] = useState(() => {
-    const saved = localStorage.getItem('serviceRatings');
-    return saved ? JSON.parse(saved) : {};
+
+  // Récupération des données
+  const { data: demandes = [], isLoading: isLoadingDemandes } = useGetDemandeForClientIdQuery(user?._id, {
+    skip: !user?._id
   });
+  const { data: existingAvis = [], refetch: refetchAvis } = useGetAvisQuery();
+  const { data: services = [] } = useGetServicesQuery();
+  const { data: techniciens = [] } = useGetTechniciensQuery();
+  const { data: users = [] } = useGetUsersQuery();
+  const { data: categories = [] } = useGetCategoriesQuery();
 
-  const mockReviews = [
-    {
-      id: 1,
-      image: "/dev.jpg",
-      service: "Maintenance Informatique",
-      date: "Terminé le 25/02/2025",
-      price: "20.000 XOF",
-      status: "Noter",
-      category: "Informatique"
-    },
-    {
-      id: 2,
-      image: "/plomberie.jpg",
-      service: "Réparation Plomberie", 
-      date: "Terminé le 26/02/2025",
-      price: "15.000 XOF",
-      status: "Noter",
-      category: "Bâtiment"
-    },
-    {
-      id: 3,
-      image: "/maintenance.jpg",
-      service: "Installation Électrique",
-      date: "Terminé le 27/02/2025",
-      price: "25.000 XOF",
-      status: "Noter",
-      category: "electricity",
+  // Formatage de date
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return format(isNaN(date) ? new Date() : date, "dd MMM yyyy", { locale: fr });
+    } catch {
+      return "-";
     }
-  ];
-
-  useEffect(() => {
-    setReviews(mockReviews);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('serviceRatings', JSON.stringify(ratings));
-  }, [ratings]);
-
-  const handleRating = (reviewId) => {
-    setRatings(prev => {
-      const current = prev[reviewId] || 0;
-      return current < 5 ? { ...prev, [reviewId]: current + 1 } : prev;
-    });
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Avis à donner</h1>
-        </div>
+  // Fonctions utilitaires
+  const getCategorieNom = (categorieId) => {
+    return categories.find(cat => cat._id === categorieId)?.nom || "-";
+  };
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reviews.map(review => (
-            <AvisCard
-              key={review.id}
-              review={review}
-              currentRating={ratings[review.id] || 0}
-              onRate={() => handleRating(review.id)}
-              maxRating={5}
-              isAdmin={false}
-            />
-          ))}
-        </div>
+  const getServiceById = (serviceId) => {
+    return services.find(service => service._id === serviceId) || { nom: "Service inconnu" };
+  };
+
+  const getTechnicienById = (technicienId) => {
+    return techniciens.find(tech => tech._id === technicienId) || { prenom: "Technicien", nom: "Inconnu" };
+  };
+
+  const getAdminById = (adminId) => {
+    return users.find(user => user._id === adminId) || { prenom: "Admin", nom: "Inconnu" };
+  };
+
+  // Filtrer les demandes terminées non encore notées
+  const demandesANoter = demandes.filter(demande => 
+    demande.statut === 'terminee' && 
+    !existingAvis.some(avis => avis.demande === demande._id)
+  );
+
+
+  // Animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
+  if (isLoadingDemandes) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <motion.div 
+      className="min-h-screen bg-gray-50 p-6"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Section Services à noter */}
+        {demandesANoter.length > 0 && (
+          <>
+            <div className="flex justify-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-800">
+                Services à évaluer ({demandesANoter.length})
+              </h1>
+            </div>
+
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={containerVariants}
+            >
+              {[...demandesANoter].reverse().map((demande) => {
+                const service = getServiceById(demande.service._id);
+                const category = getCategorieNom(demande.categorieService);
+                
+                return (
+                  <motion.div key={demande._id} variants={itemVariants}>
+                    <AvisCard
+                      demande={demande}
+                      review={{
+                        id: demande._id,
+                        image: service.image || "/image3.jpeg",
+                        service: service.nom,
+                        serviceId: service._id,
+                        date: formatDate(demande.dateDemande),
+                        price: service.tarif ? `${service.tarif} XOF` : "Non spécifié",
+                        status: "Noter",
+                        category: category,
+                        note: demande.note,
+                        description: service.description,
+                        client: `${user.prenom} ${user.nom}`,
+                        demandeId: demande._id,
+                        technicienId: demande.technicien?._id,
+                      }}
+                      refetchAvis={refetchAvis}
+                    />
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </>
+        )}
+
+        {/* Section Avis déjà donnés */}
+        {existingAvis.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+              Vos évaluations ({existingAvis.length})
+            </h2>
+            <div className="space-y-6">
+              {[...existingAvis].reverse().map((avis) => {
+                const service = getServiceById(avis.service);
+                const technicien = getTechnicienById(avis.technicien);
+                const demande = demandes.find(d => d._id === avis.demande) || {};
+                const admin = getAdminById(demande.admin);
+
+                return (
+                  <motion.div 
+                    key={avis._id} 
+                    className="bg-white rounded-lg shadow-md p-6"
+                    variants={itemVariants}
+                  >
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="bg-orange-100 text-orange-600 rounded-full p-3">
+                            <FaStar className="text-xl" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg text-gray-800">
+                              {service.nom}
+                            </h3>
+                            <p className="text-gray-500 text-sm">
+                              Terminé le {formatDate(demande.dates?.finIntervention)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center mb-4">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-xl mr-1">
+                              {i < avis.note ? (
+                                <FaStar className="text-yellow-400" />
+                              ) : (
+                                <FaRegStar className="text-gray-300" />
+                              )}
+                            </span>
+                          ))}
+                          <span className="ml-2 text-gray-600">
+                            {avis.note}/5
+                          </span>
+                        </div>
+
+                        <p className="text-gray-700 italic border-l-4 border-orange-200 pl-4 py-2 bg-gray-50 rounded">
+                          "{avis.commentaire}"
+                        </p>
+                      </div>
+
+                      <div className="md:w-1/3 border-l md:pl-6 pl-3">
+                        <div className="flex items-center gap-3 mb-4">
+                          {technicien.image ? (
+                            <img 
+                              src={technicien.image} 
+                              alt={`${technicien.prenom} ${technicien.nom}`}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : (
+                            <FaUserCircle className="text-4xl text-gray-400" />
+                          )}
+                          <div>
+                            <h4 className="font-medium capitalize">
+                              {technicien.prenom} {technicien.nom}
+                            </h4>
+                            <p className="text-sm text-gray-500">Technicien</p>
+                          </div>
+                        </div>
+
+                        <div className="text-sm text-gray-600 space-y-2">
+                          <p>
+                            <span className="font-medium">Date d'évaluation:</span> {formatDate(avis.dateSoumission)}
+                          </p>
+                          {service.tarif && (
+                            <p>
+                              <span className="font-medium">Prix:</span> {service.tarif} FCFA
+                            </p>
+                          )}
+                          <p>
+                            <span className="font-medium">Admin:</span> {admin.prenom} {admin.nom}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-center mt-2">
+                        <Link
+                          to={`/${user.role}/demandes/${demande._id}`}
+                          className="block text-center text-blue-500 hover:underline"
+                        >
+                          Voir le service
+                        </Link>
+                      </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Message quand il n'y a rien */}
+        {demandesANoter.length === 0 && existingAvis.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-lg text-gray-600">
+              Vous n'avez aucun service à évaluer pour le moment.
+            </p>
+            <p className="text-gray-500 mt-2">
+              Vos services terminés apparaîtront ici pour évaluation.
+            </p>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 
 export default AvisClient;
-
-
-
-
-// import { useState, useEffect } from 'react';
-// import { useOutletContext } from 'react-router-dom';
-// import AvisCard from "../../components/cards/AvisCard";
-
-// const AvisClient = () => {
-//   const { user } = useOutletContext();
-//   const [reviews, setReviews] = useState([]);
-//   const [ratings, setRatings] = useState( () => { 
-//       // Récupération des notes depuis le localStorage
-//       const savedRatings = localStorage.getItem('serviceRatings');
-//       return savedRatings ? JSON.parse(savedRatings) : {};
-//     }
-//   );
-//   // Données fictives améliorées
-//   const mockReviews = [
-//     {
-//       id: 1,
-//       image: "/dev.jpg",
-//       service: "Maintenance Informatique",
-//       date: "Terminé le 25/02/2025",
-//       price: "20.000 XOF",
-//       status: "Noter",
-//       category: "Informatique"
-//     },
-//     {
-//       id: 2,
-//       image: "/plomberie.jpg",
-//       service: "Réparation Plomberie",
-//       date: "Terminé le 26/02/2025",
-//       price: "15.000 XOF",
-//       status: "Noter",
-//       category: "Bâtiment"
-//     },
-//     {
-//       id: 3,
-//       image: "/maintenance.jpg",
-//       service: "Installation Électrique",
-//       date: "Terminé le 27/02/2025",
-//       price: "25.000 XOF",
-//       status: "Noter",
-//       category: "electricity",
-//     }
-//   ];
-
-//   useEffect(() => {
-//     setReviews(mockReviews);
-//     // Sauvegarde des notes dans le localStorage
-//     localStorage.setItem('serviceRatings', JSON.stringify(ratings));
-//   }, [ratings]);
-
-//   const handleRating = (reviewId) => {
-//     setRatings(prev => {
-//       const currentRating = prev[reviewId] || 0;
-//       if(currentRating >= 5) return prev; // Bloque à 5 étoiles
-      
-//       const newRating = currentRating + 1;
-//       return { 
-//         ...prev, 
-//         [reviewId]: newRating 
-//       };
-//     });
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-6">
-//       <div className="max-w-6xl mx-auto">
-//         <div className="flex justify-center mb-8">
-//           <h1 className="text-3xl font-bold text-gray-800 text-center">Avis</h1>
-//         </div>
-
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-//           {reviews.map((review) => (
-//             <AvisCard 
-//               key={review.id} 
-//               review={review} 
-//               currentRating={ratings[review.id] || 0}
-//               onRate={() => handleRating(review.id)}
-//               maxRating={5}
-//             />
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AvisClient;
-
-

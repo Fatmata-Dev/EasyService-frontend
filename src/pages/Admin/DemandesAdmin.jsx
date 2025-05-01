@@ -3,8 +3,6 @@ import DemandesCard from "../../components/cards/DemandesCards";
 import toast from "react-hot-toast";
 import {
   useGetDemandesQuery,
-  useCommencerDemandeMutation,
-  useTerminerDemandeMutation,
 } from "../../API/demandesApi";
 
 export default function DemandesAdmin() {
@@ -14,10 +12,8 @@ export default function DemandesAdmin() {
     isLoading,
     isError,
     error,
+    refetch,
   } = useGetDemandesQuery();
-
-  const [commencerDemande] = useCommencerDemandeMutation();
-  const [terminerDemande] = useTerminerDemandeMutation();
 
   const [displayedDemandes, setDisplayedDemandes] = useState([]);
   const [demandesParStatut, setDemandesParStatut] = useState([
@@ -138,24 +134,7 @@ export default function DemandesAdmin() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Gestion des actions sur les demandes
-  const handleCommencerDemande = async (id) => {
-    try {
-      await commencerDemande(id).unwrap();
-      toast.success("Demande marquée comme 'en cours'");
-    } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la mise à jour");
-    }
-  };
 
-  const handleTerminerDemande = async (id) => {
-    try {
-      await terminerDemande(id).unwrap();
-      toast.success("Demande marquée comme 'terminée'");
-    } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la mise à jour");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -298,8 +277,7 @@ export default function DemandesAdmin() {
             <DemandesCard 
               key={demande._id} 
               demande={demande}
-              // onCommencer={handleCommencerDemande}
-              // onTerminer={handleTerminerDemande}
+              refetch={refetch}
             />
           ))
         ) : (

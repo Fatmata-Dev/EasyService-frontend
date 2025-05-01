@@ -72,17 +72,23 @@ const MessagesList = () => {
   }
 
   // Combiner et trier les messages par date
-  const allMessages = [...(sentMessages.data || []), ...(receivedMessages.data || [])]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const allMessages = [
+    ...new Map([
+      ...(sentMessages.data || []), 
+      ...(receivedMessages.data || [])
+    ].map(message => [message._id, message])).values()
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   // Fonction pour vérifier si un message est non lu pour l'utilisateur actuel
   const isMessageUnread = (message) => {
+    console.log(message);
     if (message.expediteur?.email === currentUser.email) return false;
     
     return message.destinataires?.some(
       destinataire => destinataire?.email === currentUser.email && !destinataire?.lu
     );
   };
+
 
   // Marquer un message comme lu au clic
   const handleMessageClick = async (messageId, isUnread) => {
@@ -135,7 +141,7 @@ const MessagesList = () => {
                   to={`/admin/messages/${message._id}`}
                   key={message._id}
                   onClick={() => handleMessageClick(message._id, isUnread)}
-                  className={`block border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors ${
+                  className={`block border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-100 transition-colors ${
                     isUnread ? "bg-blue-50 font-semibold" : ""
                   }`}
                 >

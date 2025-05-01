@@ -1,43 +1,56 @@
-import { Routes, Route } from "react-router-dom";
-// import PrivateRoute from "./PrivateRoute";
-// import AuthProvider from "../context/AuthProvider";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
-import ClientHome from "../pages/client/Client";
+import ServiceDetails from "../pages/ServiceDetails";
+
 import Dashboard from "../pages/client/Dashboard";
 import Demands from "../pages/client/Demands";
+import DetailsDemandeClient from "../pages/client/DetailsDemandeClient";
 import MessagesClient from "../pages/client/Messages";
+import DetailsMessageClient from "../pages/client/DetailsMessageClient";
 import Services from "../pages/client/Services";
+import ServiceDetailsClient from "../pages/client/ServiceDetailsClient";
 import AvisClient from "../pages/client/AvisClient";
 import Contact from "../pages/client/Contact";
-import ServiceDetailsClient from "../pages/client/ServiceDetailsClient";
-import AdminHome from "../pages/Admin/Admin";
+
 import DashboardAdmin from "../pages/Admin/Dashboard";
 import ServicesAdmin from "../pages/Admin/ServicesAdmin";
 import ServiceDetailAdmin from "../pages/Admin/ServiceDetailAdmin";
 import DemandesAdmin from "../pages/Admin/DemandesAdmin";
+import DetailsDemandeAdmin from "../pages/Admin/DetailsDemandesAdmin";
 import MessagesList from "../pages/Admin/MessageList";
+import DetailsMessageAdmin from "../pages/Admin/DetailsMessageAdmin";
 import PermissionsAdmin from "../pages/Admin/Permsissions";
 import AvisAdmin from "../pages/Admin/AvisAdmin";
+
 import DashboardTechniciens from "../pages/Technicien/Dashboard";
 import Intervention from "../pages/Technicien/Intervention";
 import InterventionDetails from "../pages/Technicien/InterventionDetails";
 import MessagesTechniciens from "../pages/Technicien/Messages";
+import DetailsMessageTechnicien from "../pages/Technicien/DetailsMessageTechnicien";
 import AvisTechniciens from "../pages/Technicien/Avis";
 import ContactTechniciens from "../pages/Technicien/Contact";
-import TechnicienHome from "../pages/Technicien/Technicien";
-import ServiceDetails from "../pages/ServiceDetails";
-import DetailsDemandeClient from "../pages/client/DetailsDemandeClient";
-import DetailsDemandeAdmin from "../pages/Admin/DetailsDemandesAdmin";
-import DetailsMessageClient from "../pages/client/DetailsMessageClient";
-import DetailsMessageAdmin from "../pages/Admin/DetailsMessageAdmin";
-import DetailsMessageTechnicien from "../pages/Technicien/DetailsMessageTechnicien";
-import { useSearchParams } from "react-router-dom";
+
 import NewPasswordModal from "../components/Modals/NewPassword";
-import { useState, useEffect } from "react";
 import LoginModal from "../components/Modals/LoginModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
 import SignupModal from "../components/Modals/SignupModal";
+import PrivateRoute from "./PrivateRoute";
+import { useGetUserConnetedQuery } from "../API/authApi";
+import { useLocation } from "react-router-dom";
+import UsersHome from "../pages/UsersHome";
+import UserProfil from "../pages/UserProfil";
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 export default function AppRoutes() {
   const [searchParams] = useSearchParams();
@@ -47,6 +60,7 @@ export default function AppRoutes() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showForgetPassword, setShowForgetPassword] = useState(false);
+  const { data: user } = useGetUserConnetedQuery();
 
   useEffect(() => {
     if (newPassToken) {
@@ -55,17 +69,16 @@ export default function AppRoutes() {
   }, [newPassToken]);
 
   return (
-    // <AuthProvider>
     <>
+      <ScrollToTop />
+
       <Routes>
-        {/* Page publique */}
+        {/* Route publique */}
         <Route path="/" element={<Home />} />
         <Route path="/services/:id" element={<ServiceDetails />} />
 
-        {/* Routes privées selon le rôle */}
         {/* Espace client */}
-        {/* <Route element={<PrivateRoute role="client" />}> */}
-        <Route path="/client" element={<ClientHome />}>
+        <Route path="/client" element={ <PrivateRoute role="client"> <UsersHome /> </PrivateRoute> } >
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="demandes" element={<Demands />} />
@@ -76,12 +89,11 @@ export default function AppRoutes() {
           <Route path="services/:id" element={<ServiceDetailsClient />} />
           <Route path="avis" element={<AvisClient />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="profil/:id" element={<UserProfil user={user} />} />
         </Route>
-        {/* </Route> */}
 
-        {/* Espace Admin */}
-        {/* <Route element={<PrivateRoute role="admin" />}> */}
-        <Route path="/admin" element={<AdminHome />}>
+        {/* Espace admin */}
+        <Route path="/admin" element={ <PrivateRoute role="admin"> <UsersHome /> </PrivateRoute> } >
           <Route index element={<DashboardAdmin />} />
           <Route path="dashboard" element={<DashboardAdmin />} />
           <Route path="services" element={<ServicesAdmin />} />
@@ -92,12 +104,11 @@ export default function AppRoutes() {
           <Route path="messages/:id" element={<DetailsMessageAdmin />} />
           <Route path="permissions" element={<PermissionsAdmin />} />
           <Route path="avis" element={<AvisAdmin />} />
+          <Route path="profil/:id" element={<UserProfil user={user} />} />
         </Route>
-        {/* </Route> */}
 
         {/* Espace technicien */}
-        {/* <Route element={<PrivateRoute role="technicien" />}> */}
-        <Route path="/technicien" element={<TechnicienHome />}>
+        <Route path="/technicien" element={ <PrivateRoute role="technicien"> <UsersHome /> </PrivateRoute> } >
           <Route index element={<DashboardTechniciens />} />
           <Route path="dashboard" element={<DashboardTechniciens />} />
           <Route path="interventions" element={<Intervention />} />
@@ -106,12 +117,14 @@ export default function AppRoutes() {
           <Route path="messages/:id" element={<DetailsMessageTechnicien />} />
           <Route path="avis" element={<AvisTechniciens />} />
           <Route path="contact" element={<ContactTechniciens />} />
+          <Route path="profil/:id" element={<UserProfil user={user} />} />
         </Route>
-        {/* </Route> */}
 
-        {/* Page 404 - Doit être placée en dernier */}
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {/* Modaux */}
       {showNewPassword && (
         <NewPasswordModal
           onClose={() => setShowNewPassword(false)}
@@ -134,7 +147,6 @@ export default function AppRoutes() {
           }}
         />
       )}
-
       {showSignup && (
         <SignupModal
           onClose={() => setShowSignup(false)}
@@ -154,6 +166,5 @@ export default function AppRoutes() {
         />
       )}
     </>
-    // </AuthProvider>
   );
 }
