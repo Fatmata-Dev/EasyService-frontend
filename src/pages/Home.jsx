@@ -7,7 +7,7 @@ import FooterSection from "../components/sections/FooterSection";
 import LoginModal from "../components/Modals/LoginModal";
 import SignupModal from "../components/Modals/SignupModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
-import Navbar from "../components/Header/Navbar";
+import Navbar from "../components/navigation/Navbar";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { scroller } from "react-scroll";
 

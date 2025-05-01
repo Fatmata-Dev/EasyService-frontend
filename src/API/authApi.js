@@ -28,6 +28,12 @@ export const authApi = createApi({
         })),
     }),
 
+    getUserConneted: builder.query({
+      query: () => "/auth/users/me",
+      providesTags: ["User"],
+      transformResponse: (response) => response.user,
+    }),
+
     getUserById: builder.query({
       query: (id) => `/auth/users/${id}`,
       providesTags: (result, error, id) => [{ type: "user", id }],
@@ -127,6 +133,7 @@ export const authApi = createApi({
 
 export const {
   useGetUsersQuery,
+  useGetUserConnetedQuery,
   useGetUserByIdQuery,
   useUserRegisterMutation,
   useUserLoginMutation,

@@ -9,7 +9,7 @@ import {
   useUpdateDemandeMutation
 } from "../../API/demandesApi"; // Ajustez le chemin selon votre structure
 
-const DemandesCard = memo(({ demande }) => {
+const DemandesCard = memo(({ demande, onRefresh }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const navigate = useNavigate();
   const [updateDemande] = useUpdateDemandeMutation();
@@ -60,6 +60,7 @@ const DemandesCard = memo(({ demande }) => {
       
       toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
       navigate("/admin/demandes");
+      onRefresh?.();
     } catch (err) {
       toast.error(err.data?.message || `Erreur lors de la modification du statut`);
     }
@@ -89,7 +90,7 @@ const DemandesCard = memo(({ demande }) => {
             <div>
               <p className="text-sm text-gray-600">Client(e)</p>
               <p className="font-semibold text-orange-600 capitalize line-clamp-1">
-                {demande.client.prenom} {demande.client.nom}
+                {demande?.client?.prenom} {demande?.client?.nom}
               </p>
             </div>
             <div>

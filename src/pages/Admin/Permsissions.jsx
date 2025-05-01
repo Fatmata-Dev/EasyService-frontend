@@ -33,7 +33,7 @@ export default function PermissionsAdmin() {
     }
   }, [usersData]);
 
-  console.log(users);
+  // console.log(users);
 
   const handleRoleChange = (userId, newRole) => {
     const user = users.find(u => u._id === userId);

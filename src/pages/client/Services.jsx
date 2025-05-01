@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import ServiceCardClient from "../../components/cards/ServiceCardClient";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useGetServicesQuery } from "../../API/servicesApi";
 
 export default function Services() {
-  const { data: services = [], isLoading, error } = useGetServicesQuery();
+  const { data: services = [], isLoading, error, isFetching } = useGetServicesQuery();
   const [allServices, setAllServices] = useState([]);
   const [displayedServices, setDisplayedServices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const totalPages = Math.ceil(allServices.length / itemsPerPage);
-  const navigate = useNavigate();
 
   useEffect(() => {
       if (services && services.length > 0) {
@@ -22,35 +20,6 @@ export default function Services() {
       }
     }, [services]);
 
-  // useEffect(() => {
-  //   const fetchServices = async () => {
-  //     try {
-  //       const { data } = await axios.get(
-  //         "https://easyservice-backend-iv29.onrender.com/api/services/afficher/service",
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //           },
-  //         }
-  //       );
-
-  //       const formattedServices = data.map((service) => ({
-  //         ...service,
-  //         categorie: service.categorie || {},
-  //       }));
-
-  //       setServices(formattedServices);
-  //       setAllServices(formattedServices);
-  //     } catch (err) {
-  //       toast.error("Erreur lors du chargement des services");
-  //       console.error(err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchServices();
-  // }, []);
 
   useEffect(() => {
     if (allServices && allServices.length > 0) {
@@ -103,6 +72,7 @@ export default function Services() {
               <ServiceCardClient
                 key={service._id}
                 service={service}
+                isFetching={isFetching}
               />
             ))}
           </div>

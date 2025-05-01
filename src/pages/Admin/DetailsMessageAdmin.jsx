@@ -12,6 +12,7 @@ import { useGetDemandeByIdQuery } from "../../API/demandesApi";
 import toast from "react-hot-toast";
 import MessageForm from "./MessageForm";
 import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from "../../context/useAuth";
 
 const MessageDetail = () => {
   const { id } = useParams();
@@ -28,7 +29,8 @@ const MessageDetail = () => {
     skip: !message?.demande
   });
 
-  const currentUser = JSON.parse(localStorage.getItem("user")) || {};
+  const { user } = useAuth();
+  const currentUser = user || {};
   const currentUserEmail = currentUser.email;
 
   const formatDate = (dateString) => {
@@ -158,7 +160,7 @@ const MessageDetail = () => {
           </div>
           
           {message?.demande && demande && (
-            <div className="bg-gray-50 p-3 rounded-lg mb-4">
+            <div className="bg-gray-100 p-3 rounded-lg mb-4">
               <h4 className="font-medium text-gray-700 mb-1">Lié à la demande :</h4>
               <div className="flex items-center gap-1 flex-wrap">
                 <Link 

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { useGetDemandeForTechnicienIdQuery } from "../../API/demandesApi";
 import toast from "react-hot-toast";
 import InterventionCard from "../../components/cards/InterventionCard";
 import { motion } from "framer-motion";
@@ -24,87 +24,88 @@ export default function Intervention() {
     setUser(userData);
   }, []);
 
-  const fetchInterventions = useCallback(async () => {
-    try {
-      setLoading(true);
+  // Utilisation du hook RTK Query
+  const { data: interventionsData, isLoading, isError, error, refetch } = useGetDemandeForTechnicienIdQuery(
+    user?.id,
+    { skip: !user || user.role !== "technicien" }
+  );
 
-      if (!user || user.role !== "technicien") return;
-
-      const response = await axios.get(
-        `https://easyservice-backend-iv29.onrender.com/api/demandes/technicien/${user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        }
-      );
-
-      const interventionsAvecDetails = response.data.map((intervention) => {
-        // console.log(intervention)
-        const demandeObj = intervention || {};
-        const serviceObj = demandeObj.service || { nom: "Service inconnu" };
-        const clientObj = demandeObj.client || {
-          prenom: "Client",
-          nom: "inconnu",
-        };
-
-        return {
-          _id: intervention._id,
-          dateIntervention: intervention.dateIntervention || "Non définie",
-          heureDebut: intervention.heureDebut || "À définir",
-          heureFin: intervention.heureFin || "À définir",
-          etatExecution: intervention.etatExecution || "non_commencee", // Correction ici
-          service: serviceObj.nom,
-          client: `${clientObj.prenom} ${clientObj.nom}`,
-          adresse: demandeObj.adresse || "Adresse non spécifiée",
-          description: demandeObj.description || "Aucune description",
-          note: intervention.note || null,
-          commentaire: intervention.commentaire || "",
-          clientId: intervention.client._id,
-          demandeId: intervention._id,
-          technicienId: intervention.technicien._id,
-          serviceId: intervention.service._id,
-          adminId: intervention?.admin,
-          tarif: intervention.tarif
-        };
-      });
-
-      // Compter les interventions par statut
-      const counts = {
-        "En attente": 0,
-        "En cours": 0,
-        Terminé: 0,
-        Annulé: 0,
-      };
-
-      interventionsAvecDetails.forEach((intervention) => {
-        const statutNormalise = normalizeStatut(intervention.etatExecution);
-
-        if (statutNormalise === "non_commencee") counts["En attente"]++;
-        else if (statutNormalise === "en_cours") counts["En cours"]++;
-        else if (statutNormalise === "terminee") counts["Terminé"]++;
-        else if (statutNormalise === "annulee") counts["Annulé"]++;
-      });
-
-      setAllInterventions(interventionsAvecDetails);
-      setInterventionsParStatut(
-        Object.entries(counts).map(([statut, nombre]) => ({
-          statut, // Changé de etatExecution à statut pour correspondre à l'état initial
-          nombre,
-        }))
-      );
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Erreur lors du chargement");
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+  // console.log(interventionsData);
 
   useEffect(() => {
-    if (user) {
-      fetchInterventions();
+    if (!isLoading && interventionsData) {
+      try {
+        const interventionsAvecDetails = interventionsData.map((intervention) => {
+          const demandeObj = intervention || {};
+          const serviceObj = demandeObj.service || { nom: "Service inconnu" };
+          const clientObj = demandeObj.client || {
+            prenom: "Client",
+            nom: "inconnu",
+          };
+
+          // console.log(intervention);
+
+          return {
+            _id: intervention._id,
+            dateIntervention: intervention.dateIntervention || "Non définie",
+            heureDebut: intervention.heureDebut || "À définir",
+            heureFin: intervention.heureFin || "À définir",
+            etatExecution: intervention.etatExecution || "non_commencee",
+            service: serviceObj.nom,
+            client: `${clientObj.prenom} ${clientObj.nom}`,
+            adresse: demandeObj.adresse || "Adresse non spécifiée",
+            description: demandeObj.description || "Aucune description",
+            note: intervention.note || null,
+            commentaire: intervention.commentaire || "",
+            clientId: intervention.client?._id,
+            demandeId: intervention._id,
+            technicienId: intervention.technicien?._id,
+            serviceId: intervention.service?._id,
+            adminId: intervention?.admin,
+            tarif: intervention.tarif
+          };
+        });
+
+        // console.log(interventionsAvecDetails);
+
+        // Compter les interventions par statut
+        const counts = {
+          "En attente": 0,
+          "En cours": 0,
+          Terminé: 0,
+          Annulé: 0,
+        };
+
+        interventionsAvecDetails.forEach((intervention) => {
+          // console.log(intervention);
+          const statutNormalise = normalizeStatut(intervention.etatExecution);
+
+          if (statutNormalise === "non_commencee") counts["En attente"]++;
+          else if (statutNormalise === "en_cours") counts["En cours"]++;
+          else if (statutNormalise === "terminee") counts["Terminé"]++;
+          else if (statutNormalise === "annulee") counts["Annulé"]++;
+        });
+
+        setAllInterventions(interventionsAvecDetails);
+        setInterventionsParStatut(
+          Object.entries(counts).map(([statut, nombre]) => ({
+            statut,
+            nombre,
+          }))
+        );
+      } catch (err) {
+        refetch();
+        toast.error("Erreur lors du traitement des données");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    } else if (isError) {
+      // refetch(); // Force le rafraîchissement des données
+      toast.error(error?.data?.message || "Erreur lors du chargement");
+      setLoading(false);
     }
-  }, [fetchInterventions, user]);
+  }, [interventionsData, isLoading, isError, error, refetch]);
 
   const normalizeStatut = (statut) => {
     if (!statut) return "";
@@ -119,7 +120,7 @@ export default function Intervention() {
 
   useEffect(() => {
     const filtered = allInterventions.filter(
-      (i) => normalizeStatut(i.etatExecution) === activeTab // Changé de statut à etatExecution
+      (i) => normalizeStatut(i.etatExecution) === activeTab
     );
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
@@ -127,7 +128,7 @@ export default function Intervention() {
   }, [allInterventions, activeTab, currentPage]);
 
   const totalFilteredInterventions = allInterventions.filter(
-    (i) => normalizeStatut(i.etatExecution) === activeTab // Changé de statut à etatExecution
+    (i) => normalizeStatut(i.etatExecution) === activeTab
   ).length;
   const totalPages = Math.ceil(totalFilteredInterventions / itemsPerPage);
 
@@ -136,7 +137,7 @@ export default function Intervention() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold uppercase text-center mb-8">

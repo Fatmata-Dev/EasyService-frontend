@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useCreateDemandeMutation } from "../../API/demandesApi";
 import { useGetCategoriesQuery } from "../../API/servicesApi";
+import { useAuth } from "../../context/useAuth";
 
 export default function ReservationModal({ setShowModal, selectedService }) {
-  // const [showModalReservation, setShowModalReservation] = useState(false);
-  const userData = JSON.parse(localStorage.getItem("user"));
-  const user = userData?.id;
+  const { user } = useAuth();
+  const userData = user._id;
 
   // Utilisation des hooks RTK Query
   const [createDemande, { isLoading }] = useCreateDemandeMutation();
@@ -62,7 +62,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       return;
     }
 
-    if (!user || typeof user !== "string" || user === "undefined") {
+    if (!userData || typeof userData !== "string" || userData === "undefined") {
       setError("Identifiant client invalide");
       toast.error("Identifiant client invalide");
       return;
@@ -83,7 +83,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       duree: formData.duree,
       uniteDuree: formData.uniteDuree,
       dateIntervention: formData.dateIntervention,
-      client: user,
+      client: userData,
       status: "en_attente",
       technicien: formData.technicien || null,
       admin: null,

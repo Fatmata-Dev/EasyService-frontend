@@ -42,8 +42,7 @@ export default function LoginModal({
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem(
-        "message",
-        `Binevenu(e) ${response.data.user.prenom} ${response.data.user.nom}, vous êtes connecté en tant que ${response.data.user.role}`
+        "message", true
       );
 
       if ((response.data.token && response.data.user.role) || isConnected) {
@@ -51,9 +50,10 @@ export default function LoginModal({
           navigate(`/${response.data.user.role}/services/${id}`);
         } else {
           navigate(`/${response.data.user.role}/dashboard`);
+          window.location.reload();
         }
       }
-      console.log(response.data);
+      // console.log(response.data);
 
       onClose(); // Fermer la modale après connexion
     } catch (err) {

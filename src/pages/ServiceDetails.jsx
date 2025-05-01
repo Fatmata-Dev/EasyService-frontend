@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import LoginModal from "../components/Modals/LoginModal";
 import SignupModal from "../components/Modals/SignupModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
-import Navbar from "../components/Header/Navbar";
+import Navbar from "../components/navigation/Navbar";
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -85,12 +85,6 @@ const ServiceDetails = () => {
       <Navbar defaultSection={"services"} />
 
       <div className="mx-8 mt-2">
-        <Link
-          to="/"
-          className="text-white-700 px-2 py-1 h-fit bg-gray-500 hover:bg-gray-300 rounded"
-        >
-          Retour
-        </Link>
         <h1 className="text-2xl font-bold my-4 text-center self-center">
           DÉTAIL DU SERVICE
         </h1>
