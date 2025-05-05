@@ -3,9 +3,10 @@ import { useGetDemandeForTechnicienIdQuery } from "../../API/demandesApi";
 import toast from "react-hot-toast";
 import InterventionCard from "../../components/cards/InterventionCard";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/useAuth";
 
 export default function Intervention() {
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [allInterventions, setAllInterventions] = useState([]);
   const [displayedInterventions, setDisplayedInterventions] = useState([]);
   const [interventionsParStatut, setInterventionsParStatut] = useState([
@@ -19,14 +20,9 @@ export default function Intervention() {
   const itemsPerPage = 6;
   const [activeTab, setActiveTab] = useState("en_cours");
 
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    setUser(userData);
-  }, []);
-
   // Utilisation du hook RTK Query
   const { data: interventionsData, isLoading, isError, error, refetch } = useGetDemandeForTechnicienIdQuery(
-    user?.id,
+    user?._id,
     { skip: !user || user.role !== "technicien" }
   );
 
@@ -86,6 +82,7 @@ export default function Intervention() {
           else if (statutNormalise === "annulee") counts["Annulé"]++;
         });
 
+        refetch();
         setAllInterventions(interventionsAvecDetails);
         setInterventionsParStatut(
           Object.entries(counts).map(([statut, nombre]) => ({
@@ -136,6 +133,10 @@ export default function Intervention() {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  useEffect(() => {
+      refetch();
+    }, [refetch]);
 
   if (loading || isLoading) {
     return (
@@ -254,6 +255,7 @@ export default function Intervention() {
             <InterventionCard
               key={intervention._id}
               intervention={intervention}
+              onRefresh={refetch} 
             />
           ))
         ) : (

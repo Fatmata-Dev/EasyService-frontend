@@ -31,7 +31,7 @@ import Intervention from "../pages/Technicien/Intervention";
 import InterventionDetails from "../pages/Technicien/InterventionDetails";
 import MessagesTechniciens from "../pages/Technicien/Messages";
 import DetailsMessageTechnicien from "../pages/Technicien/DetailsMessageTechnicien";
-import AvisTechniciens from "../pages/Technicien/Avis";
+// import AvisTechniciens from "../pages/Technicien/Avis";
 import ContactTechniciens from "../pages/Technicien/Contact";
 
 import NewPasswordModal from "../components/Modals/NewPassword";
@@ -115,7 +115,7 @@ export default function AppRoutes() {
           <Route path="interventions/:id" element={<InterventionDetails />} />
           <Route path="messages" element={<MessagesTechniciens />} />
           <Route path="messages/:id" element={<DetailsMessageTechnicien />} />
-          <Route path="avis" element={<AvisTechniciens />} />
+          {/* <Route path="avis" element={<AvisTechniciens />} /> */}
           <Route path="contact" element={<ContactTechniciens />} />
           <Route path="profil/:id" element={<UserProfil user={user} />} />
         </Route>

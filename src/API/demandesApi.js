@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const demandesApi = createApi({
   reducerPath: "demandesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://easyservice-backend-iv29.onrender.com/api",
+    baseUrl: "http://localhost:4000/api",
     prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("authToken");
       if (token) headers.set("Authorization", `Bearer ${token}`);
@@ -62,18 +62,19 @@ export const demandesApi = createApi({
 
     // Endpoints pour les catégories
     commencerDemande: builder.mutation({
-      query: (id) => ({
+      query: ({id, body}) => ({
         url: `/demandes/commencer/${id}`,
         method: "PUT",
+        body,
       }),
       invalidatesTags: ["DemandeStatut"],
     }),
 
     terminerDemande: builder.mutation({
-      query: (id) => ({
+      query: ({id, body}) => ({
         url: `/demandes/terminer/${id}`,
-        method: "POST",
-        // body: newCategory,
+        method: "PUT",
+        body,
       }),
       invalidatesTags: ["DemandeStatut"],
     }),

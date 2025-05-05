@@ -14,7 +14,7 @@ import MessageForm from "../Admin/MessageForm";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../context/useAuth";
 
-const MessageDetail = () => {
+const DetailsMessageClient = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
@@ -64,7 +64,7 @@ const MessageDetail = () => {
     try {
       await deleteMessage(messageId).unwrap();
       toast.success("Message supprimé avec succès");
-      navigate("/admin/messages");
+      navigate("/client/messages");
     } catch (err) {
       console.error("Erreur de suppression:", err);
       toast.error(err.data?.message || "Erreur lors de la suppression");
@@ -126,7 +126,7 @@ const MessageDetail = () => {
     <div className="sm:container sm:mx-auto sm:p-4 max-w-6xl">
       <div className="bg-white rounded-lg shadow-md sm:p-6 p-2">
         <Link 
-          to="/admin/messages" 
+          to="/client/messages" 
           className="inline-block mb-4 text-orange-500 hover:underline"
         >
           &larr; Retour aux messages
@@ -164,7 +164,7 @@ const MessageDetail = () => {
               <h4 className="font-medium text-gray-700 mb-1">Lié à la demande :</h4>
               <div className="flex items-center gap-1 flex-wrap">
                 <Link 
-                  to={`/admin/demandes/${demande._id}`} 
+                  to={`/client/demandes/${demande._id}`} 
                   className="text-sm text-gray-600 hover:underline w-fit"
                 >
                   #{demande.numeroDemande || message?.demande}
@@ -222,4 +222,4 @@ const MessageDetail = () => {
   );
 };
 
-export default MessageDetail;
+export default DetailsMessageClient;

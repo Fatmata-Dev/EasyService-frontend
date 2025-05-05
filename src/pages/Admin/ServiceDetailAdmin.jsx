@@ -9,7 +9,7 @@ import {
 } from "../../API/servicesApi";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FaEdit, FaTrash, FaStar, FaRegStar, FaArrowLeft } from "react-icons/fa";
+import { FaEdit, FaTrash, FaStar, FaRegStar, FaArrowLeft, FaUser, FaUserCircle } from "react-icons/fa";
 import { useGetUserByIdQuery } from "../../API/authApi";
 
 const ServiceDetailAdmin = () => {
@@ -178,6 +178,12 @@ const ServiceDetailAdmin = () => {
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex justify-between items-center w-full flex-wrap gap-2">
                     <h4 className="font-semibold">
+        
+        <img
+              src={user?.image?.url || `<FaUserCircle className="w-12 h-12 rounded-full object-cover" />`}
+              alt="Signature professionnelle"
+              className="w-12 h-12 rounded-full object-cover"
+            />
                       <span className="capitalize">{user?.prenom || ""} {" "}{user?.nom || "Client anonyme"}</span>
                       
                     </h4>

@@ -3,10 +3,12 @@ import { toast } from "react-hot-toast";
 import { useCreateDemandeMutation } from "../../API/demandesApi";
 import { useGetCategoriesQuery } from "../../API/servicesApi";
 import { useAuth } from "../../context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function ReservationModal({ setShowModal, selectedService }) {
   const { user } = useAuth();
   const userData = user._id;
+  const navigate = useNavigate();
 
   // Utilisation des hooks RTK Query
   const [createDemande, { isLoading }] = useCreateDemandeMutation();
@@ -93,6 +95,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       await createDemande(demandeData).unwrap();
       toast.success("Demande envoyée avec succès !");
       setShowModal(false);
+      navigate("/client/demandes");
     } catch (err) {
       console.error("Erreur lors de l'envoi de la demande", err);
       const errorMessage = err.data?.message || "Erreur lors de l'envoi de la demande";

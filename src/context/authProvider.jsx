@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
+import { authApi,useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
 import { AuthContext } from "./authContext";
+import { useDispatch } from "react-redux";
+
 
 
 const AuthProvider = ({ children }) => {
@@ -10,6 +12,9 @@ const AuthProvider = ({ children }) => {
   const [loginMutation] = useUserLoginMutation();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const dispatch = useDispatch();
+    
 
   // Utilise RTK Query pour récupérer le user connecté
   const { data: user, isLoading, isError, refetch } = useGetUserConnetedQuery(undefined, {
@@ -40,23 +45,37 @@ const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
+      // 1. Appel de l'API de login
       const response = await loginMutation(credentials).unwrap();
       const { token: newToken } = response;
-
+  
+      // 2. Stockage du token
       localStorage.setItem("authToken", newToken);
       setToken(newToken);
-      refetch(); // force une actualisation du user connecté
 
+      window.location.reload();
+  
     } catch (err) {
-      console.error("Login error:", err);
-      throw err;
+      console.error("Login error:", err?.data?.message);
+      throw err?.data?.message;
     }
   };
-
+  
   const logout = () => {
+    // 1. Supprimer le token
     localStorage.removeItem("authToken");
     setToken("");
-    navigate("/");
+    
+    // 2. Réinitialiser le cache API
+    // dispatch(authApi.util.resetApiState());
+
+    // 4. Optionnel: Rafraîchir la page
+    window.location.reload();
+    
+    // 3. Rediriger vers la page de login
+    navigate("/", { replace: true });
+    
+    
   };
 
   if (isLoading) return <div>Chargement...</div>;

@@ -10,7 +10,7 @@ import {
   Clock, CheckCircle, FileText
 } from 'react-feather';
 
-const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isAdmin = false }) => {
+const AvisCardClient = ({ review, demande, currentRating, maxRating = 5, showButton = true}) => {
   const [createAvis] = useCreateAvisMutation();
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,19 +121,9 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
 
         {/* Comment */}
         <div className="mb-4">
-        {isAdmin && (
-              <div className="flex items-center bg-gray-200 px-2 py-1 rounded-full w-fit">
-                <User size={14} className="text-gray-600 mr-1" />
-                <span className="text-xs font-medium text-gray-700">
-                  {review?.client?.prenom || "Anonyme"} {" "}
-                  {review?.client?.nom || ""}
-                </span>
-              </div>
-            )}
-          <div className="flex items-start bg-gray-100 px-3 py-2 mt-2 rounded-lg">
-            <MessageSquare size={18} className="text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+          <div className="flex items-start py-2 mt-2 rounded-lg">
             <p className="text-gray-600 line-clamp-2">
-              {review?.commentaire || review?.description || "Aucun commentaire"}
+              {review?.description || "Aucun commentaire"}
             </p>
           </div>
         </div>
@@ -142,12 +132,6 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
         <div className="flex justify-between items-center border-t border-gray-100 pt-2">
           <div className="flex justify-between flex-wrap gap-2 items-center w-full">
             <span className="text-xl font-bold text-gray-900">{review?.price}</span>
-            <Link
-            to={`/client/demandes/${review?.demande?._id}`}
-            className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
-          >
-            Voir les détails <ArrowRight size={14} className="ml-1" />
-          </Link>
           </div>
           
           {showButton && (
@@ -178,6 +162,15 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
           )}
         </div>
 
+        <div className="flex justify-center items-center">
+
+            <Link
+                to={`/client/demandes/${review?.demandeId}`}
+                className="inline-flex items-center text-sm p-2 text-blue-600 hover:text-blue-800 hover:underline"
+            >
+                Voir les détails <ArrowRight size={14} className="ml-1" />
+            </Link>
+        </div>
         
       </div>
 
@@ -240,7 +233,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
                 name="commentaire"
                 value={feedback.commentaire}
                 onChange={handleFeedbackChange}
-                className="w-full px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
                 rows="3"
                 placeholder="Décrivez votre expérience..."
               />
@@ -280,7 +273,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
   );
 };
 
-AvisCard.propTypes = {
+AvisCardClient.propTypes = {
   review: PropTypes.object.isRequired,
   currentRating: PropTypes.number.isRequired,
   maxRating: PropTypes.number,
@@ -288,4 +281,4 @@ AvisCard.propTypes = {
   isAdmin: PropTypes.bool
 };
 
-export default AvisCard;
+export default AvisCardClient;

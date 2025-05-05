@@ -18,7 +18,7 @@ export default function DetailsDemandeClient() {
   const { data: categorie } = useGetCategorieByIdQuery(idCategorie, { skip: !idCategorie });
   const idUser = demande?.admin;
   const { data: admin } = useGetUserByIdQuery(idUser, { skip: !idUser });
-  console.log(demande);
+  // console.log(demande);
   const [updateDemande] = useUpdateDemandeMutation();
   const [deleteDemande] = useDeleteDemandeMutation();
   const [createAvis] = useCreateAvisMutation();
@@ -114,7 +114,7 @@ export default function DetailsDemandeClient() {
       }
   
       // Appel API direct sans passer par Redux
-      const response = await fetch(`https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`, {
+      const response = await fetch(`http://localhost:4000/api/factures/${facture.odooInvoiceId}/download`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }

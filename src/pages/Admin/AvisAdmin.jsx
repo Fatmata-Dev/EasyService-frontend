@@ -10,6 +10,7 @@ const AvisAdmin = () => {
   const { data: services } = useGetServicesQuery();
   const [selectedCategory, setSelectedCategory] = useState('Tous');
   const navigate = useNavigate();
+  // console.log(reviews);
 
   if (isError) {
     toast.error(error?.data?.message || "Erreur lors du chargement des avis");
@@ -30,7 +31,7 @@ const AvisAdmin = () => {
 
   // Fusionner les avis avec les données du service
   const enrichedReviews = reviews?.map(review => {
-    const service = servicesMap?.[review.service];
+    const service = servicesMap?.[review.service._id];
     return {
       ...review,
       service: service || null
@@ -52,7 +53,7 @@ const AvisAdmin = () => {
         (selectedCategory === 'Non catégorisé' && !review.service?.categorie)
       );
 
-      console.log(filteredReviews)
+      // console.log(filteredReviews)
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -105,15 +106,16 @@ const AvisAdmin = () => {
           <>
             {filteredReviews?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredReviews.map((review) => (
+                {[...filteredReviews].reverse().map((review) => (
+                  console.log(review),
                   <AvisCard
                     key={review._id}
                     review={{
                       id: review._id,
-                      image: review.service?.image || "/image3.jpeg",
-                      service: review.service?.nom || "Service supprimé",
-                      serviceId: review.service._id,
-                      date: new Date(review.dateSoumission).toLocaleDateString('fr-FR', {
+                      image: review?.service?.image || "/image3.jpeg",
+                      service: review?.service?.nom || "Service supprimé",
+                      serviceId: review?.service?._id,
+                      date: new Date(review?.dateSoumission).toLocaleDateString('fr-FR', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric'
@@ -123,7 +125,8 @@ const AvisAdmin = () => {
                       category: review.service?.categorie?.nom || "Non catégorisé",
                       note: review.note,
                       commentaire: review.commentaire,
-                      client: review.client ? `${review.client.prenom} ${review.client.nom}` : "Client anonyme"
+                      client: review?.client || "Client anonyme",
+                      demande: review?.demande
                     }}
                     currentRating={review.note || 0}
                     maxRating={5}

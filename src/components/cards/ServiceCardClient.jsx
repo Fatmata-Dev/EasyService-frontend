@@ -5,7 +5,7 @@ import ReservationModal from "../Modals/ReservationModal";
 const ServiceCardClient = ({ service }) => {
   const [showModal, setShowModal] = useState(false);
 
-  console.log(service);
+  // console.log(service);
 
   // Vérification que le service existe et a la bonne structure
   if (!service || typeof service !== 'object') {
@@ -74,7 +74,7 @@ const ServiceCardClient = ({ service }) => {
             to={`/client/services/${service._id}`}
             className="hover:font-semibold text-orange-500 text-center underline"
           >
-            Détail
+            Détails
           </Link>
         </div>
         <div className="flex justify-center w-full">
