@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { authApi,useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
 import { AuthContext } from "./authContext";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 
 
@@ -53,7 +54,20 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", newToken);
       setToken(newToken);
 
-      window.location.reload();
+      // window.location.reload();
+
+      console.log(response);
+
+      toast.success(
+        <span>
+          <p>
+            Bienvenu(e)
+            <strong className='font-bold capitalize'>{" "}{response?.user?.prenom} {response?.user?.nom}</strong>, vous êtes connecté en tant que
+            <strong className='font-bold capitalize'>{" "}{response?.user?.role}</strong>
+          </p>
+        </span>,
+        { duration: 5000 }
+      );
   
     } catch (err) {
       console.error("Login error:", err?.data?.message);

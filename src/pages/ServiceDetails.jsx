@@ -94,7 +94,7 @@ const ServiceDetails = () => {
             <img
               src={service.image || "Image indisponible"}
               alt={service.nom || "Image indisponible"}
-              className="w-full sm:max-w-lg rounded-lg shadow-md max-h-[400px]"
+              className="w-full sm:max-w-lg rounded-lg shadow-md max-h-[400px] object-cover w-full"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = "Image indisponible";

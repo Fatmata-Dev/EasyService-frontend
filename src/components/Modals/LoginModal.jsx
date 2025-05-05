@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginModal({
   onClose,
@@ -13,6 +14,7 @@ export default function LoginModal({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     if (message) {
       setError(message);
