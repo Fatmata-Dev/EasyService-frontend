@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import { 
   useGetSentMessagesQuery, 
   useGetReceivedMessagesQuery,
-  useMarkAsReadMutation
+  useMarkAsReadMutation,
+  // useGetUnreadMessagesQuery,
 } from "../../API/messagesApi";
 import MessageForm from "../Admin/MessageForm";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaEnvelope, FaSearch } from "react-icons/fa";
 
-const MessagesList = () => {
+const MessagesClient = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const currentUser = JSON.parse(localStorage.getItem("user")) || {};
   
@@ -33,6 +35,9 @@ const MessagesList = () => {
   });
 
   const [markAsRead] = useMarkAsReadMutation();
+  // const { data: unreadMessages } = useGetUnreadMessagesQuery();
+
+  // // console.log(unreadMessages);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -81,7 +86,7 @@ const MessagesList = () => {
 
   // Fonction pour vérifier si un message est non lu pour l'utilisateur actuel
   const isMessageUnread = (message) => {
-    console.log(message);
+    // console.log(message);
     if (message.expediteur?.email === currentUser.email) return false;
     
     return message.destinataires?.some(
@@ -110,16 +115,22 @@ const MessagesList = () => {
         className="bg-white rounded-lg sm:shadow-md sm:p-6"
       >
         {/* En-tête */}
-        <div className="flex justify-between items-center flex-wrap gap-2 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Messagerie Admin
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+            <FaEnvelope className="mr-2 text-orange-500" />
+            Mes Messages ({allMessages.map((message) => isMessageUnread(message) ? 1 : 0).reduce((a, b) => a + b, 0)} non lus)
           </h1>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Nouveau Message
-          </button>
+
+          <div className="relative mt-4 md:mt-0 w-full md:w-64">
+            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher un message..."
+              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* Formulaire de nouveau message */}
@@ -188,4 +199,4 @@ const MessagesList = () => {
   );
 };
 
-export default MessagesList;
+export default MessagesClient;

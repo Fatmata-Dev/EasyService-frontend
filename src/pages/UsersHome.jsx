@@ -1,13 +1,9 @@
 import { Outlet } from "react-router-dom";
-// import Sidebar from "../components/client/Sidebar";
-// import SidebarAdmin from "../components/Admin/SidebarAdmin";
-// import SidebarTechnicien from "../components/Technicien/SidebarTechnicien";
 import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useGetUserConnetedQuery } from "../API/authApi";
-// import axios from 'axios';
 import Sidebar from "../components/navigation/Sidebar";
 
 const UsersHome = () => {
@@ -15,7 +11,6 @@ const { data: user, isloading } = useGetUserConnetedQuery();
 const [isScrolled, setIsScrolled] = useState(false);
 const [messageShown, setMessageShown] = useState(false);
 const message = localStorage.getItem('message');
-// const navigate = useNavigate();
 const RoleBasedSidebar = ({ role }) => {
   if (role === "admin") return <SidebarAdmin user={user} />;
   if (role === "technicien") return <SidebarTechnicien user={user} />;
@@ -58,7 +53,7 @@ const RoleBasedSidebar = ({ role }) => {
       window.removeEventListener("scroll", handleScroll);
     };
     
-  }, [ message, user, messageShown ]);
+  }, [ message, user, messageShown]);
   
 
 //   if (!token) return navigate("/", { replace: true });

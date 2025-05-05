@@ -39,7 +39,7 @@ const ServiceCard = ({ service }) => {
             to={`/admin/services/${service?._id}`}
             className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded transition-colors hover:cursor-pointer"
           >
-            Détail
+            Détails
           </Link>
         </div>
       </div>

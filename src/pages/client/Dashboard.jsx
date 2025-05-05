@@ -264,7 +264,7 @@ const Dashboard = () => {
           <div className="space-y-4">
             {[...processedMessages].slice(0, 2).map((message) => (
               <div 
-                key={message._id} className={`flex gap-2 border border-gray-200 rounded-lg p-2 sm:p-4 hover:bg-gray-100 cursor-pointer ${
+                key={message._id} className={`flex gap-2 border rounded-lg p-2 sm:p-4 hover:bg-gray-100 cursor-pointer ${
                 message.unreaded ? "border-l-4 border-blue-500 bg-blue-50" : ""
                 }`} onClick={() => navigate(`/client/messages/${message._id}`)}
                 >
@@ -279,6 +279,13 @@ const Dashboard = () => {
                     <span className="text-xs text-gray-500">
                       {formatDate(message.createdAt)}
                     </span>
+                  </div>
+                  <div className="flex justify-start">
+                      {message.objet && (
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 text-gray-600">
+                          {message.objet}
+                        </span>
+                      )}
                   </div>
                   <p className="text-gray-600 mt-1 line-clamp-2">{message.contenu}</p>
                 </div>

@@ -1,24 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useGetTechniciensQuery } from "../../API/authApi";
 import { useAssignerDemandeMutation } from "../../API/demandesApi";
-import { useSelector } from "react-redux";
+import { useAuth } from "../../context/useAuth";
 
 export default function AssignTechnicienModal({
   setShowModal,
   demande,
 }) {
   const [selectedTechnicien, setSelectedTechnicien] = useState("");
-  const adminId = useSelector(state => state?.auth?.user?.id) || JSON.parse(localStorage.getItem("user"))?.id;
+  const { user } = useAuth();
+  const adminId = user;
   
 
   // Récupération des techniciens via RTK Query
   const { 
     data: techniciensData, 
     isLoading: isLoadingTechniciens, 
-    error: techniciensError 
+    error: techniciensError ,
+    refetch
   } = useGetTechniciensQuery();
 
   console.log(techniciensData);
@@ -35,6 +37,10 @@ export default function AssignTechnicienModal({
     tech._id && tech.prenom && tech.nom && tech.disponible
   ) || [];
 
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -43,11 +49,13 @@ export default function AssignTechnicienModal({
       return;
     }
 
+    // console.log(demande);
+
     try {
       await assignerDemande({
         demandeId: demande._id,
         technicienId: selectedTechnicien,
-        adminId: adminId
+        adminId: adminId._id
       }).unwrap();
 
       toast.success("Technicien assigné avec succès");

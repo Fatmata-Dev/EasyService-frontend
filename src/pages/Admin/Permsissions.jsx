@@ -9,7 +9,7 @@ import {
   IoMdTrash,
   IoMdBuild 
 } from "react-icons/io";
-import { useGetUsersQuery, useUpdateUserMutation, useBlockUserMutation, useUnblockUserMutation } from "../../API/authApi";
+import { useGetUsersQuery, useUpdateUserRoleMutation, useBlockUserMutation, useUnblockUserMutation } from "../../API/authApi";
 import toast from "react-hot-toast";
 import TechnicienInfoModal from "../../components/Modals/TechnicienInfoModal";
 
@@ -25,7 +25,7 @@ export default function PermissionsAdmin() {
 
   // RTK Query hooks
   const { data: usersData, isLoading, error, refetch } = useGetUsersQuery();
-  const [updateUser] = useUpdateUserMutation();
+  const [updateUserRole] = useUpdateUserRoleMutation();
 
   useEffect(() => {
     if (usersData) {
@@ -70,7 +70,7 @@ export default function PermissionsAdmin() {
       const userToUpdate = users.find(user => user._id === userId);
       if (!userToUpdate) return;
 
-      await updateUser({
+      await updateUserRole({
         id: userId,
         body: { 
           role: userToUpdate.role,
@@ -80,7 +80,8 @@ export default function PermissionsAdmin() {
             categories: userToUpdate.categories || [],
             telephone: userToUpdate.telephone || '',
             firstConnexion: userToUpdate.firstConnexion !== undefined ? userToUpdate.firstConnexion : true,
-            disponible: userToUpdate.disponible !== undefined ? userToUpdate.disponible : true
+            disponible: userToUpdate.disponible !== undefined ? userToUpdate.disponible : true,
+            image: userToUpdate.image,
           } : {})
         }
       }).unwrap();

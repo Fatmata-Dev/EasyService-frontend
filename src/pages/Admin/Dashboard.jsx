@@ -23,6 +23,7 @@ import { Star, MessageSquare, User } from "react-feather";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
+import ProfilSignature from "../../assets/ProfileSignature.png";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -106,20 +107,20 @@ export default function DashboardAdmin() {
         {/* Statistiques */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white p-4 rounded-lg shadow animate-pulse h-28" />
+            <div key={i} className="bg-gray-200 p-4 rounded-lg shadow animate-pulse h-28" />
           ))}
         </div>
 
         {/* Graphiques */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow animate-pulse h-96" />
-          <div className="bg-white p-4 rounded-lg shadow animate-pulse h-96" />
+          <div className="bg-gray-200 p-4 rounded-lg shadow animate-pulse h-96" />
+          <div className="bg-gray-200 p-4 rounded-lg shadow animate-pulse h-96" />
         </div>
 
         {/* Avis et Messages */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded-lg shadow animate-pulse h-96" />
-          <div className="bg-white p-4 rounded-lg shadow animate-pulse h-96" />
+          <div className="bg-gray-200 p-4 rounded-lg shadow animate-pulse h-96" />
+          <div className="bg-gray-200 p-4 rounded-lg shadow animate-pulse h-96" />
         </div>
       </div>
     );
@@ -271,14 +272,23 @@ function AvisItem({ avis }) {
     });
   };
 
+  const { user } = useAuth();
+
   const navigate = useNavigate();
 
   return (
     <div className="border-b pb-3 last:border-0 cursor-pointer hover:bg-gray-100 p-2 rounded" onClick={() => navigate(`/admin/services/${avis?.service?._id}`)}>
       <div className="flex justify-between items-start">
-        <div>
-          <p className="font-medium">{avis.client?.nom || "Anonyme"}</p>
-          <p className="text-sm text-gray-500">{avis.service?.nom || "Service supprimé"}</p>
+        <div className="flex gap-2 items-center">
+          <img
+                src={user?.image?.url || ProfilSignature}
+                alt="Signature professionnelle"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+          <div className="flex flex-col justify-between items-between">
+            <p className="font-medium">{avis.client?.nom || "Anonyme"}</p>
+            <p className="text-sm text-gray-500">{avis.service?.nom || "Service supprimé"}</p>
+          </div>
         </div>
         <div className="flex items-center">
           {[...Array(5)].map((_, i) => (
@@ -319,7 +329,7 @@ function MessageItem({ message }) {
   
   // Vérification si le message est non lu pour l'utilisateur actuel
   const isUnread = message.destinataires?.some(
-    destinataire => destinataire?.utilisateur === currentUser._id && !destinataire?.lu
+    destinataire => destinataire?.email === currentUser.email && !destinataire?.lu
   );
 
   return (

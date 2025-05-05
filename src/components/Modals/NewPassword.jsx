@@ -1,9 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { useResetPasswordMutation } from "../../API/authApi";
 
 export default function NewPasswordModal({ onClose, onSwitchToLogin }) {
+  const [resetPassword, { isLoading, isError }] = useResetPasswordMutation();
   const [error, setError] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,15 +21,7 @@ export default function NewPasswordModal({ onClose, onSwitchToLogin }) {
     }
 
     try {
-      const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/reset-password",
-        { token, newPassword: password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await resetPassword({ token, newPassword: password }).unwrap();
 
       // Supprimer le token de l'URL sans recharger la page
       if (window.history.replaceState) {
@@ -36,12 +29,12 @@ export default function NewPasswordModal({ onClose, onSwitchToLogin }) {
         window.history.replaceState({}, document.title, newUrl);
       }
 
-      alert(response.data.message);
+      // alert(response?.data?.message);
       onClose(); // Fermer la modale après le changement de mot de passe
-      toast.success("Mot de passe changé avec succès !");
+      toast.success(response?.data?.message || "Mot de passe changé avec succès !");
     } catch (error) {
       const errorMsg =
-        error.response?.data?.message ||
+        error?.data?.message ||
         "Erreur lors du changement de mot de passe";
       setError(errorMsg);
       toast.error(errorMsg);
@@ -61,9 +54,9 @@ export default function NewPasswordModal({ onClose, onSwitchToLogin }) {
         <h3 className="font-bold text-lg text-center uppercase mb-3">
           Changement de mot de passe
         </h3>
-        {error && (
+        {(error || isError) && (
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-            {error}
+            {(error || isError)}
           </div>
         )}
         <form onSubmit={handleSubmit}>
@@ -95,10 +88,15 @@ export default function NewPasswordModal({ onClose, onSwitchToLogin }) {
             />
           </div>
           <button
+            disabled={isLoading}
             type="submit"
-            className="w-full bg-orange-500 text-white font-bold py-2 my-4 rounded hover:bg-orange-600"
+            className={`w-full bg-orange-500 text-white cursor-pointer font-bold py-2 my-4 rounded ${
+              isLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-orange-600"
+            }`}
           >
-            Envoyer
+            {isLoading ? "Confirmation en cours..." : "Confirmer"}
           </button>
           <div className="flex justify-center">
             <p>

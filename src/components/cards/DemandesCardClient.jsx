@@ -1,282 +1,428 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
-import { memo } from "react";
-import { useUpdateDemandeMutation, useDeleteDemandeMutation, useGetFacturesQuery  } from "../../API/demandesApi";
-// import { useDownloadFactureMutation } from "../../API/demandesApi";
+import {
+  FileText,
+  Trash2,
+  XCircle,
+  CheckCircle,
+  Eye,
+  Star,
+  Calendar,
+  User,
+  Clock,
+  Play,
+  ChevronRight,
+  ArrowRight
+} from "lucide-react";
+import {
+  useUpdateDemandeMutation,
+  useDeleteDemandeMutation,
+  useGetFacturesQuery,
+} from "../../API/demandesApi";
 import { useCreateAvisMutation } from "../../API/servicesApi";
+import { MessageSquare, X, ThumbsUp } from "react-feather";
 
 const DemandesCardClient = memo(({ demande, onRefresh }) => {
   const navigate = useNavigate();
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({
     note: demande.note || "",
     commentaire: demande.commentaire || "",
   });
 
-  // Utilisation des hooks RTK Query
   const [updateDemande] = useUpdateDemandeMutation();
   const [deleteDemande] = useDeleteDemandeMutation();
   const [createAvis] = useCreateAvisMutation();
   const { data: factures = [] } = useGetFacturesQuery();
-  // const [downloadFacture] = useDownloadFactureMutation();
+
+  const handleFeedbackChange = (e) => {
+    const { name, value } = e.target;
+    setFeedback(prev => ({ ...prev, [name]: value }));
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "Non définie";
     try {
-      return format(parseISO(dateString), "dd/MM/yyyy à HH:mm", { locale: fr });
+      return format(parseISO(dateString), "dd/MM/yyyy", { locale: fr });
+    } catch {
+      return dateString;
+    }
+  };
+  const formatHeure = (dateString) => {
+    if (!dateString) return "Non définie";
+    try {
+      return format(parseISO(dateString), "HH:mm", { locale: fr });
     } catch {
       return dateString;
     }
   };
 
   const statutConfig = {
-    en_attente: { label: "En attente", color: "bg-yellow-500" },
-    acceptee: { label: "Acceptée", color: "bg-indigo-500" },
-    en_cours: { label: "En cours", color: "bg-blue-500" },
-    terminee: { label: "Terminée", color: "bg-green-500" },
-    annulee: { label: "Annulée", color: "bg-red-500" },
-    refusee: { label: "Refusée", color: "bg-gray-500" },
+    en_attente: { 
+      label: "En attente", 
+      icon: <Clock className="w-4 h-4 mr-1 text-yellow-600" />,
+      color: "bg-yellow-100 text-yellow-800"
+    },
+    acceptee: { 
+      label: "Acceptée", 
+      icon: <CheckCircle className="w-4 h-4 mr-1 text-blue-600" />,
+      color: "bg-blue-100 text-blue-800"
+    },
+    en_cours: { 
+      label: "En cours", 
+      icon: <Play className="w-4 h-4 mr-1 text-indigo-600" />,
+      color: "bg-indigo-100 text-indigo-800"
+    },
+    terminee: { 
+      label: "Terminée", 
+      icon: <CheckCircle className="w-4 h-4 mr-1 text-green-600" />,
+      color: "bg-green-100 text-green-800"
+    },
+    annulee: { 
+      label: "Annulée", 
+      icon: <XCircle className="w-4 h-4 mr-1 text-red-600" />,
+      color: "bg-red-100 text-red-800"
+    },
+    refusee: { 
+      label: "Refusée", 
+      icon: <XCircle className="w-4 h-4 mr-1 text-gray-600" />,
+      color: "bg-gray-100 text-gray-800"
+    },
   };
 
-const generateFacture = async (id) => {
-  try {
-    const facture = factures.find(f => f.refDemande === id);
-    if (!facture) {
-      toast.error("Aucune facture trouvée pour cette demande");
-      return;
+  const generateFacture = async (id) => {
+    try {
+      const facture = factures.find((f) => f.refDemande === id);
+      if (!facture) return toast.error("Aucune facture trouvée");
+      const response = await fetch(
+        `http://localhost:4000/api/factures/${facture.odooInvoiceId}/download`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
+      );
+      if (!response.ok) throw new Error("Erreur de téléchargement");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "facture.pdf";
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+      toast.success("Facture téléchargée");
+    } catch (err) {
+      toast.error(err.message || "Erreur lors du téléchargement");
     }
-
-    // Appel API direct sans passer par Redux
-    const response = await fetch(`https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      }
-    });
-
-    if (!response.ok) throw new Error("Erreur de téléchargement");
-
-    const blob = await response.blob();
-    const contentDisposition = response.headers.get('content-disposition');
-    
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    
-    let filename = 'facture.pdf';
-    if (contentDisposition) {
-      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-      if (filenameMatch?.[1]) filename = filenameMatch[1];
-    }
-    
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    
-    setTimeout(() => {
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-    }, 100);
-    
-    toast.success("Facture téléchargée avec succès");
-  } catch (err) {
-    console.error("Erreur de téléchargement:", err);
-    toast.error(err.message || "Erreur lors du téléchargement");
-  }
-};
+  };
 
   const handleCancel = async (id) => {
-    if (!window.confirm("Voulez-vous annuler cette demande ?")) return;
-
+    if (!window.confirm("Annuler cette demande ?")) return;
     try {
-      await updateDemande({
-        id,
-        body: { statut: "annulee", etatExecution: "annulee" }
-      }).unwrap();
-      toast.success("Demande annulée avec succès");
+      await updateDemande({ id, body: { statut: "annulee", etatExecution: "annulee" } }).unwrap();
+      toast.success("Demande annulée");
       navigate("/client/demandes");
-      onRefresh?.(); // appeler le refetch du parent
+      onRefresh?.();
     } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de l'annulation de la demande");
+      toast.error(err.data?.message || "Erreur lors de l'annulation");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Voulez-vous supprimer cette demande ?")) return;
-
+    if (!window.confirm("Supprimer cette demande ?")) return;
     try {
       await deleteDemande(id).unwrap();
-      toast.success("Demande supprimée avec succès");
+      toast.success("Demande supprimée");
       navigate("/client/demandes");
-      onRefresh?.(); // appeler le refetch du parent
+      onRefresh?.();
     } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la suppression de la demande");
+      toast.error(err.data?.message || "Erreur lors de la suppression");
     }
   };
+
+  console.log(demande);
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
 
+    if (!feedback.note || feedback.note < 1 || feedback.note > 5) {
+          toast.error("Veuillez donner une note valide entre 1 et 5");
+          return;
+        }
+    
+    setIsSubmitting(true);
+
     try {
       await createAvis({
         ...feedback,
-        client: demande?.clientId,
-        technicien: demande?.technicienId,
+        client: demande?.client?._id,
+        technicien: demande?.technicien?._id,
         service: demande?.serviceId,
-        demande: demande?._id
+        demande: demande?._id,
       }).unwrap();
-
-      toast.success("Évaluation soumise avec succès");
+      toast.success("Évaluation envoyée");
       setFeedback({ note: "", commentaire: "" });
       setShowFeedbackForm(false);
-      onRefresh?.(); // appeler le refetch du parent
+      onRefresh?.();
+      navigate('/client/avis', { replace: true });
     } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la soumission de l'évaluation");
+      toast.error(err.data?.message || "Erreur lors de l'envoi");
+    } finally {
+      setIsSubmitting(false);
     }
-  };
-
-  const handleFeedbackChange = (e) => {
-    const { name, value } = e.target;
-    setFeedback((prev) => ({ ...prev, [name]: value }));
   };
 
   const currentStatut = statutConfig[demande?.statut] || statutConfig.refusee;
 
   return (
-    <div className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 flex flex-col">
-      <h2 className="text-orange-500 font-bold text-lg mb-2 uppercase text-center">
-        DEMANDE #{demande?.numeroDemande}
-      </h2>
-
-      <div className="space-y-2 mb-4">
-        <p>
-          <strong className="font-semibold pe-2">SERVICE :</strong>
-          <span className="text-orange-600">{demande?.service}</span>
-        </p>
-        <p>
-          <strong className="font-semibold pe-2">DATE :</strong>
-          {formatDate(demande?.dateDemande)}
-        </p>
-        <p>
-          <strong className="font-semibold pe-2">TECHNICIEN :</strong>
-          {`${demande?.technicienPrenom} ${demande?.technicienNom}`}
-        </p>
-        <p className="flex items-center flex-wrap">
-          <strong className="font-semibold pe-2">INTERVENTION :</strong>
-          {formatDate(demande?.dateIntervention)}
-        </p>
-        <p className="flex items-center">
-          <strong className="font-semibold pe-2">STATUT :</strong>
-          <span
-            className={`${currentStatut.color} text-white px-2 py-1 rounded-full text-sm`}
-          >
+    <div className="border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden">
+      <div className="p-4">
+        <div className="flex justify-between items-start flex-wrap mb-3">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Demande #{demande?.numeroDemande}
+          </h2>
+          <span className={`${currentStatut.color} px-2 py-1 rounded-full text-xs font-medium flex items-center`}>
+            {currentStatut.icon}
             {currentStatut.label}
           </span>
-        </p>
+        </div>
+
+        <div className="space-y-3 text-sm text-gray-600">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 mt-0.5">
+              <FileText className="w-4 h-4 text-gray-400" />
+            </div>
+            <div className="ml-2">
+              <p className="font-medium text-gray-700">{demande?.service}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                <p className="text-xs text-gray-500">Date demande</p>
+                <p className="font-medium">{formatDate(demande?.dateDemande)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                <p className="text-xs text-gray-500">Heure demande</p>
+                <p className="font-medium">{formatHeure(demande?.dateDemande)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                <p className="text-xs text-gray-500">Date intervention</p>
+                <p className="font-medium">{formatDate(demande?.dateIntervention)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <Calendar className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                <p className="text-xs text-gray-500">Heure intervention</p>
+                <p className="font-medium">{formatHeure(demande?.dateIntervention)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start">
+            <div className="flex-shrink-0 mt-0.5">
+              <User className="w-4 h-4 text-gray-400" />
+            </div>
+            <div className="ml-2">
+              <p className="text-xs text-gray-500">Technicien</p>
+              <p className="font-medium">
+                {demande?.technicienPrenom} {demande?.technicienNom || "Non assigné"}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Actions */}
-      <div className="mt-auto">
+      <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
         {["en_attente", "en_cours", "acceptee"].includes(demande?.statut) && (
-          <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
-            <Link
-              to={`/client/demandes/${demande?._id}`}
-              className="block text-center text-blue-500 hover:underline"
+          <div className="grid grid-cols-2 gap-2">
+            <Link 
+              to={`/client/demandes/${demande?._id}`} 
+              className="flex items-center justify-center bg-white text-gray-600 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium"
             >
-              Plus de détails
+              <Eye className="w-4 h-4 mr-1.5" /> 
+              Détails
+              <ChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
-              className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
               onClick={() => handleCancel(demande?._id)}
+              className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
+              <XCircle className="w-4 h-4 mr-1.5" />
               Annuler
             </button>
           </div>
         )}
 
         {["annulee", "refusee"].includes(demande?.statut) && (
-          <div className="flex justify-between gap-2 items-center mb-2 flex-wrap">
-            <Link
-              to={`/client/demandes/${demande?._id}`}
-              className="block text-center text-blue-500 hover:underline"
+          <div className="grid grid-cols-2 gap-2">
+            <Link 
+              to={`/client/demandes/${demande?._id}`} 
+              className="flex items-center justify-center bg-white text-gray-600 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium"
             >
-              Plus de détails
+              <Eye className="w-4 h-4 mr-1.5" /> 
+              Détails
+              <ChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
-              className="bg-red-500 text-white px-4 py-1.5 rounded hover:bg-red-600 w-fit"
               onClick={() => handleDelete(demande?._id)}
+              className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
+              <Trash2 className="w-4 h-4 mr-1.5" />
               Supprimer
             </button>
           </div>
         )}
 
         {demande?.statut === "terminee" && (
-          <>
-            <div className="flex justify-between gap-2 mb-2">
+          <div className="space-y-3">
+            <div className="flex gap-2">
               <button
-                className="bg-gray-500 text-white px-4 py-1.5 rounded hover:bg-gray-600 flex-1"
                 onClick={() => generateFacture(demande?._id)}
+                className="flex-1 flex items-center justify-center bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium"
               >
+                <FileText className="w-4 h-4 mr-1.5" /> 
                 Facture
               </button>
               <button
-                className={`${
-                  showFeedbackForm ? "bg-gray-500" : "bg-orange-500"
-                } text-white px-4 py-1.5 rounded hover:bg-orange-600 flex-1`}
                 onClick={() => setShowFeedbackForm(!showFeedbackForm)}
+                className="flex-1 flex items-center justify-center bg-white border border-yellow-300 hover:bg-yellow-100 text-yellow-700 py-2 rounded text-sm font-medium"
               >
-                {showFeedbackForm ? "Masquer" : "Noter"}
+                <Star className="w-4 h-4 mr-1.5" />
+                {showFeedbackForm ? "Masquer" : "Évaluer"}
               </button>
+            </div>
+            <div className="flex justify-center items-center">
+              <Link
+                to={`/client/demandes/${demande?._id}`}
+                className="inline-flex items-center text-sm p-2 text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Voir les détails <ArrowRight size={14} className="ml-1" />
+              </Link>
             </div>
 
             {showFeedbackForm && (
-              <form onSubmit={handleFeedbackSubmit} className="mt-2 space-y-2">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Note (1-5)
-                  </label>
-                  <input
-                    type="number"
-                    name="note"
-                    min="1"
-                    max="5"
-                    value={feedback.note}
-                    onChange={handleFeedbackChange}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Commentaire
-                  </label>
-                  <textarea
-                    name="commentaire"
-                    value={feedback.commentaire}
-                    onChange={handleFeedbackChange}
-                    className="w-full p-2 border rounded"
-                    rows="2"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-orange-500 text-white py-1.5 rounded hover:bg-orange-600"
-                >
-                  Soumettre
-                </button>
-              </form>
-            )}
-
-            <Link
-              to={`/client/demandes/${demande?._id}`}
-              className="block text-center mt-2 text-blue-500 hover:underline"
+        <div className="p-5 border-t border-gray-100 bg-gray-50">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+              <MessageSquare size={18} className="mr-2 text-orange-500" />
+              Donnez votre avis
+            </h3>
+            <button 
+              onClick={() => setShowFeedbackForm(false)}
+              className="text-gray-400 hover:text-gray-600"
             >
-              Plus de détails
-            </Link>
-          </>
+              <X size={18} />
+            </button>
+          </div>
+          
+          <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Votre note
+              </label>
+              <div className="flex items-center justify-between">
+                <div className="flex space-x-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedback(prev => ({ ...prev, note: star }))}
+                      className={`p-1 rounded-full ${
+                        feedback.note >= star 
+                          ? 'bg-yellow-100 text-yellow-500' 
+                          : 'text-gray-300 hover:text-yellow-400'
+                      }`}
+                    >
+                      <Star size={20} className={feedback.note >= star ? 'fill-current' : ''} />
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="number"
+                  name="note"
+                  min="1"
+                  max="5"
+                  value={feedback.note}
+                  onChange={handleFeedbackChange}
+                  className="w-14 px-2 py-1 border border-gray-300 rounded text-center text-sm"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Votre commentaire
+              </label>
+              <textarea
+                name="commentaire"
+                value={feedback.commentaire}
+                onChange={handleFeedbackChange}
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                rows="3"
+                placeholder="Décrivez votre expérience..."
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowFeedbackForm(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center"
+              >
+                <X size={16} className="mr-1" />
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-70 flex items-center"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Clock size={16} className="mr-1 animate-spin" />
+                    Envoi...
+                  </>
+                ) : (
+                  <>
+                    <ThumbsUp size={16} className="mr-1" />
+                    Envoyer
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+          </div>
         )}
       </div>
     </div>

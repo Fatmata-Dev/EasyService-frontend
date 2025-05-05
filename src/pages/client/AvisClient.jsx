@@ -1,13 +1,13 @@
 import { useOutletContext } from 'react-router-dom';
 import { useGetAvisQuery, useGetServicesQuery, useGetCategoriesQuery } from '../../API/servicesApi';
 import { useGetDemandeForClientIdQuery } from '../../API/demandesApi';
-import AvisCard from "../../components/cards/AvisCard";
+import { useGetUserByIdQuery } from '../../API/authApi';
 import { FaStar, FaRegStar, FaUserCircle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useGetTechniciensQuery, useGetUsersQuery } from '../../API/authApi';
 import { Link } from 'react-router-dom';
+import AvisCardClient from '../../components/cards/AvisCardClient';
 
 const AvisClient = () => {
   const { user } = useOutletContext();
@@ -18,9 +18,8 @@ const AvisClient = () => {
   });
   const { data: existingAvis = [], refetch: refetchAvis } = useGetAvisQuery();
   const { data: services = [] } = useGetServicesQuery();
-  const { data: techniciens = [] } = useGetTechniciensQuery();
-  const { data: users = [] } = useGetUsersQuery();
   const { data: categories = [] } = useGetCategoriesQuery();
+  const { data: perosonnes = [] } = useGetUserByIdQuery();
 
   // Formatage de date
   const formatDate = (dateString) => {
@@ -33,6 +32,8 @@ const AvisClient = () => {
     }
   };
 
+  console.log(existingAvis);
+
   // Fonctions utilitaires
   const getCategorieNom = (categorieId) => {
     return categories.find(cat => cat._id === categorieId)?.nom || "-";
@@ -42,18 +43,14 @@ const AvisClient = () => {
     return services.find(service => service._id === serviceId) || { nom: "Service inconnu" };
   };
 
-  const getTechnicienById = (technicienId) => {
-    return techniciens.find(tech => tech._id === technicienId) || { prenom: "Technicien", nom: "Inconnu" };
-  };
-
-  const getAdminById = (adminId) => {
-    return users.find(user => user._id === adminId) || { prenom: "Admin", nom: "Inconnu" };
+  const getUserById = (userId) => {
+    return perosonnes.find(personne => personne._id === userId) || { nom: "Admin inconnu" };
   };
 
   // Filtrer les demandes terminées non encore notées
   const demandesANoter = demandes.filter(demande => 
     demande.statut === 'terminee' && 
-    !existingAvis.some(avis => avis.demande === demande._id)
+    !existingAvis.some(avis => avis?.demande?._id === demande._id)
   );
 
 
@@ -81,7 +78,7 @@ const AvisClient = () => {
 
   if (isLoadingDemandes) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
       </div>
     );
@@ -89,7 +86,7 @@ const AvisClient = () => {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gray-50 p-6"
+      className="min-h-screen bg-gray-50 p-4"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -99,7 +96,7 @@ const AvisClient = () => {
         {demandesANoter.length > 0 && (
           <>
             <div className="flex justify-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-2xl font-bold text-gray-800">
                 Services à évaluer ({demandesANoter.length})
               </h1>
             </div>
@@ -114,7 +111,7 @@ const AvisClient = () => {
                 
                 return (
                   <motion.div key={demande._id} variants={itemVariants}>
-                    <AvisCard
+                    <AvisCardClient
                       demande={demande}
                       review={{
                         id: demande._id,
@@ -142,16 +139,15 @@ const AvisClient = () => {
 
         {/* Section Avis déjà donnés */}
         {existingAvis.length > 0 && (
-          <div className="mt-16">
+          <div className={`${demandesANoter.length > 0 ? "mt-12" : ""}`}>
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
               Vos évaluations ({existingAvis.length})
             </h2>
             <div className="space-y-6">
               {[...existingAvis].reverse().map((avis) => {
-                const service = getServiceById(avis.service);
-                const technicien = getTechnicienById(avis.technicien);
-                const demande = demandes.find(d => d._id === avis.demande) || {};
-                const admin = getAdminById(demande.admin);
+                const admin = getUserById(avis?.demande?.admin);
+                console.log(avis.demande.admin)
+                console.log(user._id)
 
                 return (
                   <motion.div 
@@ -167,10 +163,10 @@ const AvisClient = () => {
                           </div>
                           <div>
                             <h3 className="font-semibold text-lg text-gray-800">
-                              {service.nom}
+                              {avis?.service?.nom}
                             </h3>
                             <p className="text-gray-500 text-sm">
-                              Terminé le {formatDate(demande.dates?.finIntervention)}
+                              Terminé le {formatDate(avis?.demande?.dates?.finIntervention)}
                             </p>
                           </div>
                         </div>
@@ -197,10 +193,10 @@ const AvisClient = () => {
 
                       <div className="md:w-1/3 border-l md:pl-6 pl-3">
                         <div className="flex items-center gap-3 mb-4">
-                          {technicien.image ? (
+                          {avis?.technicien?.image ? (
                             <img 
-                              src={technicien.image} 
-                              alt={`${technicien.prenom} ${technicien.nom}`}
+                              src={avis?.technicien?.image?.url} 
+                              alt={`${avis?.technicien?.prenom} ${avis?.technicien?.nom}`}
                               className="w-12 h-12 rounded-full object-cover"
                             />
                           ) : (
@@ -208,7 +204,8 @@ const AvisClient = () => {
                           )}
                           <div>
                             <h4 className="font-medium capitalize">
-                              {technicien.prenom} {technicien.nom}
+                              {avis?.technicien?.prenom && avis?.technicien?.prenom.length > 8 ? `${avis?.technicien?.prenom.slice(0, 1) || ""}. ` : `${avis?.technicien?.prenom}`} {" "}
+                              { avis?.technicien?.nom && avis?.technicien?.nom.length > 7 ? `${avis?.technicien?.nom.charAt(0).toUpperCase() || ""}. ` : `${avis?.technicien?.nom}`}
                             </h4>
                             <p className="text-sm text-gray-500">Technicien</p>
                           </div>
@@ -218,20 +215,23 @@ const AvisClient = () => {
                           <p>
                             <span className="font-medium">Date d'évaluation:</span> {formatDate(avis.dateSoumission)}
                           </p>
-                          {service.tarif && (
+                          {avis?.service?.tarif && (
                             <p>
-                              <span className="font-medium">Prix:</span> {service.tarif} FCFA
+                              <span className="font-medium">Prix:</span> {avis?.service?.tarif} FCFA
                             </p>
                           )}
                           <p>
-                            <span className="font-medium">Admin:</span> {admin.prenom} {admin.nom}
+                            <span className="font-medium">Admin:</span>
+                            
+                            {admin?.prenom && admin?.prenom.length > 8 ? `${admin?.prenom.slice(0, 1) || ""}. ` : `${admin?.prenom}`} {" "}
+                            { admin?.nom && admin?.nom.length > 7 ? `${admin?.nom.charAt(0).toUpperCase() || ""}. ` : `${admin?.nom}`}
                           </p>
                         </div>
                       </div>
                     </div>
                     <div className="flex justify-center mt-2">
                         <Link
-                          to={`/${user.role}/demandes/${demande._id}`}
+                          to={`/${user.role}/demandes/${avis?.demande?._id}`}
                           className="block text-center text-blue-500 hover:underline"
                         >
                           Voir le service

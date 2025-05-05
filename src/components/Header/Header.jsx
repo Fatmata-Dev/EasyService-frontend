@@ -24,17 +24,22 @@ const Header = ({ user }) => {
     return isUnread ? count + 1 : count;
   }, 0);
 
-  const handleLogout = () => {
-    navigate("/");
-    logout();
-    window.location.reload();
-    toast.success("Déconnexion réussie");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Déconnexion réussie");
+      // Optionnel: Rediriger immédiatement si nécessaire
+      // navigate("/");
+    } catch (error) {
+      toast.error("Erreur lors de la déconnexion");
+      console.error("Logout error:", error);
+    }
   };
 
   return (
     <div className="bg-gray-50 sticky top-0 z-10 p-2 w-full">
       <div className="flex items-center justify-between mx-3">
-        <FiMenu className="text-3xl md:hidden cursor-pointer" />
+        <FiMenu className="text-2xl md:hidden cursor-pointer" />
         
         <Link to="dashboard" className="ml-8 hidden md:block">
           <img 
@@ -96,7 +101,7 @@ const Header = ({ user }) => {
 
           {/* Image utilisateur */}
           <img
-            src={ProfileSignature}
+            src={user?.image?.url || ProfileSignature}
             alt="Profil utilisateur"
             className="w-10 h-10 rounded-full object-cover cursor-pointer"
             onClick={() => navigate(`/${user?.role}/profil/${user?._id}`)}

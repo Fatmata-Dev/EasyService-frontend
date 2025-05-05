@@ -1,23 +1,18 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 export default function LoginModal({
   onClose,
   onSwitchToSignup,
   onSwitchToForgetPassword,
   message,
-  isConnected,
 }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { id } = useParams();
-
   useEffect(() => {
     if (message) {
       setError(message);
@@ -31,33 +26,13 @@ export default function LoginModal({
     setError("");
 
     try {
-      const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem(
-        "message", true
-      );
-
-      if ((response.data.token && response.data.user.role) || isConnected) {
-        if (isConnected) {
-          navigate(`/${response.data.user.role}/services/${id}`);
-        } else {
-          navigate(`/${response.data.user.role}/dashboard`);
-          window.location.reload();
-        }
-      }
-      // console.log(response.data);
+      const jsonData = { email, password };
+      await login(jsonData);
 
       onClose(); // Fermer la modale après connexion
     } catch (err) {
-      setError(err.response?.data?.message || "Échec de la connexion");
+      console.error(err);
+      setError(err || "Échec de la connexion");
     } finally {
       setIsLoading(false);
     }

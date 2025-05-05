@@ -3,13 +3,13 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://easyservice-backend-iv29.onrender.com/api",
+    baseUrl: "http://localhost:4000/api",
     prepareHeaders: (headers, { endpoint }) => {
       const token = localStorage.getItem("authToken");
       if (token) headers.set("Authorization", `Bearer ${token}`);
 
       // Ne pas définir Content-Type pour les uploads de fichiers
-      if (!["updateUser"].includes(endpoint)) {
+      if (!["updateUserProfile"].includes(endpoint)) {
         headers.set("Content-Type", "application/json");
       }
 
@@ -57,13 +57,22 @@ export const authApi = createApi({
       invalidatesTags: ["User"],
     }),
 
-    updateUser: builder.mutation({
+    updateUserProfile: builder.mutation({
       query: ({ id, body }) => ({
         url: `/auth/users/${id}`,
         method: "PUT",
         body,
       }),
       invalidatesTags: ["User"],
+    }),
+
+    updateUserRole: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/auth/users/${id}/change-role`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["User", "Technicien"],
     }),
 
     createTechnicien: builder.mutation({
@@ -137,7 +146,8 @@ export const {
   useGetUserByIdQuery,
   useUserRegisterMutation,
   useUserLoginMutation,
-  useUpdateUserMutation,
+  useUpdateUserProfileMutation,
+  useUpdateUserRoleMutation,
   useCreateTechnicienMutation,
   useGetTechniciensQuery,
   useUpdateToTechnicienMutation,

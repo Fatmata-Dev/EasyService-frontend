@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { 
   useGetSentMessagesQuery, 
   useGetReceivedMessagesQuery,
-  useMarkAsReadMutation
+  useMarkAsReadMutation,
+  // useGetUnreadMessagesQuery
 } from "../../API/messagesApi";
 import MessageForm from "./MessageForm";
 import { FaUserCircle } from "react-icons/fa";
@@ -33,6 +34,9 @@ const MessagesList = () => {
   });
 
   const [markAsRead] = useMarkAsReadMutation();
+
+  // const { data : unreadMessages } = useGetUnreadMessagesQuery();
+  // console.log(unreadMessages);
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -81,7 +85,7 @@ const MessagesList = () => {
 
   // Fonction pour vérifier si un message est non lu pour l'utilisateur actuel
   const isMessageUnread = (message) => {
-    console.log(message);
+    // console.log(message);
     if (message.expediteur?.email === currentUser.email) return false;
     
     return message.destinataires?.some(

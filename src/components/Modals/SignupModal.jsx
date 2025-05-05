@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { useUserRegisterMutation } from "../../API/authApi";
 
 export default function SignupModal({ onClose, onSwitchToLogin }) {
   const [error, setError] = useState("");
@@ -12,6 +12,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
     terms: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [register, { isLoading, isError }] = useUserRegisterMutation();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -21,42 +22,42 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
     }));
   };
 
-  const validateForm = () => {
-    if (
-      !formData.nom ||
-      !formData.prenom ||
-      !formData.email ||
-      !formData.password
-    ) {
-      setError("Veuillez remplir tous les champs");
-      return false;
-    }
+  // const validateForm = () => {
+  //   if (
+  //     !formData.nom ||
+  //     !formData.prenom ||
+  //     !formData.email ||
+  //     !formData.password
+  //   ) {
+  //     setError("Veuillez remplir tous les champs");
+  //     return false;
+  //   }
 
-    if (!formData.terms) {
-      setError("Veuillez accepter les conditions générales");
-      return false;
-    }
+  //   if (!formData.terms) {
+  //     setError("Veuillez accepter les conditions générales");
+  //     return false;
+  //   }
 
-    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      setError("Veuillez entrer une adresse email valide");
-      return false;
-    }
+  //   if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+  //     setError("Veuillez entrer une adresse email valide");
+  //     return false;
+  //   }
 
-    if (formData.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return false;
-    }
+  //   if (formData.password.length < 6) {
+  //     setError("Le mot de passe doit contenir au moins 6 caractères");
+  //     return false;
+  //   }
 
-    return true;
-  };
+  //   return true;
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //   return;
+    // }
 
     setIsSubmitting(true);
 
@@ -68,14 +69,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
         password: formData.password,
         role: "client",
       };
-      const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/register",
-        JSON.stringify(jsonData),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
+      const response = await register(jsonData).unwrap();
 
       if (response.data.errors) {
         setError(response.data.message || "Erreur lors de l'inscription");
@@ -108,7 +102,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
           Inscription
         </h2>
 
-        {error && (
+        {(error || isError) && (
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
             {error}
           </div>
@@ -212,12 +206,12 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             type="submit"
             disabled={isSubmitting}
             className={`w-full bg-orange-500 text-white font-bold py-2 my-4 rounded ${
-              isSubmitting
+              (isSubmitting || isLoading)
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:bg-orange-600"
             }`}
           >
-            {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
+            {(isSubmitting || isLoading) ? "Inscription en cours..." : "S'inscrire"}
           </button>
 
           <p className="text-center text-gray-600">

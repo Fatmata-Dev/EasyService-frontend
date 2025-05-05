@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const messagesApi = createApi({
   reducerPath: "messagesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://easyservice-backend-iv29.onrender.com/api",
+    baseUrl: "http://localhost:4000/api",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("authToken");
       if (token) headers.set("Authorization", `Bearer ${token}`);
@@ -16,19 +16,23 @@ export const messagesApi = createApi({
       query: () => "/messages",
       providesTags: ["Message"],
     }),
+
     getMessageById: builder.query({
       query: (id) => `/messages/${id}`,
       providesTags: (result, error, id) => [{ type: "Message", id }],
       transformResponse: (response) => response.data,
     }),
+
     getSentMessages: builder.query({
       query: () => "/messages/envoyes",
       providesTags: ["Message"],
     }),
+
     getReceivedMessages: builder.query({
       query: () => "/messages/recus",
       providesTags: ["Message"],
     }),
+
     createMessage: builder.mutation({
       query: (message) => ({
         url: "/messages",
@@ -37,6 +41,7 @@ export const messagesApi = createApi({
       }),
       invalidatesTags: ["Message"],
     }),
+
     deleteMessage: builder.mutation({
       query: (id) => ({
         url: `/messages/${id}`,
@@ -44,12 +49,19 @@ export const messagesApi = createApi({
       }),
       invalidatesTags: ["Message"],
     }),
+
     markAsRead: builder.mutation({
       query: (id) => ({
         url: `/messages/${id}/lu`,
         method: "PUT",
       }),
       invalidatesTags: ["Message"],
+    }),
+
+    getUnreadMessages: builder.query({
+      query: () => `/messages/non-lus/count`,
+      providesTags: ["Message"],
+      transformResponse: (response) => response.data,
     }),
   }),
 });
@@ -62,4 +74,5 @@ export const {
   useCreateMessageMutation,
   useDeleteMessageMutation,
   useMarkAsReadMutation,
+  useGetUnreadMessagesQuery
 } = messagesApi;

@@ -151,7 +151,7 @@ export default function FooterSection() {
                   {section === "contact" && "Contact"}
                 </ScrollLink>
               ) : (
-                <RouterLink
+                <Link
                   to="/"
                   onClick={() =>
                     sessionStorage.setItem("scrollToSection", section)
@@ -162,7 +162,7 @@ export default function FooterSection() {
                   {section === "services" && "Services"}
                   {section === "testimonials" && "Témoignages"}
                   {section === "contact" && "Contact"}
-                </RouterLink>
+                </Link>
               )}
             </div>
           ))}

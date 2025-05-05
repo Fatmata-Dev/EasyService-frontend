@@ -17,7 +17,7 @@ export default function Demands() {
     if (!statut) return "";
     const s = statut.toLowerCase().trim();
     if (s.includes("attente")) return "en_attente";
-    if (s.includes("acceptee")) return "acceptee";
+    if (s.includes("accept")) return "acceptee";
     if (s.includes("cours")) return "en_cours";
     if (s.includes("annul")) return "annulee";
     if (s.includes("refus")) return "refusee";
@@ -48,7 +48,7 @@ export default function Demands() {
         serviceId: serviceObj?._id || demande.service,
         clientPrenom: clientObj?.prenom || "Client non spécifié",
         clientNom: clientObj?.nom || "",
-        technicienPrenom: technicienObj?.prenom || "À définir",
+        technicienPrenom: technicienObj?.prenom || "",
         technicienNom: technicienObj?.nom || "",
         statutNormalise: normalizeStatut(demande.statut),
       };
@@ -104,7 +104,8 @@ export default function Demands() {
   // Réinitialiser la page quand on change d'onglet
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab]);
+    refetch();
+  }, [activeTab, refetch]);
 
   // Loading state
   if (!response) {

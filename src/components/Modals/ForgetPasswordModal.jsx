@@ -1,21 +1,19 @@
 import React from "react";
-import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useForgotPasswordMutation } from "../../API/authApi";
 
 export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
+  const [forgotPassword, { isLoading, isError }] = useForgotPasswordMutation();
   const [error, setError] = useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     try {
-      const response = await axios.post(
-        "https://easyservice-backend-iv29.onrender.com/api/auth/forgot-password",
-        { email }
-      );
-      alert(response.data.message);
+      const response = await forgotPassword({ email }).unwrap();
+      // alert(response?.data?.message);
       onClose(); // Fermer la modale après l'envoi de l'email
-      toast.success("Email de réinitialisation envoyé avec succès !");
+      toast.success(response?.data?.message || "Email de réinitialisation envoyé avec succès !");
     } catch (error) {
       console.error(
         "Erreur lors de l'envoi de l'email de réinitialisation :",
@@ -35,7 +33,7 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-lg">Mot de passe oublié ?</h3>
-        {error && (
+        {(error || isError) && (
           <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
             {error}
           </div>
@@ -58,10 +56,15 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
             />
           </div>
           <button
+            disabled={isLoading}
             type="submit"
-            className="w-full bg-orange-500 text-white font-bold py-2 my-4 rounded hover:bg-orange-600"
+            className={`w-full bg-orange-500 text-white cursor-pointer font-bold py-2 my-4 rounded ${
+              isLoading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-orange-600"
+            }`}
           >
-            Envoyer
+            {isLoading ? "Envoi en cours..." : "Envoyer"}
           </button>
           <div className="flex justify-center">
             <p>
