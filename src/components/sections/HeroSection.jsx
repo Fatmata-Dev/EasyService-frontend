@@ -1,8 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-scroll";
 import { useState, useEffect } from "react";
 
-// Configuration d'animation réutilisable
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -11,23 +10,6 @@ const fadeInUp = {
     transition: { duration: 0.6, ease: "easeOut" },
   },
 };
-
-// const slideInRight = {
-//   hidden: { opacity: 0, x: 100 },
-//   visible: {
-//     opacity: 1,
-//     x: 0,
-//     transition: { duration: 0.8, ease: "anticipate" }
-//   }
-// };
-
-// Configuration d'hover pour les images
-// const imageHover = {
-//   hover: {
-//     scale: 1.05,
-//     transition: { duration: 0.6, ease: "easeOut" }
-//   }
-// };
 
 export default function HeroSection() {
   const backgroundImages = [
@@ -43,39 +25,52 @@ export default function HeroSection() {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-    }, 5000); // change every 2s
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+        setIsTransitioning(false);
+      }, 800); // Durée de la transition
+    }, 5000); // Changement toutes les 5 secondes
 
     return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
-  const backgroundStyle = {
-    backgroundImage: `url(${backgroundImages[currentIndex]})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  };
   return (
-    <section id="home" className="bg-gray-50 p-4">
-      <div
-        className="md:px-12 flex flex-col items-center lg:flex-row h-dvh -m-4 mb-2 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity"
-        style={backgroundStyle}
-      >
+    <section id="home" className="bg-gray-50 p-4 relative overflow-hidden">
+      {/* Conteneur principal avec fond animé */}
+      <div className="relative h-dvh -m-4 mb-2">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${backgroundImages[currentIndex]})`,
+              willChange: "opacity", // Optimisation pour les animations
+            }}
+          >
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Contenu superposé */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={{
-            visible: { transition: { staggerChildren: 0.3 } },
+            visible: { transition: { staggerChildren: 0.2 } },
           }}
-          className="text-center absolute bottom-0 right-[50%] translate-x-[50%] w-full mb-1"
+          className="absolute z-10 text-center absolute bottom-24 right-[50%] translate-x-[50%] w-full mb-1"
         >
-          <motion.h1
-            variants={fadeInUp}
-            className="text-4xl font-bold text-white"
-          >
+          <motion.h1 variants={fadeInUp} className="text-4xl font-bold text-white">
             Bienvenue sur <span className="text-orange-500">EasyService</span>
           </motion.h1>
 
@@ -96,45 +91,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Section images avec animations */}
-      {/* <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="grid grid-cols-2 w-100 md:w-1/2"
-        >
-          <motion.img 
-            src="/mecano.jpg" 
-            alt="Mécanicien"
-            className="h-full object-cover cursor-pointer"
-            whileHover="hover"
-            variants={imageHover}
-          />
-          <div className="flex flex-col">
-            <motion.img 
-              src="/13430.jpg" 
-              alt="Service client"
-              className="cursor-pointer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              whileHover="hover"
-              variants={imageHover}
-            />
-            <motion.img 
-              src="/dev.jpg" 
-              alt="Développement"
-              className="cursor-pointer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              whileHover="hover"
-              variants={imageHover}
-            />
-          </div>
-        </motion.div> */}
-
-      {/* Section Femme */}
+      {/* Sections suivantes (inchangées) */}
       <div className="flex flex-col items-center sm:flex-row md:px-12 md:mx-12">
         <motion.div
           initial={{ opacity: 0, x: -100 }}

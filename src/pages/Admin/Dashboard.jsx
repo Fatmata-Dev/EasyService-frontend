@@ -46,7 +46,7 @@ export default function DashboardAdmin() {
 
   // Fusionner les avis avec les données du service
   const enrichedAvis = avis?.map(avisItem => {
-    const service = servicesMap?.[avisItem.service];
+    const service = servicesMap?.[avisItem.service?._id];
     return {
       ...avisItem,
       service: service || null
@@ -272,21 +272,22 @@ function AvisItem({ avis }) {
     });
   };
 
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   const navigate = useNavigate();
 
+  // console.log(avis);
   return (
     <div className="border-b pb-3 last:border-0 cursor-pointer hover:bg-gray-100 p-2 rounded" onClick={() => navigate(`/admin/services/${avis?.service?._id}`)}>
       <div className="flex justify-between items-start">
         <div className="flex gap-2 items-center">
           <img
-                src={user?.image?.url || ProfilSignature}
+                src={avis.client?.image?.url || ProfilSignature}
                 alt="Signature professionnelle"
                 className="w-12 h-12 rounded-full object-cover"
               />
           <div className="flex flex-col justify-between items-between">
-            <p className="font-medium">{avis.client?.nom || "Anonyme"}</p>
+            <p className="font-medium">{avis.client?.prenom || "Anonyme"} {avis.client?.nom || "Anonyme"}</p>
             <p className="text-sm text-gray-500">{avis.service?.nom || "Service supprimé"}</p>
           </div>
         </div>

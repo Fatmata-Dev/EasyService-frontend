@@ -2,14 +2,14 @@ import { Outlet } from "react-router-dom";
 import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 import { useGetUserConnetedQuery } from "../API/authApi";
 import Sidebar from "../components/navigation/Sidebar";
 
 const UsersHome = () => {
 const { data: user, isloading } = useGetUserConnetedQuery();
 const [isScrolled, setIsScrolled] = useState(false);
-const [messageShown, setMessageShown] = useState(false);
+// const [messageShown, setMessageShown] = useState(false);
 const message = localStorage.getItem('message');
 const RoleBasedSidebar = ({ role }) => {
   if (role === "admin") return <SidebarAdmin user={user} />;
@@ -32,28 +32,28 @@ const RoleBasedSidebar = ({ role }) => {
     window.addEventListener("scroll", handleScroll);
 
     
-    const message = localStorage.getItem('message');
+    // const message = localStorage.getItem('message');
 
-    if (message && user && !messageShown) {
-        toast.success(
-          <span>
-            <p>
-              Bienvenu(e)
-              <strong className='font-bold capitalize'>{" "}{user?.prenom} {user?.nom}</strong>, vous êtes connecté en tant que
-              <strong className='font-bold capitalize'>{" "}{user?.role}</strong>
-            </p>
-          </span>,
-          { duration: 5000 }
-        );
-        localStorage.removeItem('message');
-        setMessageShown(true);
-      }
+    // if (message && user && !messageShown) {
+    //     toast.success(
+    //       <span>
+    //         <p>
+    //           Bienvenu(e)
+    //           <strong className='font-bold capitalize'>{" "}{user?.prenom} {user?.nom}</strong>, vous êtes connecté en tant que
+    //           <strong className='font-bold capitalize'>{" "}{user?.role}</strong>
+    //         </p>
+    //       </span>,
+    //       { duration: 5000 }
+    //     );
+    //     localStorage.removeItem('message');
+    //     setMessageShown(true);
+    //   }
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
     
-  }, [ message, user, messageShown]);
+  }, [ message, user]);
   
 
 //   if (!token) return navigate("/", { replace: true });
