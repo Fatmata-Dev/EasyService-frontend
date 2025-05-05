@@ -114,7 +114,7 @@ export default function DetailsDemandeClient() {
       }
   
       // Appel API direct sans passer par Redux
-      const response = await fetch(`http://localhost:4000/api/factures/${facture.odooInvoiceId}/download`, {
+      const response = await fetch(`https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }

@@ -39,7 +39,7 @@ export default function Disponibilite({ setShowModal }) {
       data.append("role", formData.role);
 
       const response = await axios.post(
-        "http://localhost:4000/api/auth/creer/technicien",
+        "https://easyservice-backend-iv29.onrender.com/api/auth/creer/technicien",
         data,
         {
           headers: {
@@ -70,7 +70,7 @@ export default function Disponibilite({ setShowModal }) {
     const getAllCategories = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/categories/all/categories",
+          "https://easyservice-backend-iv29.onrender.com/api/categories/all/categories",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,

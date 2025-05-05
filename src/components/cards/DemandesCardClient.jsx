@@ -99,7 +99,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
       const facture = factures.find((f) => f.refDemande === id);
       if (!facture) return toast.error("Aucune facture trouvée");
       const response = await fetch(
-        `http://localhost:4000/api/factures/${facture.odooInvoiceId}/download`,
+        `https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
       );
       if (!response.ok) throw new Error("Erreur de téléchargement");
