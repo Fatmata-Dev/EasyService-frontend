@@ -3,7 +3,7 @@ import { useCreateTechnicienMutation } from "../../API/authApi";
 import { useGetCategoriesQuery } from "../../API/servicesApi";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, UserPlus, User, Phone, Briefcase, Mail, Lock, Hash } from "react-feather";
+import { FiBriefcase, FiHash, FiLock, FiMail, FiPhone, FiUser, FiUserPlus, FiX } from "react-icons/fi";
 
 export default function AddTechnicienModal({ setShowModal }) {
   const [formData, setFormData] = useState({
@@ -59,14 +59,14 @@ export default function AddTechnicienModal({ setShowModal }) {
           {/* Header */}
           <div className="flex justify-between items-center border-b p-4">
             <h3 className="text-xl font-bold text-gray-800 flex items-center">
-              <UserPlus className="mr-2 text-orange-500" />
+              <FiUserPlus className="mr-2 text-orange-500" />
               Ajouter un technicien
             </h3>
             <button 
               onClick={() => setShowModal(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <X size={20} />
+              <FiX size={20} />
             </button>
           </div>
 
@@ -75,7 +75,7 @@ export default function AddTechnicienModal({ setShowModal }) {
             {/* Informations personnelles */}
             <div className="space-y-2">
               <h4 className="font-medium text-gray-700 flex items-center">
-                <User size={16} className="mr-2 text-orange-500" />
+                <FiUser size={16} className="mr-2 text-orange-500" />
                 Informations personnelles
               </h4>
 
@@ -115,7 +115,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                     Téléphone
                   </label>
                   <div className="relative">
-                    <Phone size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <FiPhone size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       name="telephone"
                       value={formData.telephone}
@@ -131,7 +131,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                     Métier
                   </label>
                   <div className="relative">
-                    <Briefcase size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <FiBriefcase size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       name="metier"
                       value={formData.metier}
@@ -148,7 +148,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                   Catégorie
                 </label>
                 <div className="relative">
-                  <Hash size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <FiHash size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <select
                     name="categorie"
                     value={formData.categorie}
@@ -171,7 +171,7 @@ export default function AddTechnicienModal({ setShowModal }) {
             {/* Informations de connexion */}
             <div className="space-y-2">
               <h4 className="font-medium text-gray-700 flex items-center">
-                <Lock size={16} className="mr-2 text-orange-500" />
+                <FiLock size={16} className="mr-2 text-orange-500" />
                 Informations de connexion
               </h4>
 
@@ -181,7 +181,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                     Email
                   </label>
                   <div className="relative">
-                    <Mail size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <FiMail size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       name="email"
                       type="email"
@@ -198,7 +198,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                     Mot de passe (par défaut)
                   </label>
                   <div className="relative">
-                    <Lock size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <FiLock size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
                       name="password"
                       value={formData.password}

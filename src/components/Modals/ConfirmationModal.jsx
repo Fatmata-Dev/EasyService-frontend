@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertTriangle, CheckCircle, Info, HelpCircle } from 'react-feather';
+import { FiAlertTriangle, FiCheckCircle, FiHelpCircle, FiInfo } from 'react-icons/fi';
 
 const ConfirmationModal = ({
   isOpen,
@@ -14,11 +14,11 @@ const ConfirmationModal = ({
   type = "warning", // 'warning', 'info', 'success', 'danger'
 }) => {
   const iconMap = {
-    warning: <AlertTriangle className="text-yellow-500" size={24} />,
-    info: <Info className="text-blue-500" size={24} />,
-    success: <CheckCircle className="text-green-500" size={24} />,
-    danger: <AlertTriangle className="text-red-500" size={24} />,
-    default: <HelpCircle className="text-gray-500" size={24} />,
+    warning: <FiAlertTriangle className="text-yellow-500" size={24} />,
+    info: <FiInfo className="text-blue-500" size={24} />,
+    success: <FiCheckCircle className="text-green-500" size={24} />,
+    danger: <FiAlertTriangle className="text-red-500" size={24} />,
+    default: <FiHelpCircle className="text-gray-500" size={24} />,
   };
 
   const buttonColorMap = {

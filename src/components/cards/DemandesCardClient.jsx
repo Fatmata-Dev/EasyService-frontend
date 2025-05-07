@@ -4,26 +4,12 @@ import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import {
-  FileText,
-  Trash2,
-  XCircle,
-  CheckCircle,
-  Eye,
-  Star,
-  Calendar,
-  User,
-  Clock,
-  Play,
-  ChevronRight,
-  ArrowRight
-} from "lucide-react";
-import {
   useUpdateDemandeMutation,
   useDeleteDemandeMutation,
   useGetFacturesQuery,
 } from "../../API/demandesApi";
 import { useCreateAvisMutation } from "../../API/servicesApi";
-import { MessageSquare, X, ThumbsUp } from "react-feather";
+import { FiArrowRight, FiCalendar, FiChevronRight, FiClock, FiXCircle, FiEye, FiFileText, FiMessageSquare, FiStar, FiThumbsUp, FiTool, FiTrash2, FiUser, FiCheckCircle, FiPlay, FiX } from "react-icons/fi";
 
 const DemandesCardClient = memo(({ demande, onRefresh }) => {
   const navigate = useNavigate();
@@ -52,6 +38,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
       return dateString;
     }
   };
+
   const formatHeure = (dateString) => {
     if (!dateString) return "Non définie";
     try {
@@ -64,32 +51,32 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
   const statutConfig = {
     en_attente: { 
       label: "En attente", 
-      icon: <Clock className="w-4 h-4 mr-1 text-yellow-600" />,
+      icon: <FiClock className="w-4 h-4 mr-1 text-yellow-600" />,
       color: "bg-yellow-100 text-yellow-800"
     },
     acceptee: { 
       label: "Acceptée", 
-      icon: <CheckCircle className="w-4 h-4 mr-1 text-blue-600" />,
+      icon: <FiCheckCircle className="w-4 h-4 mr-1 text-blue-600" />,
       color: "bg-blue-100 text-blue-800"
     },
     en_cours: { 
       label: "En cours", 
-      icon: <Play className="w-4 h-4 mr-1 text-indigo-600" />,
+      icon: <FiPlay className="w-4 h-4 mr-1 text-indigo-600" />,
       color: "bg-indigo-100 text-indigo-800"
     },
     terminee: { 
       label: "Terminée", 
-      icon: <CheckCircle className="w-4 h-4 mr-1 text-green-600" />,
+      icon: <FiCheckCircle className="w-4 h-4 mr-1 text-green-600" />,
       color: "bg-green-100 text-green-800"
     },
     annulee: { 
       label: "Annulée", 
-      icon: <XCircle className="w-4 h-4 mr-1 text-red-600" />,
+      icon: <FiXCircle className="w-4 h-4 mr-1 text-red-600" />,
       color: "bg-red-100 text-red-800"
     },
     refusee: { 
       label: "Refusée", 
-      icon: <XCircle className="w-4 h-4 mr-1 text-gray-600" />,
+      icon: <FiXCircle className="w-4 h-4 mr-1 text-gray-600" />,
       color: "bg-gray-100 text-gray-800"
     },
   };
@@ -145,7 +132,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
     }
   };
 
-  console.log(demande);
+  // console.log(demande);
 
   const handleFeedbackSubmit = async (e) => {
     e.preventDefault();
@@ -184,7 +171,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
       <div className="p-4">
         <div className="flex justify-between items-start flex-wrap mb-3">
           <h2 className="text-lg font-semibold text-gray-800">
-            Demande #{demande?.numeroDemande}
+            {demande?.numeroDemande}
           </h2>
           <span className={`${currentStatut.color} px-2 py-1 rounded-full text-xs font-medium flex items-center`}>
             {currentStatut.icon}
@@ -193,19 +180,35 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
         </div>
 
         <div className="space-y-3 text-sm text-gray-600">
-          <div className="flex items-start">
-            <div className="flex-shrink-0 mt-0.5">
-              <FileText className="w-4 h-4 text-gray-400" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <FiTool className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                  <p className="text-xs text-gray-500">Service</p>
+                  <p className="font-medium">{demande?.service}</p>
+              </div>
             </div>
-            <div className="ml-2">
-              <p className="font-medium text-gray-700">{demande?.service}</p>
+
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <FiUser className="w-4 h-4 text-gray-400" />
+              </div>
+              <div className="ml-2">
+                <p className="text-xs text-gray-500">Technicien</p>
+                <p className="font-medium">
+                  {demande?.technicienPrenom} {demande?.technicienNom || "Non assigné"}
+                </p>
+              </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                <FiCalendar className="w-4 h-4 text-gray-400" />
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Date demande</p>
@@ -215,7 +218,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
 
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                <FiClock className="w-4 h-4 text-gray-400" />
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Heure demande</p>
@@ -227,7 +230,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                <FiCalendar className="w-4 h-4 text-gray-400" />
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Date intervention</p>
@@ -237,7 +240,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
 
             <div className="flex items-start">
               <div className="flex-shrink-0 mt-0.5">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                <FiClock className="w-4 h-4 text-gray-400" />
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Heure intervention</p>
@@ -246,17 +249,6 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
             </div>
           </div>
 
-          <div className="flex items-start">
-            <div className="flex-shrink-0 mt-0.5">
-              <User className="w-4 h-4 text-gray-400" />
-            </div>
-            <div className="ml-2">
-              <p className="text-xs text-gray-500">Technicien</p>
-              <p className="font-medium">
-                {demande?.technicienPrenom} {demande?.technicienNom || "Non assigné"}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -267,15 +259,15 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               to={`/client/demandes/${demande?._id}`} 
               className="flex items-center justify-center bg-white text-gray-600 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium"
             >
-              <Eye className="w-4 h-4 mr-1.5" /> 
+              <FiEye className="w-4 h-4 mr-1.5" /> 
               Détails
-              <ChevronRight className="w-4 h-4 ml-0.5" />
+              <FiChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
               onClick={() => handleCancel(demande?._id)}
               className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
-              <XCircle className="w-4 h-4 mr-1.5" />
+              <FiXCircle className="w-4 h-4 mr-1.5" />
               Annuler
             </button>
           </div>
@@ -287,15 +279,15 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               to={`/client/demandes/${demande?._id}`} 
               className="flex items-center justify-center bg-white text-gray-600 border border-gray-200 px-3 py-2 rounded hover:bg-gray-100 text-sm font-medium"
             >
-              <Eye className="w-4 h-4 mr-1.5" /> 
+              <FiEye className="w-4 h-4 mr-1.5" /> 
               Détails
-              <ChevronRight className="w-4 h-4 ml-0.5" />
+              <FiChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
               onClick={() => handleDelete(demande?._id)}
               className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
-              <Trash2 className="w-4 h-4 mr-1.5" />
+              <FiTrash2 className="w-4 h-4 mr-1.5" />
               Supprimer
             </button>
           </div>
@@ -308,23 +300,23 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
                 onClick={() => generateFacture(demande?._id)}
                 className="flex-1 flex items-center justify-center bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium"
               >
-                <FileText className="w-4 h-4 mr-1.5" /> 
+                <FiFileText className="w-4 h-4 mr-1.5" /> 
                 Facture
               </button>
               <button
                 onClick={() => setShowFeedbackForm(!showFeedbackForm)}
                 className="flex-1 flex items-center justify-center bg-white border border-yellow-300 hover:bg-yellow-100 text-yellow-700 py-2 rounded text-sm font-medium"
               >
-                <Star className="w-4 h-4 mr-1.5" />
+                <FiStar className="w-4 h-4 mr-1.5" />
                 {showFeedbackForm ? "Masquer" : "Évaluer"}
               </button>
             </div>
             <div className="flex justify-center items-center">
               <Link
                 to={`/client/demandes/${demande?._id}`}
-                className="inline-flex items-center text-sm p-2 text-blue-600 hover:text-blue-800 hover:underline"
+                className="inline-flex items-center text-sm p-1 text-blue-600 hover:text-blue-800 hover:underline"
               >
-                Voir les détails <ArrowRight size={14} className="ml-1" />
+                Voir les détails <FiArrowRight size={14} className="ml-1" />
               </Link>
             </div>
 
@@ -332,14 +324,14 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
         <div className="p-5 border-t border-gray-100 bg-gray-50">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-              <MessageSquare size={18} className="mr-2 text-orange-500" />
+              <FiMessageSquare size={18} className="mr-2 text-orange-500" />
               Donnez votre avis
             </h3>
             <button 
               onClick={() => setShowFeedbackForm(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <X size={18} />
+              <FiX size={18} />
             </button>
           </div>
           
@@ -361,7 +353,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
                           : 'text-gray-300 hover:text-yellow-400'
                       }`}
                     >
-                      <Star size={20} className={feedback.note >= star ? 'fill-current' : ''} />
+                      <FiStar size={20} className={feedback.note >= star ? 'fill-current' : ''} />
                     </button>
                   ))}
                 </div>
@@ -398,7 +390,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
                 onClick={() => setShowFeedbackForm(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center"
               >
-                <X size={16} className="mr-1" />
+                <FiX size={16} className="mr-1" />
                 Annuler
               </button>
               <button
@@ -408,12 +400,12 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               >
                 {isSubmitting ? (
                   <>
-                    <Clock size={16} className="mr-1 animate-spin" />
+                    <FiClock size={16} className="mr-1 animate-spin" />
                     Envoi...
                   </>
                 ) : (
                   <>
-                    <ThumbsUp size={16} className="mr-1" />
+                    <FiThumbsUp size={16} className="mr-1" />
                     Envoyer
                   </>
                 )}
