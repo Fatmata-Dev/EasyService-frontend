@@ -19,11 +19,11 @@ import { useGetDemandesQuery } from "../../API/demandesApi";
 import { useGetTechniciensQuery } from "../../API/authApi";
 import { useGetReceivedMessagesQuery } from "../../API/messagesApi";
 import { motion } from "framer-motion";
-import { Star, MessageSquare, User } from "react-feather";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import ProfilSignature from "../../assets/ProfileSignature.png";
+import { FiMessageSquare, FiStar, FiUser } from "react-icons/fi";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -133,25 +133,25 @@ export default function DashboardAdmin() {
       {/* Statistiques */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         <StatCard 
-          icon={<User size={24} />}
+          icon={<FiUser size={24} />}
           title="Services" 
           value={services.length} 
           color="bg-blue-500" 
         />
         <StatCard 
-          icon={<User size={24} />}
+          icon={<FiUser size={24} />}
           title="Demandes" 
           value={demandes.length} 
           color="bg-purple-500" 
         />
         <StatCard 
-          icon={<User size={24} />}
+          icon={<FiUser size={24} />}
           title="Techniciens" 
           value={techniciens.length} 
           color="bg-green-500" 
         />
         <StatCard 
-          icon={<Star size={24} />}
+          icon={<FiStar size={24} />}
           title="Avis" 
           value={avis.length} 
           color="bg-yellow-500" 
@@ -293,7 +293,7 @@ function AvisItem({ avis }) {
         </div>
         <div className="flex items-center">
           {[...Array(5)].map((_, i) => (
-            <Star 
+            <FiStar 
               key={i} 
               size={16} 
               className={i < avis.note ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} 
@@ -338,7 +338,7 @@ function MessageItem({ message }) {
       isUnread ? "bg-blue-50 font-semibold" : ""
     }`} onClick={() => navigate(`/admin/messages/${message._id}`)}>
       <div className="bg-blue-100 p-2 rounded-full w-fit h-fit">
-        <MessageSquare size={18} className="text-blue-500" />
+        <FiMessageSquare size={18} className="text-blue-500" />
       </div>
       <div className="flex-1">
         <div className="flex justify-between items-center flex-wrap gap-1 mb-1">

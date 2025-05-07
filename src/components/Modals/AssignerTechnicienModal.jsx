@@ -12,8 +12,8 @@ export default function AssignTechnicienModal({
 }) {
   const [selectedTechnicien, setSelectedTechnicien] = useState("");
   const { user } = useAuth();
-  const adminId = user;
-  
+  const adminId = user?._id;
+  console.log(adminId);
 
   // Récupération des techniciens via RTK Query
   const { 
@@ -55,7 +55,7 @@ export default function AssignTechnicienModal({
       await assignerDemande({
         demandeId: demande._id,
         technicienId: selectedTechnicien,
-        adminId: adminId._id
+        adminId: adminId
       }).unwrap();
 
       toast.success("Technicien assigné avec succès");

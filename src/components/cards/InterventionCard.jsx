@@ -3,24 +3,12 @@ import { motion } from "framer-motion";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "react-hot-toast";
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  FileText,
-  User,
-  ChevronDown,
-  ChevronUp,
-  Play,
-  Check,
-  X,
-  Loader2
-} from "lucide-react";
 import { 
   useCommencerDemandeMutation,
   useTerminerDemandeMutation,
   useCreateFactureMutation
 } from "../../API/demandesApi";
+import { FiCalendar, FiCheck, FiChevronDown, FiChevronUp, FiClock, FiFileText, FiLoader, FiMapPin, FiPlay, FiUser, FiX } from "react-icons/fi";
 
 export default function InterventionCard({ intervention, onRefresh }) {
   const [showDetails, setShowDetails] = useState(false);
@@ -29,6 +17,8 @@ export default function InterventionCard({ intervention, onRefresh }) {
   const [commencerDemande, { isLoading: isStarting }] = useCommencerDemandeMutation();
   const [terminerDemande, { isLoading: isFinishing }] = useTerminerDemandeMutation();
   const [createFacture] = useCreateFactureMutation();
+
+  // console.log(intervention);
 
 
   const formatDate = (dateString) => {
@@ -89,22 +79,22 @@ export default function InterventionCard({ intervention, onRefresh }) {
     const statusMap = {
       non_commencee: {
         text: "Non commencée",
-        icon: <Clock className="w-4 h-4 mr-1" />,
+        icon: <FiClock className="w-4 h-4 mr-1" />,
         color: "bg-gray-100 text-gray-800"
       },
       en_cours: { 
         text: "En cours", 
-        icon: <Play className="w-4 h-4 mr-1" />,
+        icon: <FiPlay className="w-4 h-4 mr-1" />,
         color: "bg-blue-100 text-blue-800" 
       },
       terminee: { 
         text: "Terminée", 
-        icon: <Check className="w-4 h-4 mr-1" />,
+        icon: <FiCheck className="w-4 h-4 mr-1" />,
         color: "bg-green-100 text-green-800" 
       },
       annulee: { 
         text: "Annulée", 
-        icon: <X className="w-4 h-4 mr-1" />,
+        icon: <FiX className="w-4 h-4 mr-1" />,
         color: "bg-red-100 text-red-800" 
       },
     };
@@ -129,11 +119,11 @@ export default function InterventionCard({ intervention, onRefresh }) {
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <FileText className="w-5 h-5 mr-2 text-blue-500" />
+              <FiFileText className="w-5 h-5 mr-2 text-blue-500" />
               {intervention.service || "Service non spécifié"}
             </h3>
             <div className="mt-1 flex items-center text-sm text-gray-500">
-              <User className="w-4 h-4 mr-1.5" />
+              <FiUser className="w-4 h-4 mr-1.5" />
               {intervention.client || "Client non spécifié"}
             </div>
           </div>
@@ -142,11 +132,11 @@ export default function InterventionCard({ intervention, onRefresh }) {
 
         <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center">
-            <Calendar className="w-4 h-4 mr-1.5 text-gray-400" />
+            <FiCalendar className="w-4 h-4 mr-1.5 text-gray-400" />
             <span>{formatDate(intervention.dateIntervention)}</span>
           </div>
           <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-1.5 text-gray-400" />
+            <FiClock className="w-4 h-4 mr-1.5 text-gray-400" />
             <span>
               {intervention.heureDebut || "--:--"} - {intervention.heureFin || "--:--"}
             </span>
@@ -159,9 +149,9 @@ export default function InterventionCard({ intervention, onRefresh }) {
         >
           <span>{showDetails ? "Masquer les détails" : "Voir les détails"}</span>
           {showDetails ? (
-            <ChevronUp className="w-4 h-4" />
+            <FiChevronUp className="w-4 h-4" />
           ) : (
-            <ChevronDown className="w-4 h-4" />
+            <FiChevronDown className="w-4 h-4" />
           )}
         </button>
       </div>
@@ -174,7 +164,7 @@ export default function InterventionCard({ intervention, onRefresh }) {
         >
           <div className="mt-4 space-y-3 text-sm">
             <div className="flex items-start">
-              <MapPin className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
+              <FiMapPin className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
               <div>
                 <p className="font-medium text-gray-700">Adresse</p>
                 <p className="text-gray-600">
@@ -184,7 +174,7 @@ export default function InterventionCard({ intervention, onRefresh }) {
             </div>
 
             <div className="flex items-start">
-              <FileText className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
+              <FiFileText className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
               <div>
                 <p className="font-medium text-gray-700">Description</p>
                 <p className="text-gray-600">
@@ -202,9 +192,9 @@ export default function InterventionCard({ intervention, onRefresh }) {
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isStarting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <FiLoader className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Play className="w-4 h-4" />
+                  <FiPlay className="w-4 h-4" />
                 )}
                 Commencer
               </button>
@@ -217,9 +207,9 @@ export default function InterventionCard({ intervention, onRefresh }) {
                 className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isFinishing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <FiLoader className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Check className="w-4 h-4" />
+                  <FiCheck className="w-4 h-4" />
                 )}
                 Terminer
               </button>

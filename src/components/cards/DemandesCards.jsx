@@ -150,26 +150,26 @@ const DemandesCard = memo(({ demande, onRefresh }) => {
           </div>
         </div>
 
-        {/* Section Technicien */}
-        <div className="flex items-start">
-          <FiUser className="mt-1 mr-2 text-gray-400" />
-          <div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-start">
+            <FiUser className="mt-1 mr-2 text-gray-400" />
+            <div>
             <p className="text-xs text-gray-500">Technicien</p>
             <p className="font-medium text-gray-800 capitalize">
               {demande.technicien?.prenom} {demande.technicien?.nom || "Non assigné"}
             </p>
+            </div>
           </div>
-        </div>
-
-        {/* Section État d'exécution */}
-        <div className="flex items-center">
-          <FiAlertCircle className="mr-2 text-gray-400" />
-          <div>
+          <div className="flex items-start">
+            <FiInfo className="mt-1 mr-2 text-gray-400" />
+            <div>
             <p className="text-xs text-gray-500">Exécution</p>
             <span className={`${currentExecutionState.color} px-3 py-1 rounded-full text-xs font-medium flex items-center mt-1`}>
               {currentExecutionState.icon}
               {currentExecutionState.label}
             </span>
+            </div>
           </div>
         </div>
       </div>

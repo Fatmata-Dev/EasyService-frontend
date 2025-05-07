@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import { useGetAvisQuery, useGetServicesQuery, useGetCategoriesQuery } from '../../API/servicesApi';
 import { useGetDemandeForClientIdQuery } from '../../API/demandesApi';
-import { useGetUserByIdQuery } from '../../API/authApi';
+import { useGetUsersQuery } from '../../API/authApi';
 import { FaStar, FaRegStar, FaUserCircle } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
@@ -19,7 +19,7 @@ const AvisClient = () => {
   const { data: existingAvis = [], refetch: refetchAvis } = useGetAvisQuery();
   const { data: services = [] } = useGetServicesQuery();
   const { data: categories = [] } = useGetCategoriesQuery();
-  const { data: perosonnes = [] } = useGetUserByIdQuery();
+  const { data: personne = [] } = useGetUsersQuery();
 
   // Formatage de date
   const formatDate = (dateString) => {
@@ -32,7 +32,7 @@ const AvisClient = () => {
     }
   };
 
-  console.log(existingAvis);
+  // console.log(existingAvis);
 
   // Fonctions utilitaires
   const getCategorieNom = (categorieId) => {
@@ -44,7 +44,7 @@ const AvisClient = () => {
   };
 
   const getUserById = (userId) => {
-    return perosonnes.find(personne => personne._id === userId) || { nom: "Admin inconnu" };
+    return personne.find(pers => pers._id === userId) || { nom: "Admin inconnu" };
   };
 
   // Filtrer les demandes terminées non encore notées
@@ -146,8 +146,6 @@ const AvisClient = () => {
             <div className="space-y-6">
               {[...existingAvis].reverse().map((avis) => {
                 const admin = getUserById(avis?.demande?.admin);
-                console.log(avis.demande.admin)
-                console.log(user._id)
 
                 return (
                   <motion.div 
@@ -195,8 +193,8 @@ const AvisClient = () => {
                         <div className="flex items-center gap-3 mb-4">
                           {avis?.technicien?.image ? (
                             <img 
-                              src={avis?.technicien?.image?.url} 
-                              alt={`${avis?.technicien?.prenom} ${avis?.technicien?.nom}`}
+                              src={avis?.technicien?.image?.url || `https://ui-avatars.com/api/?name=${avis?.technicien?.prenom}+${avis?.technicien?.nom}&background=random`} 
+                              // alt={`${avis?.technicien?.prenom} ${avis?.technicien?.nom}`}
                               className="w-12 h-12 rounded-full object-cover"
                             />
                           ) : (
@@ -213,18 +211,18 @@ const AvisClient = () => {
 
                         <div className="text-sm text-gray-600 space-y-2">
                           <p>
-                            <span className="font-medium">Date d'évaluation:</span> {formatDate(avis.dateSoumission)}
+                            <span className="font-medium">Date d'évaluation : </span> {formatDate(avis.dateSoumission)}
                           </p>
                           {avis?.service?.tarif && (
                             <p>
-                              <span className="font-medium">Prix:</span> {avis?.service?.tarif} FCFA
+                              <span className="font-medium">Prix : </span> {avis?.service?.tarif} FCFA
                             </p>
                           )}
                           <p>
-                            <span className="font-medium">Admin:</span>
+                            <span className="font-medium">Admin : </span>
                             
-                            {admin?.prenom && admin?.prenom.length > 8 ? `${admin?.prenom.slice(0, 1) || ""}. ` : `${admin?.prenom}`} {" "}
-                            { admin?.nom && admin?.nom.length > 7 ? `${admin?.nom.charAt(0).toUpperCase() || ""}. ` : `${admin?.nom}`}
+                            <span className='capitalize'>{admin?.prenom && admin?.prenom.length > 8 ? `${admin?.prenom.slice(0, 1) || ""}. ` : `${admin?.prenom}`} {" "}
+                            { admin?.nom && admin?.nom.length > 7 ? `${admin?.nom.charAt(0).toUpperCase() || ""}. ` : `${admin?.nom}`}</span>
                           </p>
                         </div>
                       </div>

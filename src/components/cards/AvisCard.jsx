@@ -4,11 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useCreateAvisMutation } from '../../API/servicesApi';
 import { toast } from 'react-hot-toast';
-import { 
-  Star, MessageSquare, Calendar, User, 
-  X, ArrowRight, ThumbsUp, Edit3, 
-  Clock, CheckCircle, FileText
-} from 'react-feather';
+import { FiArrowRight, FiCalendar, FiCheckCircle, FiClock, FiEdit3, FiFileText, FiMessageSquare, FiStar, FiThumbsUp, FiUser, FiX } from 'react-icons/fi';
 
 const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isAdmin = false }) => {
   const [createAvis] = useCreateAvisMutation();
@@ -27,7 +23,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
 
   const renderStars = (rating) => {
     return Array.from({ length: maxRating }).map((_, index) => (
-      <Star
+      <FiStar
         key={index}
         size={18}
         className={`${index < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
@@ -92,7 +88,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
           <div className="flex justify-between items-end">
             <div>
               <span className="text-white text-sm font-medium bg-blue-500 px-2 py-1 rounded-full inline-flex items-center">
-                <FileText size={14} className="mr-1" />
+                <FiFileText size={14} className="mr-1" />
                 {review?.category}
               </span>
             </div>
@@ -114,7 +110,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
             <span className="ml-2 text-sm text-gray-500">{currentRating}/{maxRating}</span>
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <Calendar size={14} className="mr-1" />
+            <FiCalendar size={14} className="mr-1" />
             {review?.date}
           </div>
         </div>
@@ -123,7 +119,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
         <div className="mb-4">
         {isAdmin && (
               <div className="flex items-center bg-gray-200 px-2 py-1 rounded-full w-fit">
-                <User size={14} className="text-gray-600 mr-1" />
+                <FiUser size={14} className="text-gray-600 mr-1" />
                 <span className="text-xs font-medium text-gray-700">
                   {review?.client?.prenom || "Anonyme"} {" "}
                   {review?.client?.nom || ""}
@@ -131,7 +127,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
               </div>
             )}
           <div className="flex items-start bg-gray-100 px-3 py-2 mt-2 rounded-lg">
-            <MessageSquare size={18} className="text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
+            <FiMessageSquare size={18} className="text-gray-400 mt-0.5 mr-2 flex-shrink-0" />
             <p className="text-gray-600 line-clamp-2">
               {review?.commentaire || review?.description || "Aucun commentaire"}
             </p>
@@ -146,7 +142,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
             to={`/client/demandes/${review?.demande?._id}`}
             className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 hover:underline"
           >
-            Voir les détails <ArrowRight size={14} className="ml-1" />
+            Voir les détails <FiArrowRight size={14} className="ml-1" />
           </Link>
           </div>
           
@@ -165,12 +161,12 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
             >
               {currentRating >= maxRating ? (
                 <>
-                  <CheckCircle size={16} className="mr-1" />
+                  <FiCheckCircle size={16} className="mr-1" />
                   Déjà noté
                 </>
               ) : (
                 <>
-                  <Edit3 size={16} className="mr-1" />
+                  <FiEdit3 size={16} className="mr-1" />
                   {review?.status || 'Noter'}
                 </>
               )}
@@ -186,14 +182,14 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
         <div className="p-5 border-t border-gray-100 bg-gray-50">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-              <MessageSquare size={18} className="mr-2 text-orange-500" />
+              <FiMessageSquare size={18} className="mr-2 text-orange-500" />
               Donnez votre avis
             </h3>
             <button 
               onClick={() => setShowFeedbackForm(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <X size={18} />
+              <FiX size={18} />
             </button>
           </div>
           
@@ -215,7 +211,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
                           : 'text-gray-300 hover:text-yellow-400'
                       }`}
                     >
-                      <Star size={20} className={feedback.note >= star ? 'fill-current' : ''} />
+                      <FiStar size={20} className={feedback.note >= star ? 'fill-current' : ''} />
                     </button>
                   ))}
                 </div>
@@ -252,7 +248,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
                 onClick={() => setShowFeedbackForm(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center"
               >
-                <X size={16} className="mr-1" />
+                <FiX size={16} className="mr-1" />
                 Annuler
               </button>
               <button
@@ -262,12 +258,12 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
               >
                 {isSubmitting ? (
                   <>
-                    <Clock size={16} className="mr-1 animate-spin" />
+                    <FiClock size={16} className="mr-1 animate-spin" />
                     Envoi...
                   </>
                 ) : (
                   <>
-                    <ThumbsUp size={16} className="mr-1" />
+                    <FiThumbsUp size={16} className="mr-1" />
                     Envoyer
                   </>
                 )}
