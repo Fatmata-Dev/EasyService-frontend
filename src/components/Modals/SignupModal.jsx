@@ -71,13 +71,10 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
       };
       const response = await register(jsonData).unwrap();
 
-      if (response.data.errors) {
-        setError(response.data.message || "Erreur lors de l'inscription");
-        toast.error(response.data.message || "Erreur lors de l'inscription");
-      } else {
+      console.log(response);
+
         toast.success("Inscription réussie !");
         onSwitchToLogin();
-      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Erreur lors de l'inscription");

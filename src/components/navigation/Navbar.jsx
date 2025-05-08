@@ -13,6 +13,7 @@ export default function Navbar({ defaultSection }) {
   const [showForgetPassword, setShowForgetPassword] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const location = useLocation();
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     if (defaultSection) {
@@ -58,6 +59,7 @@ export default function Navbar({ defaultSection }) {
     >
         <div className="mx-2 sm:mx-4 lg:mx-12 py-0 flex items-center justify-between">
         <div className="flex cursor-pointer top-0 left-0">
+          {/* Menu Hamburger */}
           <FiMenu className="text-3xl lg:hidden" />
           <RouterLink
             to="/"
