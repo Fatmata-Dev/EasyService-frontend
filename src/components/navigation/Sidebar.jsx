@@ -74,14 +74,14 @@ const Sidebar = ({ user }) => {
         {/* Profil utilisateur en bas */}
         <div className="flex items-center space-x-3 p-3 border-t mt-4 hover:bg-gray-200 cursor-pointer" onClick={() => navigate(`/${user?.role}/profil/${user?._id}`)}>
           <img
-            src={user?.image?.url || ProfilSignature}
+            src={user?.image?.url || `https://ui-avatars.com/api/?name=${user?.prenom}+${user?.nom}&background=random`}
             alt="Signature professionnelle"
             className="w-12 h-12 rounded-full object-cover"
           />
           <div>
             <p className="font-semibold text-sm capitalize">
-              {prenom && prenom.length > 5 ? `${prenom.slice(0, 1) || ""}. ` : `${prenom}`} {" "}
-              { nom && nom.length > 9 ? `${nom.charAt(0).toUpperCase() || ""}. ` : `${nom}`}{" "}
+              {prenom && prenom.length > 3 ? `${prenom.slice(0, 1) || ""}. ` : `${prenom}`} {" "}
+              { nom && nom.length > 8 ? `${nom.charAt(0).toUpperCase() || ""}. ` : `${nom}`}{" "}
               ({user.role && user.role.length > 6 ? `${user.role.slice(0, 4) || ""}.` : `${user.role}`})
             </p>
             <p className="text-gray-500 text-xs flex items-center">

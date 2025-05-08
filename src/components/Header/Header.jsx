@@ -101,7 +101,7 @@ const Header = ({ user }) => {
 
           {/* Image utilisateur */}
           <img
-            src={user?.image?.url || ProfileSignature}
+            src={user?.image?.url || `https://ui-avatars.com/api/?name=${user?.prenom}+${user?.nom}&background=random`}
             alt="Profil utilisateur"
             className="w-10 h-10 rounded-full object-cover cursor-pointer"
             onClick={() => navigate(`/${user?.role}/profil/${user?._id}`)}
