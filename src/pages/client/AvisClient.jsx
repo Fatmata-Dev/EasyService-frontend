@@ -16,10 +16,14 @@ const AvisClient = () => {
   const { data: demandes = [], isLoading: isLoadingDemandes } = useGetDemandeForClientIdQuery(user?._id, {
     skip: !user?._id
   });
-  const { data: existingAvis = [], refetch: refetchAvis } = useGetAvisQuery();
+  let { data: existingAvis = [], refetch: refetchAvis } = useGetAvisQuery();
   const { data: services = [] } = useGetServicesQuery();
   const { data: categories = [] } = useGetCategoriesQuery();
   const { data: personne = [] } = useGetUsersQuery();
+
+  console.log(existingAvis);
+  existingAvis = existingAvis.filter(avis => avis.client._id === user?._id);
+
 
   // Formatage de date
   const formatDate = (dateString) => {
@@ -78,7 +82,7 @@ const AvisClient = () => {
 
   if (isLoadingDemandes) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="h-screen bg-gray-50 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
       </div>
     );
@@ -86,7 +90,7 @@ const AvisClient = () => {
 
   return (
     <motion.div 
-      className="min-h-screen bg-gray-50 p-4"
+      className="bg-gray-50 p-4"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
