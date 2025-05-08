@@ -11,11 +11,13 @@ import {
 } from "../../API/messagesApi";
 import MessageForm from "../Admin/MessageForm";
 import { FaUserCircle, FaEnvelope, FaSearch } from "react-icons/fa";
+import { useAuth } from "../../context/useAuth";
 
 const MessagesClient = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const currentUser = JSON.parse(localStorage.getItem("user")) || {};
+  const { user } = useAuth();
+  const currentUser = user;
   
   // Utilisation des queries RTK Query avec revalidation automatique
   const { 

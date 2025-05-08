@@ -210,7 +210,7 @@ export default function DashboardAdmin() {
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Derniers avis</h2>
           <div className="space-y-4 max-h-96 overflow-y-auto">
-            {enrichedAvis.slice(0, 3).map(avis => (
+            {[...enrichedAvis].reverse().slice(0, 3).map(avis => (
               <AvisItem key={avis._id} avis={avis} />
             ))}
             {enrichedAvis.length === 0 && (

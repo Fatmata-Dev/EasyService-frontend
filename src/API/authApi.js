@@ -69,7 +69,7 @@ export const authApi = createApi({
     updateUserRole: builder.mutation({
       query: ({ id, body }) => ({
         url: `/auth/users/${id}/change-role`,
-        method: "POST",
+        method: "PUT",
         body,
       }),
       invalidatesTags: ["User", "Technicien"],

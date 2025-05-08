@@ -47,6 +47,8 @@ const onSubmit = async (data) => {
       formData.append('image', selectedFile);
     }
 
+    console.log(data);
+
     await updateUser({ 
       id: user._id, 
       body: formData 
@@ -87,7 +89,6 @@ const onSubmit = async (data) => {
                 type="file"
                 accept="image/*"
                 {...register('image', { 
-                  required: 'L\'image est requis',
                   minLength: {
                     value: 2,
                     message: 'L\'image doit être un fichier JPEG ou PNG'
@@ -115,7 +116,6 @@ const onSubmit = async (data) => {
             <input
               type="text"
               {...register('nom', { 
-                required: 'Le nom est requis',
                 minLength: {
                   value: 2,
                   message: 'Le nom doit contenir au moins 2 caractères'
@@ -147,7 +147,6 @@ const onSubmit = async (data) => {
           <input
             type="email"
             {...register('email', {
-              required: 'Email est requis',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                 message: 'Email invalide',
