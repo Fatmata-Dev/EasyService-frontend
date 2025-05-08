@@ -7,6 +7,7 @@ import {
   useGetCategoriesQuery,
   useCreateCategoryMutation,
 } from "../../API/servicesApi";
+import { useAuth } from "../../context/useAuth";
 
 const ServicesModal = ({
   setShowModal,
@@ -31,8 +32,8 @@ const ServicesModal = ({
   const [newCategory, setNewCategory] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
-  const userData = JSON.parse(localStorage.getItem("user"));
-  const userId = userData?.id;
+  const { user: userData } = useAuth();
+  const userId = userData?._id;
 
   useEffect(() => {
     if (selectedService) {
