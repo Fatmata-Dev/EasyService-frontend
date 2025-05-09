@@ -6,6 +6,7 @@ import LoginModal from "../components/Modals/LoginModal";
 import SignupModal from "../components/Modals/SignupModal";
 import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
 import Navbar from "../components/navigation/Navbar";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -73,17 +74,19 @@ const ServiceDetails = () => {
     setShowLogin(true);
   };
 
-  if (loading)
-    return <div className="text-center py-8">Chargement en cours...</div>;
-  if (error)
-    return <div className="text-center py-8 text-red-500">{error}</div>;
-  if (!service)
-    return <div className="text-center py-8">Service non trouvé</div>;
+  // if (loading)
+  //   return <div className="text-center py-8">Chargement en cours...</div>;
+  // if (error)
+  //   return <div className="text-center py-8 text-red-500">{error}</div>;
+  // if (!service)
+  //   return <div className="text-center py-8">Service non trouvé</div>;
 
   return (
     <div>
       <Navbar defaultSection={"services"} />
-
+      
+      {loading ? <LoadingSpinner /> : (
+        
       <div className="mx-8 mt-2">
         <h1 className="text-2xl font-bold my-4 text-center self-center">
           DÉTAIL DU SERVICE
@@ -155,6 +158,7 @@ const ServiceDetails = () => {
           </button>
         </div>
       </div>
+      )}
 
       {showLogin && (
         <LoginModal
@@ -190,6 +194,13 @@ const ServiceDetails = () => {
           }}
         />
       )}
+
+      
+    {!service && (
+        <div className="text-center py-8">Service non trouvé</div>
+      )}
+
+      {error && <div className="text-center py-8 text-red-500">{error}</div>}
     </div>
   );
 };

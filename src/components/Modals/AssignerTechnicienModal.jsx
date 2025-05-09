@@ -34,7 +34,7 @@ export default function AssignTechnicienModal({
 
   // Filtrage des techniciens disponibles
   const techniciensDisponibles = techniciensData?.filter(tech => 
-    tech._id && tech.prenom && tech.nom && tech.disponible
+    tech._id && tech.prenom && tech.nom && tech.disponible 
   ) || [];
 
   useEffect(() => {

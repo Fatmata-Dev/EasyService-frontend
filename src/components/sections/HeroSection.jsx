@@ -13,13 +13,18 @@ const fadeInUp = {
 
 export default function HeroSection() {
   const backgroundImages = [
+    "/10655425.webp",
     "/image1.jpeg",
+    "/image10.jpeg",
     "/image2.jpeg",
+    "/coiffeuse.png",
     "/image3.jpeg",
     "/image4.jpeg",
     "/image5.jpeg",
+    "/depannage-chauffe-eau.jpg",
     "/image6.jpeg",
     "/image7.jpeg",
+    "/illustration-developpeur-C.png",
     "/image8.jpeg",
     "/image9.jpeg",
   ];

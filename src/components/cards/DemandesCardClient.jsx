@@ -188,7 +188,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               </div>
               <div className="ml-2">
                   <p className="text-xs text-gray-500">Service</p>
-                  <p className="font-medium capitalize">{demande?.service}</p>
+                  <p className="font-medium capitalize line-clamp-1">{demande?.service}</p>
               </div>
             </div>
 
@@ -198,7 +198,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Technicien</p>
-                <p className="font-medium capitalize">
+                <p className="font-medium capitalize line-clamp-1">
                   {demande?.technicienPrenom} {demande?.technicienNom || "Non assigné"}
                 </p>
               </div>

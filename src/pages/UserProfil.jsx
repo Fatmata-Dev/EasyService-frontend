@@ -66,7 +66,7 @@ const onSubmit = async (data) => {
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6">
-      <h1 className="text-2xl font-bold mb-6">Profil de {user?.nom} {user?.prenom}</h1>
+      <h1 className="text-2xl font-bold mb-6">Profil de <span className='capitalize'>{user?.nom} {user?.prenom}</span></h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="flex flex-col md:flex-row items-center gap-6">
@@ -112,6 +112,21 @@ const onSubmit = async (data) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+            <input
+              type="text"
+              {...register('prenom', {
+                minLength: {
+                  value: 2,
+                  message: 'Le prénom doit contenir au moins 2 caractères'
+                }
+              })}
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
+            />
+            {errors.prenom && <p className="text-red-500 text-xs mt-1">{errors.prenom.message}</p>}
+          </div>
+          
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
             <input
               type="text"
@@ -126,20 +141,6 @@ const onSubmit = async (data) => {
             {errors.nom && <p className="text-red-500 text-xs mt-1">{errors.nom.message}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
-            <input
-              type="text"
-              {...register('prenom', {
-                minLength: {
-                  value: 2,
-                  message: 'Le prénom doit contenir au moins 2 caractères'
-                }
-              })}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 p-2 border"
-            />
-            {errors.prenom && <p className="text-red-500 text-xs mt-1">{errors.prenom.message}</p>}
-          </div>
         </div>
 
         <div>

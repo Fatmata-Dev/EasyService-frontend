@@ -29,7 +29,7 @@ const ServiceDetailAdmin = () => {
 
   // Filtrer les avis pour ce service
   const serviceFeedbacks = feedbacks?.filter(
-    feedback => feedback.service === id
+    feedback => feedback.service._id === id
   ) || [];
 
   const clientInfos = serviceFeedbacks?.find(

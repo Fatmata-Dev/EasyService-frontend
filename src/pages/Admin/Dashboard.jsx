@@ -127,7 +127,7 @@ export default function DashboardAdmin() {
   }
 
   return (
-    <div className="sm:p-6">
+    <div className="p-2">
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>
       
       {/* Statistiques */}
@@ -282,7 +282,7 @@ function AvisItem({ avis }) {
       <div className="flex justify-between items-start">
         <div className="flex gap-2 items-center">
           <img
-                src={avis.client?.image?.url || ProfilSignature}
+                src={avis.client?.image?.url || `https://ui-avatars.com/api/?name=${avis?.client?.prenom}+${avis?.client?.nom}&background=random`}
                 alt="Signature professionnelle"
                 className="w-12 h-12 rounded-full object-cover"
               />

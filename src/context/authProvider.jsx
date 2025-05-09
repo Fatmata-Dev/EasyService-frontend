@@ -54,9 +54,9 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", newToken);
       setToken(newToken);
 
-      // window.location.reload();
+      window.location.reload();
 
-      console.log(response);
+      // console.log(response);
 
       toast.success(
         <span>
