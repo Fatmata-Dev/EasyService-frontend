@@ -21,7 +21,7 @@ const AvisClient = () => {
   const { data: categories = [] } = useGetCategoriesQuery();
   const { data: personne = [] } = useGetUsersQuery();
 
-  console.log(existingAvis);
+  // console.log(existingAvis);
   existingAvis = existingAvis.filter(avis => avis.client._id === user?._id);
 
 
@@ -106,7 +106,7 @@ const AvisClient = () => {
             </div>
 
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
               variants={containerVariants}
             >
               {[...demandesANoter].reverse().map((demande) => {

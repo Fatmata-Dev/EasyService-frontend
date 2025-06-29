@@ -44,8 +44,8 @@ export default function Intervention() {
           return {
             _id: intervention._id,
             dateIntervention: intervention.dateIntervention || "Non définie",
-            heureDebut: intervention.heureDebut || "À définir",
-            heureFin: intervention.heureFin || "À définir",
+            heureDebut: intervention?.dates?.debutIntervention || "À définir",
+            heureFin: intervention?.dates?.finIntervention || "À définir",
             etatExecution: intervention.etatExecution || "non_commencee",
             service: serviceObj.nom,
             client: `${clientObj.prenom} ${clientObj.nom}`,
@@ -172,7 +172,7 @@ export default function Intervention() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: i * 0.1 }}
-              className="border border-blue-300 p-4 rounded-lg shadow-md w-full bg-blue-50 animate-pulse"
+              className="border border-orange-300 p-4 rounded-lg shadow-md w-full bg-orange-50 animate-pulse"
             >
               <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-4" />
               <div className="space-y-3">
@@ -204,8 +204,10 @@ export default function Intervention() {
     );
   }
 
+  // console.log(displayedInterventions);
+
   return (
-    <div className="container mx-auto xl:px-4">
+    <div className="container md:mx-auto xl:px-4">
       <h1 className="text-2xl font-bold uppercase text-center mb-8">
         Mes Interventions
       </h1>
@@ -249,7 +251,7 @@ export default function Intervention() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {displayedInterventions.length > 0 ? (
           displayedInterventions.map((intervention) => (
             <InterventionCard
@@ -275,7 +277,7 @@ export default function Intervention() {
               className={`px-3 py-1 rounded-l-md border ${
                 currentPage === 1
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-orange-600 hover:bg-blue-50"
+                  : "bg-white text-orange-600 hover:bg-orange-50"
               }`}
             >
               Précédent
@@ -301,7 +303,7 @@ export default function Intervention() {
               className={`px-3 py-1 rounded-r-md border ${
                 currentPage === totalPages
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-white text-blue-600 hover:bg-blue-50"
+                  : "bg-white text-orange-600 hover:bg-orange-50"
               }`}
             >
               Suivant

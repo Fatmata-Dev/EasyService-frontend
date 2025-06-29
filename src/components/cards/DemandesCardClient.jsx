@@ -2,7 +2,7 @@ import React, { useState, memo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { format, parseISO } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr, te } from "date-fns/locale";
 import {
   useUpdateDemandeMutation,
   useDeleteDemandeMutation,
@@ -10,14 +10,20 @@ import {
 } from "../../API/demandesApi";
 import { useCreateAvisMutation } from "../../API/servicesApi";
 import { FiArrowRight, FiCalendar, FiChevronRight, FiClock, FiXCircle, FiEye, FiFileText, FiMessageSquare, FiStar, FiThumbsUp, FiTool, FiTrash2, FiUser, FiCheckCircle, FiPlay, FiX } from "react-icons/fi";
+import ConfirmationModal from "../Modals/ConfirmationModal";
 
 const DemandesCardClient = memo(({ demande, onRefresh }) => {
   const navigate = useNavigate();
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState({
     note: demande.note || "",
     commentaire: demande.commentaire || "",
+  });
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null, // 'commencer' ou 'terminer'
+    id: null
   });
 
   const [updateDemande] = useUpdateDemandeMutation();
@@ -86,7 +92,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
       const facture = factures.find((f) => f.refDemande === id);
       if (!facture) return toast.error("Aucune facture trouvée");
       const response = await fetch(
-        `https://easyservice-backend-iv29.onrender.com/api/factures/${facture.odooInvoiceId}/download`,
+        `${import.meta.env.VITE_Backend_URL}/api/factures/${facture.odooInvoiceId}/download`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` } }
       );
       if (!response.ok) throw new Error("Erreur de téléchargement");
@@ -108,27 +114,66 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
     }
   };
 
-  const handleCancel = async (id) => {
-    if (!window.confirm("Annuler cette demande ?")) return;
-    try {
-      await updateDemande({ id, body: { statut: "annulee", etatExecution: "annulee" } }).unwrap();
-      toast.success("Demande annulée");
-      navigate("/client/demandes");
-      onRefresh?.();
-    } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de l'annulation");
-    }
+  // const handleCancel = async (id) => {
+  //   if (!window.confirm("Annuler cette demande ?")) return;
+  //   try {
+  //     await updateDemande({ id, body: { statut: "annulee", etatExecution: "annulee" } }).unwrap();
+  //     toast.success("Demande annulée");
+  //     navigate("/client/demandes");
+  //     onRefresh?.();
+  //   } catch (err) {
+  //     toast.error(err.data?.message || "Erreur lors de l'annulation");
+  //   }
+  // };
+
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Supprimer cette demande ?")) return;
+  //   try {
+  //     await deleteDemande(id).unwrap();
+  //     toast.success("Demande supprimée");
+  //     navigate("/client/demandes");
+  //     onRefresh?.();
+  //   } catch (err) {
+  //     toast.error(err.data?.message || "Erreur lors de la suppression");
+  //   }
+  // };
+
+  const handleStatusChange = (id, action) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Supprimer cette demande ?")) return;
+  const handleConfirmAction = async () => {
+    const { id, action:newStatus } = confirmationState;
+    
     try {
-      await deleteDemande(id).unwrap();
-      toast.success("Demande supprimée");
+      if(newStatus === "annulee"){
+        await updateDemande({ 
+          id, 
+          body: { 
+            statut: newStatus, 
+            etatExecution: 
+            newStatus === "annulee" ? "annulee" : demande.etatExecution
+           } 
+        }).unwrap();
+      }
+
+      if(newStatus === "delete") {
+        await deleteDemande (id).unwrap();
+      }
+      
       navigate("/client/demandes");
+      
+      toast.success(`Demande ${newStatus.toLowerCase()} avec succès`);
       onRefresh?.();
     } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la suppression");
+      toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
     }
   };
 
@@ -188,7 +233,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               </div>
               <div className="ml-2">
                   <p className="text-xs text-gray-500">Service</p>
-                  <p className="font-medium capitalize">{demande?.service}</p>
+                  <p className="font-medium capitalize line-clamp-1">{demande?.service?.nom || demande?.service}</p>
               </div>
             </div>
 
@@ -198,8 +243,8 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               </div>
               <div className="ml-2">
                 <p className="text-xs text-gray-500">Technicien</p>
-                <p className="font-medium capitalize">
-                  {demande?.technicienPrenom} {demande?.technicienNom || "Non assigné"}
+                <p className="font-medium capitalize line-clamp-1">
+                  {demande?.technicienPrenom || demande?.technicien?.prenom} {demande?.technicienNom || demande?.technicien?.nom || "Non assigné"}
                 </p>
               </div>
             </div>
@@ -264,7 +309,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               <FiChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
-              onClick={() => handleCancel(demande?._id)}
+              onClick={() => handleStatusChange(demande._id, "annulee")}
               className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
               <FiXCircle className="w-4 h-4 mr-1.5" />
@@ -284,7 +329,7 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
               <FiChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
             <button
-              onClick={() => handleDelete(demande?._id)}
+              onClick={() => handleStatusChange(demande._id, "delete")}
               className="flex items-center justify-center bg-white text-red-600 border border-red-200 px-3 py-2 rounded hover:bg-red-100 text-sm font-medium"
             >
               <FiTrash2 className="w-4 h-4 mr-1.5" />
@@ -417,6 +462,16 @@ const DemandesCardClient = memo(({ demande, onRefresh }) => {
           </div>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Voulez-vous vraiment ${confirmationState.action === 'delete' ? 'supprimer' : 'annuler'} cette demande ?`}
+        confirmText={confirmationState.action === 'delete' ? 'Supprimer' : 'Annuler'}
+        cancelText="Retour"
+        type={confirmationState.action === 'delete' ? 'danger' : 'danger'}
+      />
     </div>
   );
 });

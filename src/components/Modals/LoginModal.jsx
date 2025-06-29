@@ -1,20 +1,29 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useAuth } from "../../context/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useUserLoginMutation } from "../../API/authApi";
+import { useUserLoginWithGoogleMutation } from "../../API/authApi";
+import { GoogleLogin } from '@react-oauth/google';
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function LoginModal({
   onClose,
   onSwitchToSignup,
   onSwitchToForgetPassword,
   message,
+  isConnected,
 }) {
-  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [loginMutation] = useUserLoginMutation();
+  const [loginWithGoogle] = useUserLoginWithGoogleMutation();
+  const [, setToken] = useState(localStorage.getItem("authToken") || "");
+  const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
     if (message) {
       setError(message);
@@ -29,7 +38,24 @@ export default function LoginModal({
 
     try {
       const jsonData = { email, password };
-      await login(jsonData);
+       // 1. Appel de l'API de login
+       const response = await loginMutation(jsonData).unwrap();
+       const { token: newToken } = response;
+
+      //  console.log(response);
+   
+       // 2. Stockage du token
+       localStorage.setItem("authToken", newToken);
+       setToken(newToken);
+      localStorage.setItem('mess', "message");
+       
+       if (isConnected && (response.user.role === "client" || response.user.role === "admin")) {
+         navigate(`/${response.user.role}/services/${id}`);
+        } else {
+          navigate(`/${response.user.role}/dashboard`);
+        }
+      window.location.reload();
+
 
       onClose(); // Fermer la modale après connexion
     } catch (err) {
@@ -49,7 +75,7 @@ export default function LoginModal({
         className="bg-white rounded-lg px-8 py-4 w-96 mx-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center uppercase">
+        <h2 className="text-2xl font-bold mb-4 text-center uppercase">
           Connexion
         </h2>
 
@@ -58,6 +84,39 @@ export default function LoginModal({
             {error}
           </div>
         )}
+
+        <div className=" w-full grid place-items-center">
+          <GoogleLogin
+            onSuccess={credentialResponse => {
+              loginWithGoogle({ token: credentialResponse.credential })
+                .unwrap()
+                .then((response) => {
+                  localStorage.setItem("authToken", response.tokenJwt);
+                  setToken(response.tokenJwt);
+                  
+                  if (isConnected && (response.user.role === "client" || response.user.role === "admin")) {
+                    navigate(`/${response.user.role}/services/${id}`);
+                  } else {
+                    navigate(`/${response.user.role}/dashboard`);
+                  }
+                  window.location.reload();
+                  onClose();
+                })
+                .catch(err => {
+                  console.log('Login Failed', err);
+                  toast.error(err?.data?.message || 'Erreur lors de la connexion avec Google');
+                  setError(err?.data?.message || 'Erreur lors de la connexion avec Google');
+                });
+            }}
+            onError={() => {
+              console.log('Login Failed');
+              toast.error('Erreur lors de la connexion avec Google');
+              setError('Erreur lors de la connexion avec Google');
+            }}
+          />
+
+          <p className="text-center text-gray-500 mt-2 uppercase">ou</p>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -80,16 +139,26 @@ export default function LoginModal({
             <label htmlFor="password" className="block font-bold text-gray-700">
               Mot de passe
             </label>
-            <input
-              placeholder="Votre Mot de passe"
-              id="password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              required
-            />
+            <div className="flex items-center justify-center relative">
+              <input
+                placeholder="Votre Mot de passe"
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                required
+              />
+
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 top-0 flex items-center text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                </button>
+            </div>
           </div>
 
           <button

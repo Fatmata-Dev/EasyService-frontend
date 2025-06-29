@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate, useLocation } from "react-router-dom";
-import { authApi,useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
+import { useUserLoginMutation, useGetUserConnetedQuery } from "../API/authApi";
 import { AuthContext } from "./authContext";
-import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-
+import LoadingSpinner from "../components/LoadingSpinner";
 
 
 const AuthProvider = ({ children }) => {
@@ -13,9 +12,9 @@ const AuthProvider = ({ children }) => {
   const [loginMutation] = useUserLoginMutation();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const dispatch = useDispatch();
-    
+  const [sideBarOpen, setSidebarOpen] = useState(false);
+
+  //console.log(sideBarOpen)
 
   // Utilise RTK Query pour récupérer le user connecté
   const { data: user, isLoading, isError, refetch } = useGetUserConnetedQuery(undefined, {
@@ -54,9 +53,11 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("authToken", newToken);
       setToken(newToken);
 
+      // navigate(`/${user.role}/dashboard`);
+
       // window.location.reload();
 
-      console.log(response);
+      // console.log(response);
 
       toast.success(
         <span>
@@ -79,20 +80,24 @@ const AuthProvider = ({ children }) => {
     // 1. Supprimer le token
     localStorage.removeItem("authToken");
     setToken("");
+    localStorage.setItem("disconnected", "yes")
     
     // 2. Réinitialiser le cache API
     // dispatch(authApi.util.resetApiState());
 
     // 4. Optionnel: Rafraîchir la page
-    window.location.reload();
+    // window.location.reload();
     
     // 3. Rediriger vers la page de login
-    navigate("/", { replace: true });
-    
+    // navigate("/", { replace: true });
     
   };
 
-  if (isLoading) return <div>Chargement...</div>;
+  const toggleSidebar = () => {
+    setSidebarOpen(!sideBarOpen);
+  };
+
+  if (isLoading) return <div><LoadingSpinner/></div>;
 
   return (
     <AuthContext.Provider
@@ -101,6 +106,8 @@ const AuthProvider = ({ children }) => {
         token,
         login,
         logout,
+        sideBarOpen,
+        toggleSidebar,
         refetchUser: refetch,
       }}
     >

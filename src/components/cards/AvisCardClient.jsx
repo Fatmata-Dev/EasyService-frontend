@@ -100,11 +100,11 @@ const AvisCardClient = ({ review, demande, currentRating, maxRating = 5, showBut
       {/* Card body */}
       <div className="px-5 py-2">
         
-      <h3 className="text-xl font-bold line-clamp-1">
+      <h3 className="text-xl font-bold line-clamp-1 mb-2">
                 {review?.service}
               </h3>
         {/* Rating and date */}
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
           <div className="flex items-center">
             {renderStars(currentRating)}
             <span className="ml-2 text-sm text-gray-500">{currentRating}/{maxRating}</span>

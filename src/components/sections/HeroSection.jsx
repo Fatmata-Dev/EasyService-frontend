@@ -13,19 +13,24 @@ const fadeInUp = {
 
 export default function HeroSection() {
   const backgroundImages = [
+    "/10655425.webp",
     "/image1.jpeg",
+    "/image10.jpeg",
     "/image2.jpeg",
+    "/coiffeuse.png",
     "/image3.jpeg",
     "/image4.jpeg",
     "/image5.jpeg",
+    "/depannage-chauffe-eau.jpg",
     "/image6.jpeg",
     "/image7.jpeg",
+    "/illustration-developpeur-C.png",
     "/image8.jpeg",
     "/image9.jpeg",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -68,7 +73,7 @@ export default function HeroSection() {
           variants={{
             visible: { transition: { staggerChildren: 0.2 } },
           }}
-          className="absolute z-10 text-center absolute bottom-24 right-[50%] translate-x-[50%] w-full mb-1"
+          className="absolute z-10 text-center absolute bottom-0 md:bottom-4 right-[50%] translate-x-[50%] w-full mb-1"
         >
           <motion.h1 variants={fadeInUp} className="text-4xl font-bold text-white">
             Bienvenue sur <span className="text-orange-500">EasyService</span>
@@ -82,6 +87,8 @@ export default function HeroSection() {
             <Link
               to="services"
               smooth={true}
+              duration={1000}
+              offset={-75}
               className="inline-block bg-orange-500 text-white px-8 py-3 rounded-full mb-6 lg:mb-0
                        hover:bg-orange-600 transition-all duration-300 transform hover:scale-105 cursor-pointer"
             >

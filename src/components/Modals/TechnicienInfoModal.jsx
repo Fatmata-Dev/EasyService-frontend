@@ -72,6 +72,7 @@ const handleSubmit = async (e) => {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Champs Metier */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Métier</label>
             <input
@@ -84,6 +85,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Champs Tel */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Téléphone</label>
             <input
@@ -96,6 +98,7 @@ const handleSubmit = async (e) => {
             />
           </div>
 
+          {/* Champs Catégorie */}
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Catégorie</label>
             {categories.length === 0 ? (
@@ -154,6 +157,7 @@ const handleSubmit = async (e) => {
             {error && <p className="text-red-500">{error.data?.message}</p>}
           </div>
 
+          {/* Champs Disponible */}
           <div className="mb-4 flex items-center">
             <input
               type="checkbox"

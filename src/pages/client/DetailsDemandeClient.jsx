@@ -5,9 +5,8 @@ import { parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { useDeleteDemandeMutation, useGetDemandeByIdQuery, useGetFacturesQuery, useUpdateDemandeMutation } from "../../API/demandesApi";
 import { useGetCategorieByIdQuery } from "../../API/servicesApi";
-import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetUserByIdQuery } from "../../API/authApi";
+// import { useGetUserByIdQuery } from "../../API/authApi";
 import { useState } from "react";
 import { useCreateAvisMutation } from "../../API/servicesApi";
 import { 
@@ -20,15 +19,16 @@ import {
   FiCheck,
   FiDownload
 } from "react-icons/fi";
+import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 export default function DetailsDemandeClient() {
   const { id } = useParams();
   const { data: demande, isLoading, error } = useGetDemandeByIdQuery(id, { skip: !id });
   const idCategorie = demande?.categorieService;
   const { data: categorie } = useGetCategorieByIdQuery(idCategorie, { skip: !idCategorie });
-  const idUser = demande?.admin;
-  const { data: admin } = useGetUserByIdQuery(idUser, { skip: !idUser });
-  console.log(demande);
+  // const idUser = demande?.admin;
+  // const { data: admin } = useGetUserByIdQuery(idUser, { skip: !idUser });
+  // console.log(demande);
   const [updateDemande] = useUpdateDemandeMutation();
   const [deleteDemande] = useDeleteDemandeMutation();
   const [createAvis] = useCreateAvisMutation();
@@ -40,51 +40,96 @@ export default function DetailsDemandeClient() {
     note: demande?.note || "",
     commentaire: demande?.commentaire || "",
   });
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null, // 'commencer' ou 'terminer'
+    id: null
+  });
 
-  const statusConfig = {
-    en_attente: { label: "En attente", color: "bg-yellow-500" },
-    acceptee: { label: "Acceptée", color: "bg-indigo-500" },
-    en_cours: { label: "En cours", color: "bg-blue-500" },
-    terminee: { label: "Terminée", color: "bg-green-500" },
-    annulee: { label: "Annulée", color: "bg-red-500" },
-    refusee: { label: "Refusée", color: "bg-gray-500" },
+  // const statusConfig = {
+  //   en_attente: { label: "En attente", color: "bg-yellow-500" },
+  //   acceptee: { label: "Acceptée", color: "bg-indigo-500" },
+  //   en_cours: { label: "En cours", color: "bg-blue-500" },
+  //   terminee: { label: "Terminée", color: "bg-green-500" },
+  //   annulee: { label: "Annulée", color: "bg-red-500" },
+  //   refusee: { label: "Refusée", color: "bg-gray-500" },
+  // };
+
+  // const handleStatusChange = async (id, newStatus) => {
+  //   const confirmMessages = {
+  //     annulee: "Voulez-vous annuler cette demande ?",
+  //   };
+    
+  //   if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
+    
+  //   try {
+  //     await updateDemande({ 
+  //       id, 
+  //       body: { 
+  //         statut: newStatus, 
+  //         etatExecution: 
+  //         newStatus === "refusee" ? "annulee" : demande.etatExecution
+  //        } 
+  //     }).unwrap();
+      
+  //     toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
+  //     navigate("/client/demandes");
+  //   } catch (err) {
+  //     toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+  //   }
+  // };
+
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Voulez-vous supprimer cette demande ?")) return;
+
+  //   try {
+  //     await deleteDemande(id).unwrap();
+  //     toast.success("Demande supprimée avec succès");
+  //     navigate("/client/demandes");
+  //   } catch (err) {
+  //     toast.error(err.data?.message || "Erreur lors de la suppression de la demande");
+  //   }
+  // };
+
+  const handleStatusChange = (id, action) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
   };
 
-  const handleStatusChange = async (id, newStatus) => {
-    const confirmMessages = {
-      annulee: "Voulez-vous annuler cette demande ?",
-    };
-    
-    if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
+  const handleConfirmAction = async () => {
+    const { id, action:newStatus } = confirmationState;
     
     try {
-      await updateDemande({ 
-        id, 
-        body: { 
-          statut: newStatus, 
-          etatExecution: 
-          newStatus === "refusee" ? "annulee" : demande.etatExecution
-         } 
-      }).unwrap();
+      if(newStatus === "annulee"){
+        await updateDemande({ 
+          id, 
+          body: { 
+            statut: newStatus, 
+            etatExecution: 
+            newStatus === "annulee" ? "annulee" : demande.etatExecution
+           } 
+        }).unwrap();
+      }
+
+      if(newStatus === "delete") {
+        await deleteDemande (id).unwrap();
+      }
       
-      toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
       navigate("/client/demandes");
+      
+      toast.success(`Demande ${newStatus} avec succès`);
+      // onRefresh?.();
     } catch (err) {
       toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Voulez-vous supprimer cette demande ?")) return;
-
-    try {
-      await deleteDemande(id).unwrap();
-      toast.success("Demande supprimée avec succès");
-      navigate("/client/demandes");
-    } catch (err) {
-      toast.error(err.data?.message || "Erreur lors de la suppression de la demande");
-    }
-  };
 
   const handleFeedbackChange = (e) => {
     const { name, value } = e.target;
@@ -368,7 +413,7 @@ export default function DetailsDemandeClient() {
             <div className="w-full">
               <button
                 className="fixed bottom-5 right-5 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit flex items-center"
-                onClick={() => handleDelete(demande._id)}
+                onClick={() => handleStatusChange(demande._id, "delete")}
               >
                 <FiTrash2 className="mr-2" /> Supprimer
               </button>
@@ -478,6 +523,16 @@ export default function DetailsDemandeClient() {
           </div>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Voulez-vous vraiment ${confirmationState.action === 'delete' ? 'supprimer' : 'annuler'} cette demande ?`}
+        confirmText={confirmationState.action === 'delete' ? 'Supprimer' : 'Annuler'}
+        cancelText="Retour"
+        type={confirmationState.action === 'delete' ? 'danger' : 'danger'}
+      />
     </div>  
   );
 }

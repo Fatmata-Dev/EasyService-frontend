@@ -24,6 +24,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
     uniteDuree: selectedService?.uniteDuree || "heures",
     technicien: selectedService?.technicien || "",
     dateIntervention: selectedService?.dateIntervention || "",
+    adresse: selectedService?.adresse || "",
   });
 
   const [error, setError] = useState("");
@@ -89,6 +90,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       status: "en_attente",
       technicien: formData.technicien || null,
       admin: null,
+      adresse: formData.adresse,
     };
 
     try {
@@ -110,7 +112,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
+        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto hide-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
@@ -125,6 +127,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
+            {/* Nom du service */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Service
@@ -136,6 +139,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               />
             </div>
 
+            {/* Catégorie */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">Catégorie</label>
               <select
@@ -152,15 +156,18 @@ export default function ReservationModal({ setShowModal, selectedService }) {
             </div>
           </div>
 
+          {/* Description */}
           <div className="mb-4 w-full">
             <label className="block font-bold text-gray-700">Description</label>
             <textarea
               disabled
               value={formData.description}
-              className="py-2 block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+              rows="3"
+              className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed line-clamp-2"
             />
           </div>
 
+          {/* Durée */}
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">Durée</label>
@@ -177,6 +184,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               />
             </div>
 
+            {/* Unité de durée */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Unité de durée
@@ -192,6 +200,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               </select>
             </div>
 
+            {/* Tarif */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Tarif (XOF)
@@ -210,6 +219,7 @@ export default function ReservationModal({ setShowModal, selectedService }) {
             </div>
           </div>
 
+          {/* Date et heure d'intervention */}
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
@@ -224,6 +234,21 @@ export default function ReservationModal({ setShowModal, selectedService }) {
               />
             </div>
 
+            {/* Lieu de l'intervention */}
+            {/* <div className="mb-4 w-full">
+              <label className="block font-bold text-gray-700">
+                Lieu d'intervention
+              </label>
+              <select
+                disabled
+                value={formData.adresse}
+                className="block w-full rounded bg-gray-200 px-3 py-1.5 text-base text-gray-900 border border-gray-400 cursor-not-allowed"
+              >
+                <option value="home">Chez moi</option>
+              </select>
+            </div> */}
+
+            {/* Technicien */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Technicien

@@ -53,7 +53,7 @@ export default function AddTechnicienModal({ setShowModal }) {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
-          className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-lg shadow-xl w-full md:max-w-xl max-w-md mx-4 max-h-[90vh] overflow-y-auto hide-scrollbar"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -90,6 +90,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                       value={formData.prenom}
                       onChange={handleInputChange}
                       required
+                      placeholder="Prénom du technicien"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -104,6 +105,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                     value={formData.nom}
                     onChange={handleInputChange}
                     required
+                    placeholder="Nom du technicien"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
@@ -121,6 +123,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                       value={formData.telephone}
                       onChange={handleInputChange}
                       required
+                      placeholder="Ex : +221771234567"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -137,6 +140,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                       value={formData.metier}
                       onChange={handleInputChange}
                       required
+                      placeholder="Ex : Plombier"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -188,6 +192,7 @@ export default function AddTechnicienModal({ setShowModal }) {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
+                      placeholder="Adresse email du technicien"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     />
                   </div>

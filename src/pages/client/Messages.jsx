@@ -117,10 +117,10 @@ const MessagesClient = () => {
         className="bg-white rounded-lg sm:shadow-md sm:p-6"
       >
         {/* En-tête */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center flex-wrap gap-4 mb-6">
           <h1 className="text-2xl font-bold text-gray-800 flex items-center">
             <FaEnvelope className="mr-2 text-orange-500" />
-            Mes Messages ({allMessages.map((message) => isMessageUnread(message) ? 1 : 0).reduce((a, b) => a + b, 0)} non lus)
+            Messages ({allMessages.map((message) => isMessageUnread(message) ? 1 : 0).reduce((a, b) => a + b, 0)} non lus)
           </h1>
 
           <div className="relative mt-4 md:mt-0 w-full md:w-64">

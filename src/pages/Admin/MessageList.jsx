@@ -116,7 +116,7 @@ const MessagesList = () => {
         {/* En-tête */}
         <div className="flex justify-between items-center flex-wrap gap-2 mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
-            Messagerie Admin
+            Messages
           </h1>
           <button
             onClick={() => setShowForm(true)}

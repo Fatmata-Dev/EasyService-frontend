@@ -13,11 +13,17 @@ import toast from "react-hot-toast";
 import MessageForm from "../Admin/MessageForm";
 import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../context/useAuth";
+import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 const DetailsMessageClient = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null, // 'commencer' ou 'terminer'
+    id: null
+  });
   
   // Récupération des données avec RTK Query
   const { data: message, isLoading, error } = useGetMessageByIdQuery(id);
@@ -58,16 +64,44 @@ const DetailsMessageClient = () => {
     }
   }, [id, message, currentUserEmail, markAsRead]);
 
-  const handleDeleteMessage = async (messageId) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer ce message ?")) return;
+  // const handleDeleteMessage = async (messageId) => {
+  //   if (!window.confirm("Voulez-vous vraiment supprimer ce message ?")) return;
+    
+  //   try {
+  //     await deleteMessage(messageId).unwrap();
+  //     toast.success("Message supprimé avec succès");
+  //     navigate("/client/messages");
+  //   } catch (err) {
+  //     console.error("Erreur de suppression:", err);
+  //     toast.error(err.data?.message || "Erreur lors de la suppression");
+  //   }
+  // };
+
+  const handleStatusChange = (id, action) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { id, action:newStatus } = confirmationState;
     
     try {
-      await deleteMessage(messageId).unwrap();
-      toast.success("Message supprimé avec succès");
+      if(newStatus === "delete") {
+        await deleteMessage (id).unwrap();
+      }
+      
       navigate("/client/messages");
+      
+      toast.success(`Message ${newStatus.toLowerCase()} avec succès`);
+      // onRefresh?.();
     } catch (err) {
-      console.error("Erreur de suppression:", err);
-      toast.error(err.data?.message || "Erreur lors de la suppression");
+      toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
     }
   };
 
@@ -186,7 +220,7 @@ const DetailsMessageClient = () => {
 
         <div className="border-t border-gray-200 pt-4 flex justify-between">
           <button
-            onClick={() => handleDeleteMessage(message._id)}
+            onClick={() => handleStatusChange(message._id, "delete")}
             className="text-red-500 hover:text-red-700 flex items-center"
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,6 +252,16 @@ const DetailsMessageClient = () => {
           }}
         />
       )}
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Êtes-vous sûr de vouloir ${confirmationState.action === 'delete' ? 'supprimer' : 'annuler'} ce message ?`}
+        confirmText={confirmationState.action === 'delete' ? 'Supprimer' : 'Annuler'}
+        cancelText="Retour"
+        type={confirmationState.action === 'delete' ? 'danger' : 'danger'}
+      />
     </div>
   );
 };

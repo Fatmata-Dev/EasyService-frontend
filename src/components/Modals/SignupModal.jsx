@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useUserRegisterMutation } from "../../API/authApi";
+import { useUserLoginWithGoogleMutation } from "../../API/authApi";
+import { GoogleLogin } from '@react-oauth/google';
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignupModal({ onClose, onSwitchToLogin }) {
   const [error, setError] = useState("");
@@ -13,6 +16,8 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [register, { isLoading, isError }] = useUserRegisterMutation();
+  const [loginWithGoogle] = useUserLoginWithGoogleMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -21,35 +26,6 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-
-  // const validateForm = () => {
-  //   if (
-  //     !formData.nom ||
-  //     !formData.prenom ||
-  //     !formData.email ||
-  //     !formData.password
-  //   ) {
-  //     setError("Veuillez remplir tous les champs");
-  //     return false;
-  //   }
-
-  //   if (!formData.terms) {
-  //     setError("Veuillez accepter les conditions générales");
-  //     return false;
-  //   }
-
-  //   if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-  //     setError("Veuillez entrer une adresse email valide");
-  //     return false;
-  //   }
-
-  //   if (formData.password.length < 6) {
-  //     setError("Le mot de passe doit contenir au moins 6 caractères");
-  //     return false;
-  //   }
-
-  //   return true;
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,7 +47,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
       };
       const response = await register(jsonData).unwrap();
 
-      console.log(response);
+      // console.log(response);
 
         toast.success("Inscription réussie !");
         onSwitchToLogin();
@@ -105,7 +81,36 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
           </div>
         )}
 
+
+        <div className=" w-full grid place-items-center">
+          {/* Connectez-vous avec Google */}
+            <GoogleLogin 
+              onSuccess={credentialResponse => {
+                loginWithGoogle({ token: credentialResponse.credential })
+                  .unwrap()
+                  .then((response) => {
+                    toast.success("Inscription réussie !");
+                    onSwitchToLogin();
+                    //console.log(response);
+                  })
+                  .catch(err => {
+                    console.log('Login Failed', err);
+                    toast.error(err?.data?.message || 'Erreur lors de la connexion avec Google');
+                    setError(err?.data?.message || 'Erreur lors de la connexion avec Google');
+                  });
+              }}
+              onError={() => {
+                console.log('Login Failed');
+                toast.error('Erreur lors de la connexion avec Google');
+                setError('Erreur lors de la connexion avec Google');
+              }}
+            />
+
+          <p className="text-center text-gray-500 mt-2 uppercase">ou</p>
+        </div>
+
         <form onSubmit={handleSubmit}>
+          {/* Prénom */}
           <div className="mb-4">
             <label htmlFor="prenom" className="block font-bold text-gray-700">
               Prénom
@@ -122,6 +127,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             />
           </div>
 
+          {/* Nom */}
           <div className="mb-4">
             <label htmlFor="nom" className="block font-bold text-gray-700">
               Nom
@@ -138,6 +144,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             />
           </div>
 
+          {/* Email */}
           <div className="mb-4">
             <label htmlFor="email" className="block font-bold text-gray-700">
               Email
@@ -154,23 +161,35 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             />
           </div>
 
+          {/* Mot de passe */}
           <div className="mb-4">
             <label htmlFor="password" className="block font-bold text-gray-700">
               Mot de passe
             </label>
-            <input
-              placeholder="Au moins 6 caractères"
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
-              required
-              minLength={6}
-            />
+            <div className="flex justify-center items-center relative">
+              <input
+                placeholder="Au moins 6 caractères"
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={handleChange}
+                className="block w-full rounded bg-white px-3 py-1.5 text-base text-gray-900 border border-gray-400 bg-gray-200 outline-1 -outline-offset-1 outline-orange-500 placeholder:text-gray-500 focus:outline-orange-500 sm:text-sm/6"
+                required
+                minLength={6}
+              />
+
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 top-0 flex items-center text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+                </button>
+              </div>
           </div>
 
+          {/* Conditions generales */}
           <div className="flex items-start mb-4">
             <div className="flex items-center h-5">
               <input

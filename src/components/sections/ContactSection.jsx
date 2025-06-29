@@ -24,11 +24,12 @@ export default function ContactSection() {
     setIsLoading(true);
 
     try {
+      // console.log("name", formData);
       await emailjs.send(
-        "service_tvzystp", // Remplacez par votre ID de service EmailJS
-        "template_e0lcrrm", // Remplacez par votre ID de template
+        import.meta.env.VITE_SERVICE_ID, // Remplacez par votre ID de service EmailJS
+        import.meta.env.VITE_TEMPLATE_ID, // Remplacez par votre ID de template
         formData,
-        "yEo8HiDmt3WvVcAnf" // Remplacez par votre clé publique EmailJS
+        import.meta.env.VITE_PUBLIC_KEY // Remplacez par votre clé publique EmailJS
       );
 
       toast.success("Message envoyé avec succès !");
@@ -52,12 +53,12 @@ export default function ContactSection() {
       <form onSubmit={handleSubmit} className="mx-4 md:mb-12">
         <div className="py-4 container max-w-xl mx-auto">
           <div className="bg-gray-100 py-4">
-            <p className="mb-4 text-xl text-gray-600 text-center">
+            <p className="mb-4 text-xl text-gray-600 text-center mx-4">
               Pour plus d&apos;informations sur notre entreprise et nos
               services, envoyez nous un message via ce formulaire
             </p>
 
-            <div className="mx-12">
+            <div className="mx-4 sm:mx-12">
               {/* Champs du formulaire avec ajout de value et onChange */}
               <div className="mb-4">
                 <label
@@ -106,11 +107,11 @@ export default function ContactSection() {
                   htmlFor="subjct"
                   className="block font-medium text-gray-900"
                 >
-                  subject
+                  Sujet
                 </label>
                 <div className="mt-2">
                   <input
-                    placeholder="Votre sujet"
+                    placeholder="C'est à propos de quel sujet ?"
                     id="subject"
                     name="subject"
                     type="text"

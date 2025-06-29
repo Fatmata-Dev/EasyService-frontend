@@ -16,7 +16,7 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
   });
   
 
-  console.log(review);
+  // console.log(review);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -100,11 +100,11 @@ const AvisCard = ({ review, currentRating, maxRating = 5, showButton = true, isA
       {/* Card body */}
       <div className="px-5 py-2">
         
-      <h3 className="text-xl font-bold line-clamp-1">
+      <h3 className="text-xl font-bold line-clamp-1 mb-1">
                 {review?.service}
               </h3>
         {/* Rating and date */}
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex justify-between items-center flex-wrap gap-2 mb-3">
           <div className="flex items-center">
             {renderStars(currentRating)}
             <span className="ml-2 text-sm text-gray-500">{currentRating}/{maxRating}</span>

@@ -127,7 +127,7 @@ export default function DashboardAdmin() {
   }
 
   return (
-    <div className="sm:p-6">
+    <div className="p-2">
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>
       
       {/* Statistiques */}
@@ -208,7 +208,10 @@ export default function DashboardAdmin() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Derniers avis */}
         <div className="bg-white p-4 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4">Derniers avis</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Derniers avis</h2>
+            <Link to="/admin/avis" className="text-blue-500 hover:underline">Voir plus &rarr;</Link>
+          </div>
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {[...enrichedAvis].reverse().slice(0, 3).map(avis => (
               <AvisItem key={avis._id} avis={avis} />
@@ -223,7 +226,7 @@ export default function DashboardAdmin() {
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Messages récents</h2>
-            <Link to="/admin/messages" className="text-blue-500 hover:underline">Voir tout</Link>
+            <Link to="/admin/messages" className="text-blue-500 hover:underline">Voir tout &rarr;</Link>
           </div>
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {messages.slice(0, 3).map(message => (
@@ -282,7 +285,7 @@ function AvisItem({ avis }) {
       <div className="flex justify-between items-start">
         <div className="flex gap-2 items-center">
           <img
-                src={avis.client?.image?.url || ProfilSignature}
+                src={avis.client?.image?.url || `https://ui-avatars.com/api/?name=${avis?.client?.prenom}+${avis?.client?.nom}&background=random`}
                 alt="Signature professionnelle"
                 className="w-12 h-12 rounded-full object-cover"
               />

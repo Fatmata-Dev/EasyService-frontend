@@ -13,7 +13,7 @@ export default function AssignTechnicienModal({
   const [selectedTechnicien, setSelectedTechnicien] = useState("");
   const { user } = useAuth();
   const adminId = user?._id;
-  console.log(adminId);
+  // console.log(adminId);
 
   // Récupération des techniciens via RTK Query
   const { 
@@ -23,7 +23,7 @@ export default function AssignTechnicienModal({
     refetch
   } = useGetTechniciensQuery();
 
-  console.log(techniciensData);
+  // console.log(techniciensData);
 
   // Mutation pour l'assignation
   const [assignerDemande, { isLoading: isAssigning }] = useAssignerDemandeMutation();
@@ -34,7 +34,7 @@ export default function AssignTechnicienModal({
 
   // Filtrage des techniciens disponibles
   const techniciensDisponibles = techniciensData?.filter(tech => 
-    tech._id && tech.prenom && tech.nom && tech.disponible
+    tech._id && tech.prenom && tech.nom && tech.disponible 
   ) || [];
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function AssignTechnicienModal({
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
+        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-[90vh] overflow-y-auto hide-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
