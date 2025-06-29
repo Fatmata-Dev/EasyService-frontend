@@ -30,7 +30,7 @@ export default function Deconnexion( { user } ) {
     return (
         <>
             <div className="flex flex-col justify-center items-center h-screen">
-                <img src="/src/assets/logo.png" alt="Logo de Easy Service" aria-label="Logo de Easy Service" />
+                <img src="https://res.cloudinary.com/ds5zfxlhf/image/upload/v1745237611/Logo-EasyService.png" alt="Logo de Easy Service" aria-label="Logo de Easy Service" />
                 <h1 className="text-3xl font-bold text-orange-500 animate-pulse mt-3">Deconnexion en cours...</h1>
             </div>
         </>
