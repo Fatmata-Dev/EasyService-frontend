@@ -60,7 +60,7 @@ const ServicesModal = ({
       const selectedCategory = categories.find(
         (cat) => cat._id === selectedService.categorie
       );
-      console.log("Catégorie trouvée :", selectedCategory);
+      // console.log("Catégorie trouvée :", selectedCategory);
     }
   }, [categories, selectedService]);
 
@@ -68,6 +68,7 @@ const ServicesModal = ({
   // console.log("categorie dans form:", watch("categorie"));
   // console.log("categories:", categories);
 
+  // Gestion de l'image
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -78,6 +79,7 @@ const ServicesModal = ({
     }
   };
 
+  // Gestion de la catégorie
   const handleCreateCategory = async () => {
     if (!newCategory) return;
 
@@ -144,7 +146,7 @@ const ServicesModal = ({
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-screen overflow-y-auto"
+        className="bg-white rounded-lg px-8 py-4 min-w-[200px] w-[800px] m-5 max-h-[90vh] overflow-y-auto hide-scrollbar"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="uppercase border-b-2 border-dashed w-full mb-2 font-bold text-xl text-orange-500 text-center">
@@ -234,7 +236,7 @@ const ServicesModal = ({
             </div>
           </div>
 
-          {/* Autres champs */}
+          {/* Durée */}
           <div className="flex flex-col md:flex-row md:gap-5 w-full">
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">Durée</label>
@@ -246,6 +248,7 @@ const ServicesModal = ({
               />
             </div>
 
+            {/* Unité de Durée */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Unité Durée
@@ -261,6 +264,7 @@ const ServicesModal = ({
               </select>
             </div>
 
+            {/* Tarif */}
             <div className="mb-4 w-full">
               <label className="block font-bold text-gray-700">
                 Tarif (XOF) *

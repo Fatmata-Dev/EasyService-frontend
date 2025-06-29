@@ -1,21 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import toast from "react-hot-toast";
 import { useGetUserConnetedQuery } from "../API/authApi";
 import Sidebar from "../components/navigation/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
+import toast from "react-hot-toast";
 
 const UsersHome = () => {
 const { data: user, isloading } = useGetUserConnetedQuery();
 const [isScrolled, setIsScrolled] = useState(false);
-// const [messageShown, setMessageShown] = useState(false);
 const message = localStorage.getItem('message');
-const RoleBasedSidebar = ({ role }) => {
-  if (role === "admin") return <SidebarAdmin user={user} />;
-  if (role === "technicien") return <SidebarTechnicien user={user} />;
-    return <Sidebar user={user} />; // client par défaut
-  };
       
 //   console.log(user);
 
@@ -32,33 +26,33 @@ const RoleBasedSidebar = ({ role }) => {
     window.addEventListener("scroll", handleScroll);
 
     
-    // const message = localStorage.getItem('message');
-
-    // if (message && user && !messageShown) {
-    //     toast.success(
-    //       <span>
-    //         <p>
-    //           Bienvenu(e)
-    //           <strong className='font-bold capitalize'>{" "}{user?.prenom} {user?.nom}</strong>, vous êtes connecté en tant que
-    //           <strong className='font-bold capitalize'>{" "}{user?.role}</strong>
-    //         </p>
-    //       </span>,
-    //       { duration: 5000 }
-    //     );
-    //     localStorage.removeItem('message');
-    //     setMessageShown(true);
-    //   }
+    if(user && localStorage.getItem('mess')) {
+      toast.success(
+        <span>
+          <p>
+            Bienvenu(e)
+            <strong className='font-bold capitalize'>{" "}{user?.prenom} {user?.nom}</strong>, vous êtes connecté en tant que
+            <strong className='font-bold capitalize'>{" "}{user?.role}</strong>
+          </p>
+        </span>,
+        { duration: 5000 }
+      );
+      
+        localStorage.removeItem('mess');
+    }
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+
+    
     
   }, [ message, user]);
   
 
 //   if (!token) return navigate("/", { replace: true });
-  if (!user) return <div className="text-center p-8">Vous n'êtes pas connecté</div>;
-  if (isloading) return <div className="text-center p-8">Chargement...</div>;
+  if (!user) return <div className="text-center p-8 w-full">Vous n'êtes pas connecté</div>;
+  if (isloading) return <div className="flex justify-center items-center h-screen w-full"><LoadingSpinner /></div>;
 
 return (
     <div className="min-h-screen bg-gray-50">

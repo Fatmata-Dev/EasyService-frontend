@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import AssignTechnicienModal from "../Modals/AssignerTechnicienModal";
 import { format, parseISO } from "date-fns";
@@ -11,12 +11,17 @@ import {
 } from "../../API/demandesApi";
 import { 
   FiUser, FiCalendar, FiTool, FiClock, FiCheckCircle, 
-  FiXCircle, FiAlertCircle, FiInfo, FiEdit, FiTrash2
+  FiXCircle, FiInfo, FiEdit
 } from "react-icons/fi";
+import ConfirmationModal from "../Modals/ConfirmationModal";
 
 const DemandesCard = memo(({ demande, onRefresh }) => {
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const navigate = useNavigate();
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null, // 'commencer' ou 'terminer'
+    id: null
+  });
   const [updateDemande] = useUpdateDemandeMutation();
   const [supprimerDemande] = useDeleteDemandeMutation();
 
@@ -62,14 +67,43 @@ const DemandesCard = memo(({ demande, onRefresh }) => {
     annulee: { label: "Annulée", color: "bg-gray-100 text-gray-800", icon: <FiXCircle className="mr-1" /> },
   };
 
-  const handleStatusChange = async (id, newStatus) => {
-    const confirmMessages = {
-      refusee: "Voulez-vous rejeter cette demande ?",
-      annulee: "Voulez-vous annuler cette demande ?",
-      terminee: "Voulez-vous marquer cette demande comme terminée ?",
-    };
+  // const handleStatusChange = async (id, newStatus) => {
+  //   const confirmMessages = {
+  //     refusee: "Voulez-vous rejeter cette demande ?",
+  //     annulee: "Voulez-vous annuler cette demande ?",
+  //     terminee: "Voulez-vous marquer cette demande comme terminée ?",
+  //   };
     
-    if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
+  //   if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
+    
+  //   try {
+  //     await updateDemande({ 
+  //       id, 
+  //       body: { 
+  //         statut: newStatus, 
+  //         etatExecution: 
+  //         newStatus === "refusee" ? "annulee" : demande.etatExecution ||
+  //         newStatus === "annulee" ? "annulee" : demande.etatExecution
+  //        } 
+  //     }).unwrap();
+      
+  //     toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
+  //     onRefresh?.();
+  //   } catch (err) {
+  //     toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+  //   }
+  // };
+
+    const handleStatusChange = (id, action) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { id, action:newStatus } = confirmationState;
     
     try {
       await updateDemande({ 
@@ -86,6 +120,9 @@ const DemandesCard = memo(({ demande, onRefresh }) => {
       onRefresh?.();
     } catch (err) {
       toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
     }
   };
 
@@ -243,6 +280,16 @@ const DemandesCard = memo(({ demande, onRefresh }) => {
           demande={demande}
         />
       )}
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Voulez-vous vraiment ${confirmationState.action === 'refusee' ? 'refuser' : 'annuler'} cette demande ?`}
+        confirmText={confirmationState.action === 'refusee' ? 'Refuser' : 'Annuler'}
+        cancelText="Retour"
+        type={confirmationState.action === 'refusee' ? 'danger' : 'danger'}
+      />
     </div>
   );
 });

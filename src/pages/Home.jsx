@@ -10,6 +10,8 @@ import ForgetPasswordModal from "../components/Modals/ForgetPasswordModal";
 import Navbar from "../components/navigation/Navbar";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { scroller } from "react-scroll";
+import LoadingSpinner from "../components/LoadingSpinner";
+import toast from "react-hot-toast";
 
 // Ajoutez ces données avant la fonction Home
 const testimonialsData = [
@@ -61,6 +63,7 @@ export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showForgetPassword, setShowForgetPassword] = useState(false);
+  const [loading,] = useState(false);
 
   useEffect(() => {
     const sectionToScroll = sessionStorage.getItem('scrollToSection');
@@ -87,6 +90,11 @@ export default function Home() {
         }
       }
     };
+
+    if(localStorage.getItem("disconnected")) {
+      toast.success('Déconnexion réussi');
+      localStorage.removeItem('disconnected')
+    }
 
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -132,22 +140,29 @@ export default function Home() {
         />
       )}
 
-      {/* Sections */}
-      <HeroSection />
-      <ServicesSection services={servicesData} />
-          <div className="flex justify-end items-center mt-5 lg:px-8 mx-4">
-            <span
-              to="home"
-              className="text-orange-500 cursor-pointer font-bold flex items-center gap-2"
-              onClick={() => setShowLogin(true)}
-            >
-              Voir toutes les services{" "}
-              <FaLongArrowAltRight className="text-xl" />
-            </span>
-          </div>
-      <TestimonialsSection testimonials={testimonialsData} />
-      <ContactSection />
-      <FooterSection />
+      {loading ? <LoadingSpinner /> :
+
+      (
+        <div>
+          {/* Sections */}
+          <HeroSection />
+          <ServicesSection services={servicesData} />
+              <div className="flex justify-end items-center mt-5 lg:px-8 mx-4">
+                <span
+                  to="home"
+                  className="text-orange-500 cursor-pointer font-bold flex items-center gap-2"
+                  onClick={() => setShowLogin(true)}
+                >
+                  Voir toutes les services{" "}
+                  <FaLongArrowAltRight className="text-xl" />
+                </span>
+              </div>
+          <TestimonialsSection testimonials={testimonialsData} />
+          <ContactSection />
+          <FooterSection />
+        </div>
+      )
+    }
     </div>
   );
 }

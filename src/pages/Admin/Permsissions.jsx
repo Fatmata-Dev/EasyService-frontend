@@ -12,6 +12,7 @@ import {
 import { useGetUsersQuery, useUpdateUserRoleMutation, useBlockUserMutation, useUnblockUserMutation } from "../../API/authApi";
 import toast from "react-hot-toast";
 import TechnicienInfoModal from "../../components/Modals/TechnicienInfoModal";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function PermissionsAdmin() {
   const [blockUser] = useBlockUserMutation();
@@ -114,7 +115,7 @@ export default function PermissionsAdmin() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between flex-wrap gap-2 items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
           Gestion des Permissions
         </h1>
@@ -124,7 +125,7 @@ export default function PermissionsAdmin() {
           onClick={() => setShowAddModal(true)}
         >
           <IoIosAdd className="mr-2" />
-          Ajouter un Technicien
+          Nouveau Technicien
         </button>
       </div>
 
@@ -136,9 +137,9 @@ export default function PermissionsAdmin() {
 
       <div className="overflow-x-auto bg-white p-4 shadow-md rounded-lg">
         {isLoading && users.length === 0 ? (
-          <p className="text-center text-gray-500">
-            Chargement des utilisateurs...
-          </p>
+          <div className="text-center text-gray-500 w-full h-screen">
+            <LoadingSpinner />
+          </div>
         ) : users.length === 0 ? (
           <p className="text-center text-gray-500">Aucun utilisateur trouvé</p>
         ) : (

@@ -9,16 +9,31 @@ import {
   useCreateFactureMutation
 } from "../../API/demandesApi";
 import { FiCalendar, FiCheck, FiChevronDown, FiChevronUp, FiClock, FiFileText, FiLoader, FiMapPin, FiPlay, FiUser, FiX } from "react-icons/fi";
+import ConfirmationModal from "../Modals/ConfirmationModal"
 
 export default function InterventionCard({ intervention, onRefresh }) {
   const [showDetails, setShowDetails] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null, // 'commencer' ou 'terminer'
+    id: null
+  });
   
   // Initialisation des mutations RTK Query
   const [commencerDemande, { isLoading: isStarting }] = useCommencerDemandeMutation();
   const [terminerDemande, { isLoading: isFinishing }] = useTerminerDemandeMutation();
   const [createFacture] = useCreateFactureMutation();
 
-  // console.log(intervention);
+  const formatHeure = (dateString) => {
+    try {
+      return format(parseISO(dateString), "HH:mm", { locale: fr });
+    } catch {
+      return "Heure non définie";
+    }
+  };
+
+  //console.log(intervention);
 
 
   const formatDate = (dateString) => {
@@ -50,21 +65,53 @@ export default function InterventionCard({ intervention, onRefresh }) {
     }
   };
 
-  const handleStatusChange = async (action, id) => {
-    if (!window.confirm(`Voulez-vous ${action} cette intervention ?`)) return;
+  // const handleStatusChange = async (action, id) => {
+  //   if (!window.confirm(`Voulez-vous ${action} cette intervention ?`)) return;
 
+  //   try {
+  //     if (action === "commencer") {
+  //       await commencerDemande({id,body:{ dateDebut: new Date().toISOString()}}).unwrap();
+  //       toast.success("Intervention démarrée avec succès");
+  //       onRefresh?.("en_cours")
+  //     } else {
+  //       await terminerDemande({id,body : { dateFin: new Date().toISOString()}}).unwrap();
+  //       toast.success("Intervention terminée avec succès");
+  //       await generateFacture(id);
+  //       onRefresh?.("terminee")
+  //     }
+
+  //   } catch (err) {
+  //     console.error("Erreur détaillée:", err);
+  //     toast.error(
+  //       err.data?.message ||
+  //       `Échec de l'opération` ||
+  //       "Erreur inconnue, veuillez réessayer"
+  //     );
+  //   }
+  // };
+
+  const handleStatusChange = (action, id) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { action, id } = confirmationState;
+    
     try {
       if (action === "commencer") {
-        await commencerDemande({id,body:{ dateDebut: new Date().toISOString()}}).unwrap();
+        await commencerDemande({id, body: { dateDebut: new Date().toISOString() }}).unwrap();
         toast.success("Intervention démarrée avec succès");
-        onRefresh?.("en_cours")
+        onRefresh?.("en_cours");
       } else {
-        await terminerDemande({id,body : { dateFin: new Date().toISOString()}}).unwrap();
+        await terminerDemande({id, body: { dateFin: new Date().toISOString() }}).unwrap();
         toast.success("Intervention terminée avec succès");
         await generateFacture(id);
-        onRefresh?.("terminee")
+        onRefresh?.("terminee");
       }
-
     } catch (err) {
       console.error("Erreur détaillée:", err);
       toast.error(
@@ -72,29 +119,32 @@ export default function InterventionCard({ intervention, onRefresh }) {
         `Échec de l'opération` ||
         "Erreur inconnue, veuillez réessayer"
       );
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
     }
   };
+
 
   const getStatusBadge = (status) => {
     const statusMap = {
       non_commencee: {
         text: "Non commencée",
-        icon: <FiClock className="w-4 h-4 mr-1" />,
+        icon: <FiClock className="w-4 h-4 m-1" />,
         color: "bg-gray-100 text-gray-800"
       },
       en_cours: { 
         text: "En cours", 
-        icon: <FiPlay className="w-4 h-4 mr-1" />,
+        icon: <FiPlay className="w-4 h-4 m-1" />,
         color: "bg-blue-100 text-blue-800" 
       },
       terminee: { 
         text: "Terminée", 
-        icon: <FiCheck className="w-4 h-4 mr-1" />,
+        icon: <FiCheck className="w-4 h-4 m-1" />,
         color: "bg-green-100 text-green-800" 
       },
       annulee: { 
         text: "Annulée", 
-        icon: <FiX className="w-4 h-4 mr-1" />,
+        icon: <FiX className="w-4 h-4 m-1" />,
         color: "bg-red-100 text-red-800" 
       },
     };
@@ -108,6 +158,8 @@ export default function InterventionCard({ intervention, onRefresh }) {
     );
   };
 
+  if (!intervention) return null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -116,29 +168,34 @@ export default function InterventionCard({ intervention, onRefresh }) {
       className="border border-gray-200 rounded-lg shadow-sm overflow-hidden bg-white"
     >
       <div className="p-4">
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
+          {/* Nom du service */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
               <FiFileText className="w-5 h-5 mr-2 text-blue-500" />
-              {intervention.service || "Service non spécifié"}
+              {intervention?.service?.nom || intervention?.service || "Service non spécifié"}
             </h3>
-            <div className="mt-1 flex items-center text-sm text-gray-500">
-              <FiUser className="w-4 h-4 mr-1.5" />
-              {intervention.client || "Client non spécifié"}
-            </div>
           </div>
-          {getStatusBadge(intervention.etatExecution)}
+          {getStatusBadge(intervention?.etatExecution)}
         </div>
+            <div className="mt-1 flex gap-2 flex-wrap items-center text-sm text-gray-500 capitalize">
+              <FiUser className="w-4 h-4 mr-1.5" />
+              {intervention?.client?.prenom || intervention?.client || "Client non spécifié"}
+              {intervention?.client?.nom && ` ${intervention?.client?.nom}`}
+            </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+          {/* Dates et heures de l'intervention */}
+        <div className="mt-4 flex justify-between items-center flex-wrap gap-3 text-sm">
           <div className="flex items-center">
             <FiCalendar className="w-4 h-4 mr-1.5 text-gray-400" />
-            <span>{formatDate(intervention.dateIntervention)}</span>
+            <span>{formatDate(intervention?.dateIntervention)}</span>
           </div>
           <div className="flex items-center">
             <FiClock className="w-4 h-4 mr-1.5 text-gray-400" />
             <span>
-              {intervention.heureDebut || "--:--"} - {intervention.heureFin || "--:--"}
+              {(intervention?.etatExecution === "non_commencee" || intervention?.etatExecution === "annulee") && formatHeure(intervention?.dateIntervention)}
+              {intervention?.etatExecution === "en_cours" && (formatHeure(intervention?.dateIntervention) + " - En cours")}
+              {intervention?.etatExecution === "terminee" && (formatHeure(intervention?.heureDebut || intervention?.dates?.debutIntervention) + ` - ${formatHeure(intervention?.heureFin || intervention?.dates?.finIntervention)}` )}
             </span>
           </div>
         </div>
@@ -163,16 +220,18 @@ export default function InterventionCard({ intervention, onRefresh }) {
           className="px-4 pb-4 border-t border-gray-200"
         >
           <div className="mt-4 space-y-3 text-sm">
+            {/* Adresse */}
             <div className="flex items-start">
               <FiMapPin className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
               <div>
                 <p className="font-medium text-gray-700">Adresse</p>
-                <p className="text-gray-600">
+                <p className="text-gray-600 line-clamp-1 capitalize">
                   {intervention.adresse || "Non spécifiée"}
                 </p>
               </div>
             </div>
 
+            {/* Description */}
             <div className="flex items-start">
               <FiFileText className="flex-shrink-0 mt-0.5 w-4 h-4 mr-1.5 text-gray-400" />
               <div>
@@ -184,6 +243,7 @@ export default function InterventionCard({ intervention, onRefresh }) {
             </div>
           </div>
 
+          {/* Statut */}
           <div className="mt-4 flex gap-2">
             {intervention.etatExecution === "non_commencee" && (
               <button
@@ -217,6 +277,17 @@ export default function InterventionCard({ intervention, onRefresh }) {
           </div>
         </motion.div>
       )}
+
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Voulez-vous vraiment ${confirmationState.action === 'commencer' ? 'démarrer' : 'terminer'} cette intervention ?`}
+        confirmText={confirmationState.action === 'commencer' ? 'Démarrer' : 'Terminer'}
+        cancelText="Annuler"
+        type={confirmationState.action === 'commencer' ? 'info' : 'success'}
+      />
     </motion.div>
   );
 }

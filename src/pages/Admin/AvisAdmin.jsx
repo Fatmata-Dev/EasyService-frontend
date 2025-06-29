@@ -58,13 +58,13 @@ const AvisAdmin = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center flex-wrap mb-8 gap-4">
           <h1 className="text-3xl font-bold text-gray-800">Tous les avis</h1>
           
           {/* Filtre par catégorie */}
-          <div className="flex items-center gap-2">
+          <div className="flex justify-center items-center flex-wrap gap-2">
             <label htmlFor="category-filter" className="font-medium text-gray-700">
-              Filtrer par catégorie:
+              Filtrer (catégorie) :
             </label>
             <select
               id="category-filter"
@@ -107,7 +107,7 @@ const AvisAdmin = () => {
             {filteredReviews?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...filteredReviews].reverse().map((review) => (
-                  console.log(review),
+                  // console.log(review),
                   <AvisCard
                     key={review._id}
                     review={{

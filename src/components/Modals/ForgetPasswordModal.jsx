@@ -15,12 +15,12 @@ export default function ForgetPasswordModal({ onClose, onSwitchToLogin }) {
       onClose(); // Fermer la modale après l'envoi de l'email
       toast.success(response?.data?.message || "Email de réinitialisation envoyé avec succès !");
     } catch (error) {
-      console.error(
+      console.error( error?.data?.message ||
         "Erreur lors de l'envoi de l'email de réinitialisation :",
         error
       );
-      setError("Erreur lors de l'envoi de l'email de réinitialisation");
-      toast.error("Erreur lors de l'envoi de l'email de réinitialisation");
+      setError(error?.data?.message || "Erreur lors de l'envoi de l'email de réinitialisation");
+      toast.error(error?.data?.message || "Erreur lors de l'envoi de l'email de réinitialisation");
     }
   };
   return (

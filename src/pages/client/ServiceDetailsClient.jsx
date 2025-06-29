@@ -6,6 +6,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { FaEdit, FaTrash, FaStar, FaRegStar, FaArrowLeft } from "react-icons/fa";
+import { FiCalendar } from "react-icons/fi";
 import { useGetUserByIdQuery } from "../../API/authApi";
 import React, { useState } from "react";
 import ReservationModal from "../../components/Modals/ReservationModal";
@@ -49,10 +50,8 @@ const ServiceDetailAdmin = () => {
   };
 
   const handleReservationClick = () => {
-    // e.preventDefault();
     setShowModal(true);
   };
-
 
   if (isLoading) {
     return (
@@ -167,7 +166,12 @@ const ServiceDetailAdmin = () => {
               <div key={feedback._id} className="bg-white p-4 rounded-lg shadow-sm border">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex justify-between items-center w-full flex-wrap gap-2">
-                    <h4 className="font-semibold">
+                    <h4 className="font-semibold text-gray-800 flex items-center gap-2">
+                      <img 
+                        src={feedback.client?.image?.url || `https://ui-avatars.com/api/?name=${feedback?.client?.prenom}+${feedback?.client?.nom}&background=random`}
+                        alt="Signature professionnelle"
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
                       <span className="capitalize">{user?.prenom || ""} {" "}{user?.nom || "Client anonyme"}</span>
                       
                     </h4>
@@ -203,9 +207,10 @@ const ServiceDetailAdmin = () => {
       <div className="flex justify-end">
           <div className="w-full">
             <button
-              className="fixed bottom-5 right-5 bg-red-500 text-white px-16 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
+              className="fixed bottom-5 right-5 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm font-medium w-fit flex items-center gap-2"
               onClick={() => handleReservationClick()}
             >
+              <FiCalendar />
               Réserver
             </button>
           </div>

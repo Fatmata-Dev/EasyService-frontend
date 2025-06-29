@@ -1,4 +1,4 @@
-import { useParams, Link, Links } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -6,10 +6,14 @@ import { parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { useAssignerDemandeMutation, useGetDemandeByIdQuery } from "../../API/demandesApi";
 import { useGetCategorieByIdQuery } from "../../API/servicesApi";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import AssignTechnicienModal from "../../components/Modals/AssignerTechnicienModal";
 import { useGetUserByIdQuery } from "../../API/authApi";
+import {
+  FiX, 
+  FiCheck
+} from "react-icons/fi";
+import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 export default function DemandeDetails() {
   const { id } = useParams();
@@ -18,11 +22,16 @@ export default function DemandeDetails() {
   const { data: categorie } = useGetCategorieByIdQuery(idCategorie, { skip: !idCategorie });
   const idUser = demande?.admin;
   const { data: admin } = useGetUserByIdQuery(idUser, { skip: !idUser });
-  console.log(demande);
+  // console.log(demande);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignerDemande] = useAssignerDemandeMutation();
   const [updateDemande] = useAssignerDemandeMutation();
   const navigate = useNavigate();
+  const [confirmationState, setConfirmationState] = useState({
+    isOpen: false,
+    action: null,
+    id: null
+  });
 
   const statusConfig = {
     en_attente: { label: "En attente", color: "bg-yellow-500" },
@@ -33,30 +42,63 @@ export default function DemandeDetails() {
     refusee: { label: "Refusée", color: "bg-gray-500" },
   };
 
-    const handleStatusChange = async (id, newStatus) => {
-      const confirmMessages = {
-        refusee: "Voulez-vous rejeter cette demande ?",
-        annulee: "Voulez-vous annuler cette demande ?",
-      };
+    // const handleStatusChange = async (id, newStatus) => {
+    //   const confirmMessages = {
+    //     refusee: "Voulez-vous rejeter cette demande ?",
+    //     annulee: "Voulez-vous annuler cette demande ?",
+    //   };
       
-      if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
+    //   if (!window.confirm(confirmMessages[newStatus] || "Confirmez-vous cette action ?")) return;
       
-      try {
-        await updateDemande({ 
-          id, 
-          body: { 
-            statut: newStatus, 
-            etatExecution: 
-            newStatus === "refusee" ? "annulee" : demande.etatExecution
-           } 
-        }).unwrap();
+    //   try {
+    //     await updateDemande({ 
+    //       id, 
+    //       body: { 
+    //         statut: newStatus, 
+    //         etatExecution: 
+    //         newStatus === "refusee" ? "annulee" : demande.etatExecution
+    //        } 
+    //     }).unwrap();
         
-        toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
-        navigate("/admin/demandes");
-      } catch (err) {
-        toast.error(err.data?.message || `Erreur lors de la modification du statut`);
-      }
-    };
+    //     toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
+    //     navigate("/admin/demandes");
+    //   } catch (err) {
+    //     toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    //   }
+    // };
+
+    const handleStatusChange = (id, action) => {
+    setConfirmationState({
+      isOpen: true,
+      action,
+      id
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    const { id, action:newStatus } = confirmationState;
+    
+    try {
+      await updateDemande({ 
+        id, 
+        body: { 
+          statut: newStatus, 
+          etatExecution: 
+          newStatus === "refusee" ? "annulee" : demande.etatExecution ||
+          newStatus === "annulee" ? "annulee" : demande.etatExecution
+         } 
+      }).unwrap();
+      
+      toast.success(`Demande ${statusConfig[newStatus].label.toLowerCase()} avec succès`);
+      // onRefresh?.();
+    } catch (err) {
+      toast.error(err.data?.message || `Erreur lors de la modification du statut`);
+    
+    } finally {
+      setConfirmationState({ isOpen: false, action: null, id: null });
+    }
+  };
+    
 
   const handleAssignSuccess = async (technicienId) => {
       try {
@@ -261,38 +303,41 @@ export default function DemandeDetails() {
       </div>
 
       <div className="p-3 border-t border-orange-200">
-              {demande.statut === "en_attente" && (
-                <div className="">
-                  <div className="flex flex-col-reverse justify-end items-end sm:flex-row gap-2 fixed bottom-5 sm:right-8 right-5">
-                    <button
-                      className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
-                      onClick={() => handleStatusChange(demande._id, "refusee")}
-                    >
-                      Refuser
-                    </button>
-                    <button
-                      className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 text-sm font-medium w-fit"
-                      onClick={() => setShowAssignModal(true)}
-                    >
-                      Accepter
-                    </button>
-                  </div>
-                </div>
-              )}
-      
-              {["acceptee", "en_cours"].includes(demande.statut) && (
-                <div className="flex justify-end">
-                  <div className="w-full">
-                    <button
-                      className="fixed bottom-5 right-5 bg-red-500 text-white px-16 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit"
-                      onClick={() => handleStatusChange(demande._id, "annulee")}
-                    >
-                      Annuler
-                    </button>
-                    </div>
-                </div>
-              )}
+        {demande.statut === "en_attente" && (
+          <div className="">
+            <div className="fixed bottom-6 right-6 flex gap-3 bg-white p-3 rounded-full shadow-lg">
+              <button
+                className="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 text-sm font-medium w-fit flex items-center"
+                onClick={() => handleStatusChange(demande._id, "refusee")}
+                title="Refuser"
+              >
+                <FiX className="text-xl" />
+              </button>
+              <button
+                className="bg-green-600 text-white p-3 rounded-full hover:bg-green-700 text-sm font-medium w-fit flex items-center"
+                onClick={() => setShowAssignModal(true)}
+                title="Accepter"
+              >
+                <FiCheck className="text-xl" />
+              </button>
             </div>
+          </div>
+        )}
+
+        {["acceptee", "en_cours"].includes(demande.statut) && (
+          <div className="flex justify-end">
+            <div className="w-full">
+              <button
+                className="fixed bottom-5 right-5 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm font-medium w-fit flex items-center"
+                onClick={() => handleStatusChange(demande._id, "annulee")}
+                title="Annuler"
+              >
+                <FiX className={`mr-2`} /> Annuler
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       
             {/* Modal d'assignation */}
             {showAssignModal && (
@@ -302,6 +347,16 @@ export default function DemandeDetails() {
                 onAssignSuccess={handleAssignSuccess}
               />
             )}
+      <ConfirmationModal
+        isOpen={confirmationState.isOpen}
+        onClose={() => setConfirmationState({ ...confirmationState, isOpen: false })}
+        onConfirm={handleConfirmAction}
+        title={`Confirmer l'action`}
+        message={`Voulez-vous vraiment ${confirmationState.action === 'refusee' ? 'refuser' : 'annuler'} cette demande ?`}
+        confirmText={confirmationState.action === 'refusee' ? 'Refuser' : 'Annuler'}
+        cancelText="Retour"
+        type={confirmationState.action === 'refusee' ? 'danger' : 'danger'}
+      />
     </div>  
   );
 }

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ServiceCardHome from "../cards/ServiceCardHome";
 import axios from "axios";
-import { FaLongArrowAltRight } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 
 const ServicesSection = () => {
   const [services, setServices] = useState([]);

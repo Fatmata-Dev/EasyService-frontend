@@ -11,11 +11,12 @@ import {
 } from "../../API/messagesApi";
 import MessageForm from "../Admin/MessageForm";
 import { FaUserCircle, FaEnvelope, FaSearch } from "react-icons/fa";
+import { useAuth } from "../../context/useAuth";
 
 const MessagesTechniciens = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const currentUser = JSON.parse(localStorage.getItem("user")) || {};
+  const currentUser = useAuth().user;
   
   // Utilisation des queries RTK Query avec revalidation automatique
   const { 
@@ -23,7 +24,7 @@ const MessagesTechniciens = () => {
     isLoading: isLoadingSent,
     error: sentMessagesError
   } = useGetSentMessagesQuery(undefined, {
-    pollingInterval: 60000 // Recharge toutes les minutes
+    pollingInterval: 50000 // Recharge toutes les minutes
   });
   
   const { 
@@ -31,7 +32,7 @@ const MessagesTechniciens = () => {
     isLoading: isLoadingReceived,
     error: receivedMessagesError
   } = useGetReceivedMessagesQuery(undefined, {
-    pollingInterval: 60000
+    pollingInterval: 50000
   });
 
   const [markAsRead] = useMarkAsReadMutation();
@@ -115,8 +116,8 @@ const MessagesTechniciens = () => {
         className="bg-white rounded-lg sm:shadow-md sm:p-6"
       >
         {/* En-tête */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 flex-wrap gap-3">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center">
             <FaEnvelope className="mr-2 text-orange-500" />
             Mes Messages ({allMessages.map((message) => isMessageUnread(message) ? 1 : 0).reduce((a, b) => a + b, 0)} non lus)
           </h1>
@@ -164,23 +165,24 @@ const MessagesTechniciens = () => {
                           <img
                             src={message?.expediteur?.photo}
                             alt={message?.expediteur?.prenom}
-                            className="w-10 h-10 rounded-full mr-3 object-cover"
+                            className="min-w-10 h-10 rounded-full mr-3 object-cover"
                           />) : (
-                            <FaUserCircle className="w-10 h-10 text-gray-400 mr-3" />
+                            <FaUserCircle className="min-w-10 h-10 text-gray-400 mr-3" />
                         )}
                         <div className="flex flex-col items-between">
                           <span>{isSender ? "Vous" : message.expediteur?.email}</span>
                           <span className="text-sm text-gray-600">{message?.titre}</span>
+                          <p className="text-sm text-gray-600 line-clamp-1 mt-1">
+                        {message.contenu}
+                      </p>
                         </div>
                         </h3>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 min-w-fit">
                           {formatDate(message.createdAt)}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-1 mt-1">
-                        {message.contenu}
-                      </p>
                     </div>
+
                     {isUnread && (
                       <span className="bg-orange-500 w-2 h-2 rounded-full ml-2 mt-1"></span>
                     )}

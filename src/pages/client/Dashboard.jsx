@@ -176,7 +176,7 @@ const Dashboard = () => {
           </h3>
           <Link
             to="/client/demandes"
-            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline hidden sm:flex"
           >
             Voir toutes <FaLongArrowAltRight />
           </Link>
@@ -241,6 +241,16 @@ const Dashboard = () => {
               ))}
           </div>
         )}
+        {demandes.length > 2 && (
+          <div className="flex justify-center mt-4 sm:hidden block">
+            <Link
+              to="/client/demandes"
+              className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+            >
+              Voir toutes <FaLongArrowAltRight />
+            </Link>
+          </div>
+        )}
       </motion.div>
 
       {/* Section Messages */}
@@ -252,7 +262,7 @@ const Dashboard = () => {
           <h3 className="text-xl font-bold text-gray-800">Derniers messages</h3>
           <Link
             to="/client/messages"
-            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline hidden sm:flex"
           >
             Voir tous <FaLongArrowAltRight />
           </Link>
@@ -294,6 +304,14 @@ const Dashboard = () => {
                 )}
               </div>
             ))}
+              <div className="flex justify-center item-center mt-2">
+                <Link
+                  to="/client/messages"
+                  className="text-orange-500 font-medium flex items-center gap-2 hover:underline sm:hidden"
+                >
+                  Voir tous <FaLongArrowAltRight />
+                </Link>
+              </div>
           </div>
         )}
       </motion.div>
@@ -307,7 +325,7 @@ const Dashboard = () => {
           <h3 className="text-xl font-bold text-gray-800">Services récents</h3>
           <Link
             to="/client/services"
-            className="text-orange-500 font-medium flex items-center gap-2 hover:underline"
+            className="text-orange-500 font-medium flex items-center gap-2 hover:underline hidden sm:flex"
           >
             Voir tous <FaLongArrowAltRight />
           </Link>
@@ -382,6 +400,14 @@ const Dashboard = () => {
                 </button>
               </div>
             )}
+              <div className="flex justify-center items-center mt-2">
+                <Link
+                  to="/client/services"
+                  className="text-orange-500 font-medium flex items-center gap-2 hover:underline sm:hidden"
+                >
+                  Tous les services <FaLongArrowAltRight />
+                </Link>
+              </div>
           </div>
         )}
       </motion.div>

@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const messagesApi = createApi({
   reducerPath: "messagesApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://easyservice-backend-iv29.onrender.com/api",
+    baseUrl: import.meta.env.VITE_Backend_URL,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("authToken");
       if (token) headers.set("Authorization", `Bearer ${token}`);
